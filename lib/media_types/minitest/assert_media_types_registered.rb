@@ -69,15 +69,15 @@ module MediaTypes
       end
 
       def create(**opts, &block)
-        view(Base::CREATE_VIEW, **opts, &block)
+        view(CREATE_VIEW, **opts, &block)
       end
 
       def collection(**opts, &block)
-        view(Base::COLLECTION_VIEW, **opts, &block)
+        view(COLLECTION_VIEW, **opts, &block)
       end
 
       def index(**opts, &block)
-        view(Base::INDEX_VIEW, **opts, &block)
+        view(INDEX_VIEW, **opts, &block)
       end
 
       def to_h
