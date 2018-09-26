@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-module Assertions
-  module MediaTypes
+module MediaTypes
+  module Assertions
     def assert_media_type_format(media_type, output, **opts)
       if media_type.collection?
         output[:_embedded].each do |embedded|
