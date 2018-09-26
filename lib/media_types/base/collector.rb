@@ -7,15 +7,15 @@ module MediaTypes
     class Collector < SimpleDelegator
 
       def index(*args, **options)
-        view(INDEX_VIEW, *args, **options)
+        view(MediaTypes::INDEX_VIEW, *args, **options)
       end
 
       def create(*args, **options, &block)
-        view(CREATE_VIEW, *args, **options, &block)
+        view(MediaTypes::CREATE_VIEW, *args, **options, &block)
       end
 
       def collection(*args, **options)
-        view(COLLECTION_VIEW, *args, **options)
+        view(MediaTypes::COLLECTION_VIEW, *args, **options)
       end
 
       def view(view, *args, **options)

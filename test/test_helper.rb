@@ -30,5 +30,5 @@ require 'minitest/autorun'
 require_relative './assertions'
 
 class Minitest::Test < Minitest::Runnable
-  include Assertions::MediaTypes
+  include MediaTypes::Assertions
 end
