@@ -11,6 +11,11 @@ module MediaTypes
       self.opts = opts
     end
 
+    def type(name = NO_ARG)
+      return opts[:type] if name == NO_ARG
+      ConstructableMimeType.new(__getobj__, **with(type: name))
+    end
+
     def version(version = NO_ARG)
       return opts[:version] if version == NO_ARG
       ConstructableMimeType.new(__getobj__, **with(version: version))
