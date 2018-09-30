@@ -217,7 +217,7 @@ module MediaTypes
     def all?(enumerable, options, &block)
       context = EnumerationContext.new(validations: validations)
 
-      if enumerable.is_a?(Hash) || enumerable.respond_to?(:key)
+      if enumerable.is_a?(Hash) || enumerable.respond_to?(:key) || force_single
         return enumerable.all? do |key, value|
           yield key, value, options: options, context: context.enumerate(key)
         end
