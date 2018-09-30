@@ -23,9 +23,10 @@ module MediaTypes
   # Media Type Schemes can validate content to a media type, by itself.
   #
   class Scheme
-    def initialize(allow_empty: false)
+    def initialize(allow_empty: false, force_single: false)
       self.validations = {}
       self.allow_empty = allow_empty
+      self.force_single = force_single
 
       validations.default = MissingValidation.new
     end
@@ -125,6 +126,14 @@ module MediaTypes
     #   end
     #
     def attribute(key, type = String, **opts, &block)
+      if block_given?
+        return collection(key, force_single: true, **opts, &block)
+      end
+
+      if type.is_a?(Scheme)
+        return validations[key] = type
+      end
+
       validations[key] = Attribute.new(type, **opts, &block)
     end
 
@@ -134,8 +143,12 @@ module MediaTypes
     #
     # @param [Boolean] allow_empty if true, empty (no key/value present) is allowed
     #
-    def any(allow_empty: false, &block)
-      scheme = Scheme.new(allow_empty: allow_empty)
+    def any(scheme = nil, force_single: false, allow_empty: false, &block)
+      unless block_given?
+        return validations.default = scheme
+      end
+
+      scheme = Scheme.new(allow_empty: allow_empty, force_single: force_single)
       scheme.instance_exec(&block)
 
       validations.default = scheme
@@ -156,8 +169,12 @@ module MediaTypes
     # @param [Symbol] key
     # @param [Boolean] allow_empty, if true accepts 0 items in an array / hash
     #
-    def collection(key, allow_empty: false, &block)
-      scheme = Scheme.new(allow_empty: allow_empty)
+    def collection(key, scheme = nil, allow_empty: false, force_single: false, &block)
+      unless block_given?
+        return validations.default = scheme
+      end
+
+      scheme = Scheme.new(allow_empty: allow_empty, force_single: force_single)
       scheme.instance_exec(&block)
 
       validations[key] = scheme
@@ -176,7 +193,7 @@ module MediaTypes
 
     private
 
-    attr_accessor :validations, :allow_empty
+    attr_accessor :validations, :allow_empty, :force_single
 
     def empty_guard!(output, options)
       return unless output.nil? || output.empty?
