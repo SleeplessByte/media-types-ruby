@@ -123,7 +123,7 @@ module MediaTypes
 
     def each_combination
       iterable(registered_versions).each do |version|
-        iterable(registered_views).each do |view, view_opts|
+        registered_views.each do |view, view_opts|
           iterable(registered_suffixes).each do |suffix|
             opts = { view: view_opts }
             yield version, view, suffix, opts
