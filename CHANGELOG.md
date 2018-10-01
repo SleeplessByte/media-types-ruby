@@ -1,3 +1,7 @@
+# 0.2.6
+
+- Change validation to accept both symbolised and stringified input ánd validations
+
 # 0.2.5
 
 - Add automatic require for `media_types/scheme/any_of`

@@ -175,10 +175,10 @@ module MediaTypes
       end
 
       if type.is_a?(Scheme)
-        return validations[key] = type
+        return validations[String(key)] = type
       end
 
-      validations[key] = Attribute.new(type, **opts, &block)
+      validations[String(key)] = Attribute.new(type, **opts, &block)
     end
 
     ##
@@ -287,10 +287,10 @@ module MediaTypes
     def collection(key, scheme = nil, allow_empty: false, force: Array, &block)
       unless block_given?
         if scheme.is_a?(Scheme)
-          return validations[key] = scheme
+          return validations[String(key)] = scheme
         end
 
-        return validations[key] = EnumerationOfType.new(
+        return validations[String(key)] = EnumerationOfType.new(
           scheme,
           enumeration_type: force,
           allow_empty: allow_empty
@@ -300,7 +300,7 @@ module MediaTypes
       scheme = Scheme.new(allow_empty: allow_empty, force: force)
       scheme.instance_exec(&block)
 
-      validations[key] = scheme
+      validations[String(key)] = scheme
     end
 
     ##
@@ -372,7 +372,7 @@ module MediaTypes
 
       if enumerable.is_a?(Hash) || enumerable.respond_to?(:key)
         return enumerable.all? do |key, value|
-          yield key, value, options: options, context: context.enumerate(key)
+          yield String(key), value, options: options, context: context.enumerate(key)
         end
       end
 
@@ -409,9 +409,9 @@ module MediaTypes
         return yield(->(_) {})
       end
 
-      exhaustive_keys = keys.dup
+      exhaustive_keys = keys.dup.map(&:to_s)
       # noinspection RubyScope
-      result = yield ->(key) { exhaustive_keys.delete(key) }
+      result = yield ->(key) { exhaustive_keys.delete(String(key)) }
       return result if exhaustive_keys.empty?
 
       raise_exhausted!(missing_keys: exhaustive_keys, backtrace: options.backtrace)
