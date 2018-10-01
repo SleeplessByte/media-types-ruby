@@ -1,3 +1,7 @@
+# 0.2.5
+
+- Add automatic require for `media_types/scheme/any_of`
+
 # 0.2.4
 
 - Change messages for `assert_media_types_registered` to be more informative and consistent.

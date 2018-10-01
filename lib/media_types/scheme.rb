@@ -4,6 +4,7 @@ require 'media_types/scheme/validation_options'
 require 'media_types/scheme/enumeration_context'
 
 require 'media_types/scheme/allow_nil'
+require 'media_types/scheme/any_of'
 require 'media_types/scheme/attribute'
 require 'media_types/scheme/enumeration_of_type'
 require 'media_types/scheme/links'
