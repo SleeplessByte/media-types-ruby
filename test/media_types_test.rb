@@ -9,8 +9,14 @@ class MediaTypesTest < Minitest::Test
 
   def test_it_requires
     %i[
-      Base
+      Constructable
+      Defaults
+      Dsl
+      Hash
+      Object
+      Registrar
       Scheme
+      Validations
     ].each do |klazz|
       assert MediaTypes.const_defined?(klazz),
              format('Expected %<klazz>s to be required', klazz: klazz)

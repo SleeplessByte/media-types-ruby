@@ -24,7 +24,7 @@ Or install it yourself as:
 
 By default there are no media types registered or defined, except for an abstract base type.
 
-### Definition
+## Definition
 You can define media types by inheriting from this base type, or create your own base type with a class method
 `.base_format` that is used to create the final media type string by injecting formatted parameters:
 
@@ -37,9 +37,9 @@ You can define media types by inheriting from this base type, or create your own
 require 'media_types'
 
 class Venue < MediaTypes::Base
-  media_type 'venue', suffix: :json, current_version: 2
+  media_type 'venue', defaults: { suffix: :json, version: 2 }
 
-  current_scheme do
+  validations do
     attribute :name, String
     collection :location do
       attribute :latitude, Numeric
@@ -49,22 +49,41 @@ class Venue < MediaTypes::Base
 
     link :self
     link :route, allow_nil: true
-  end
-
-  register_types :venue_json do
-    create     :create_venue_json
-    index      :venue_urls_json
-    collection :venue_collection_json
-  end
-
-  register_additional_versions do
+    
     version 1 do
       attribute :name, String
       attribute :coords, String
       attribute :updated_at, String
-
+    
       link :self
     end
+    
+    view 'create' do
+      collection :location do
+        attribute :latitude, Numeric
+        attribute :longitude, Numeric
+        attribute :altitude, AllowNil(Numeric)
+      end
+      
+      version 1 do
+        collection :location do
+          attribute :latitude, Numeric
+          attribute :longitude, Numeric
+          attribute :altitude, AllowNil(Numeric)
+        end
+      end
+    end
+  end
+
+  registrations :venue_json do
+    view 'create', :create_venue
+    view 'index', :venue_urls
+    view 'collection', :venue_collection
+    
+    versions [1,2]
+    
+    suffix :json
+    suffix :xml
   end
   
   def self.base_format
@@ -73,26 +92,201 @@ class Venue < MediaTypes::Base
 end
 ```
 
-### Schema Definitions
+## Schema Definitions
 
 If you define a scheme using `current_scheme { }`, you may use any of the following dsl:
 
-- `attribute(string, klazz)`: Adds an attribute to the scheme, with the type `klazz`
-- `any(&block)`: Allow for any key, which then is validated against the block (which is a scheme).
-- `collection(string, &block)`: Expect a collection such as an array or hash. If it's an array, each item is validated
-against the block (which is a scheme). If it's a hash, the hash is validated against the block. If you want to force an
-array or an object, prepend the collection by `attribute(string, Hash)` or `attribute(string, Array)`.
-- `no_strict`: Can be added to a `scheme` such as the root, block inside `any` or block inside `collection` to allow for
-undefined keys. If `no_strict` is not added, the block will not be valid if there are extra keys.
-- `link(string)`: Example of a domain type. Each link is actually added to a scheme for `_links` on the current scheme.
+### `attribute`
 
-If you want to compose types, you can wrap a klazz in `AllowNil(klazz)` to allow for nil values. This makes a validation
-expected that klass, or nil.
+Adds an attribute to the schema, if a +block+ is given, uses that to test against instead of +type+
 
-You an add your own DSL by inspecting the `lib/media_types/scheme/<klazz>` classes.
+| param | type | description |
+|-------|------|-------------|
+| key | `Symbol` | the attribute name |
+| opts | `Hash` | options to pass to `Scheme` or `Attribute` |
+| type | `Class`, `===`, Scheme | The type of the value, can be anything that responds to `===`,  or scheme to use if no `&block` is given. Defaults to `String` without a `&block` and to Hash with a `&block`. |
+| &block | `Block` | defines the scheme of the value of this attribute |
 
-### Validation
-If your type has a schema, you can now use this media type for validation:
+#### Add an attribute named foo, expecting a string
+```Ruby
+require 'media_types'
+
+class MyMedia
+  include MediaTypes::Dsl
+
+  validations do
+    attribute :foo, String
+  end
+end
+
+MyMedia.valid?({ foo: 'my-string' })
+# => true
+```
+
+####  Add an attribute named foo, expecting nested scheme
+
+```Ruby
+class MyMedia
+ include MediaTypes::Dsl
+
+ validations do
+   attribute :foo do
+     attribute :bar, String
+   end
+ end
+end
+
+MyMedia.valid?({ foo: { bar: 'my-string' }})
+# => true
+```
+
+### `any`
+Allow for any key. The `&block` defines the Schema for each value.
+
+| param | type | description |
+|-------|------|-------------|
+| scheme | `Scheme`, `NilClass` | scheme to use if no `&block` is given |
+| allow_empty: | `TrueClass`, `FalsClass` | if true, empty (no key/value present) is allowed |
+| force: | `Class`, | forces the validated value to have this type, defaults to `Hash` |
+| &block | `Block` | defines the scheme of the value of this attribute |
+
+#### Add a collection named foo, expecting any key with a defined value
+```Ruby
+class MyMedia
+ include MediaTypes::Dsl
+
+ validations do
+   collection :foo do
+     any do
+       attribute :bar, String
+     end
+   end
+ end
+end
+
+MyMedia.valid?({ foo: [{ anything: { bar: 'my-string' }, other_thing: { bar: 'other-string' } }] })
+# => true
+```` 
+
+### `not_strict`
+Allow for extra keys in the schema/collection even when passing `strict: true` to `#validate!`
+
+#### Allow for extra keys in collection
+
+```Ruby
+class MyMedia
+ include MediaTypes::Dsl
+
+ validations do
+   collection :foo do
+     attribute :required, String
+     not_strict
+   end
+ end
+end
+
+MyMedia.valid?({ foo: [{ required: 'test', bar: 42 }] })
+# => true
+``` 
+  
+### `collection`
+Expect a collection such as an array or hash. The `&block` defines the Schema for each item in that collection.
+
+| param | type | description |
+|-------|------|-------------|
+| key | `Symbol` | key of the collection (same as `#attribute`) |
+| scheme | `Scheme`, `NilClass`, `Class` | scheme to use if no `&block` is given or `Class` of each item in the  |
+| allow_empty: | `TrueClass`, `FalsClass` | if true, empty (no key/value present) is allowed |
+| force: | `Class`, | forces the validated value to have this type, defaults to `Array` |
+| &block | `Block` | defines the scheme of the value of this attribute |
+
+
+#### Collection with an array of string
+```Ruby
+class MyMedia
+ include MediaTypes::Dsl
+
+ validations do
+   collection :foo, String
+ end
+end
+
+MyMedia.valid?({ collection: ['foo', 'bar'] })
+# => true
+```
+
+#### Collection with defined scheme
+
+```Ruby
+class MyMedia
+ include MediaTypes::Dsl
+
+ validations do
+   collection :foo do
+     attribute :required, String
+     attribute :number, Numeric
+   end
+ end
+end
+
+MyMedia.valid?({ foo: [{ required: 'test', number: 42 }, { required: 'other', number: 0 }] })
+# => true
+```
+
+### `link`
+
+Expect a link
+
+#### Links as defined in HAL, JSON-Links and other specs
+```Ruby
+class MyMedia
+  include MediaTypes::Dsl
+
+  validations do
+    link :_self
+    link :image
+  end
+end
+
+MyMedia.valid?({ _links: { self: { href: 'https://example.org/s' }, image: { href: 'https://image.org/i' }} })
+# => true
+```
+
+
+#### Link with extra attributes
+```Ruby
+class MyMedia
+  include MediaTypes::Dsl
+
+  validations do
+    link :image do
+      attribute :templated, TrueClass
+    end
+  end
+end
+
+MyMedia.valid?({ _links: { self: { href: 'https://example.org/s' }, image: { href: 'https://image.org/i' }} })
+# => true
+```
+
+#### Link with extra attributes
+```Ruby
+class MyMedia
+ include MediaTypes::Dsl
+
+ validations do
+   link :image do
+     attribute :templated, TrueClass
+   end
+ end
+end
+
+MyMedia.valid?({ _links: { image: { href: 'https://image.org/{md5}', templated: true }} })
+# => true
+```
+
+## Validation
+If your type has a validations, you can now use this media type for validation:
 
 ```Ruby
 Venue.valid?({ ... })
@@ -102,11 +296,10 @@ Venue.validate!({ ... })
 # => raises if it's not valid
 ```
 
-### Formatting for headers
+## Formatting for headers
 Any media type object can be coerced in valid string to be used with `Content-Type` or `Accept`:
 
 ```Ruby
-
 Venue.mime_type.to_s
 # => "application/vnd.mydomain.venue.v2+json"
 
@@ -126,7 +319,11 @@ Venue.mime_type.view('active').to_s
 # => "application/vnd.mydomain.venue.v2.active+json"
 ```
 
-### Register in Rails or Rack
+## Register in Rails or Rack
+Define a `registrations` block on your media type, indicating the symbol for the base type (`registrations :symbol do`)
+and inside use the registrations dsl to define which media types to register. `versions array_of_numbers` determines which versions, 
+`suffix name` adds a suffix, `type_alias name` adds an alias and `view name, symbol` adds a view.
+
 As long as `action_dispatch` is available, you can register the mime type with `action_dispatch/http/mime_type`:
 ```Ruby
 Venue.register
@@ -147,4 +344,4 @@ push the `.gem` file to rubygems.org.
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at [SleeplessByte/media_types-ruby](https://github.com/SleeplessByte/media_types-ruby)
+Bug reports and pull requests are welcome on GitHub at [SleeplessByte/media-types-ruby](https://github.com/SleeplessByte/media-types-ruby)

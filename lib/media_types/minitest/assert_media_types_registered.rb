@@ -106,10 +106,10 @@ module MediaTypes
       uncalled = expected_types_hash.dup
 
       uncalled.length.times do
-        mock.expect(:call, nil) do |arguments|
-          type = arguments.fetch(:mime_type)
-          symbol = arguments.fetch(:symbol)
-          synonyms = arguments.fetch(:synonyms)
+        mock.expect(:call, nil) do |registerable|
+          type = registerable.to_s
+          symbol = registerable.to_sym
+          synonyms = registerable.synonyms
 
           options = uncalled.delete(type)
           options && options == [symbol, synonyms] || raise(

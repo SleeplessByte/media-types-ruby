@@ -4,7 +4,7 @@ require 'delegate'
 require 'singleton'
 
 module MediaTypes
-  class ConstructableMimeType < SimpleDelegator
+  class Constructable < SimpleDelegator
 
     def initialize(klazz, **opts)
       super klazz
@@ -13,22 +13,22 @@ module MediaTypes
 
     def type(name = NO_ARG)
       return opts[:type] if name == NO_ARG
-      ConstructableMimeType.new(__getobj__, **with(type: name))
+      Constructable.new(__getobj__, **with(type: name))
     end
 
     def version(version = NO_ARG)
       return opts[:version] if version == NO_ARG
-      ConstructableMimeType.new(__getobj__, **with(version: version))
+      Constructable.new(__getobj__, **with(version: version))
     end
 
     def view(view = NO_ARG)
       return opts[:view] if view == NO_ARG
-      ConstructableMimeType.new(__getobj__, **with(view: view))
+      Constructable.new(__getobj__, **with(view: view))
     end
 
     def suffix(suffix = NO_ARG)
       return opts[:suffix] if suffix == NO_ARG
-      ConstructableMimeType.new(__getobj__, **with(suffix: suffix))
+      Constructable.new(__getobj__, **with(suffix: suffix))
     end
 
     def collection
