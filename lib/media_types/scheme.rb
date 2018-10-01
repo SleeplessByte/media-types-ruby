@@ -220,6 +220,16 @@ module MediaTypes
     end
 
     ##
+    # Merges a +scheme+ into this scheme without changing the incoming +scheme+
+    #
+    # @param [Scheme] scheme the scheme to merge into this
+    #
+    def merge(scheme, &block)
+      self.validations = validations.merge(scheme.send(:validations).dup)
+      instance_exec(&block) if block_given?
+    end
+
+    ##
     # Allow for extra keys in the schema/collection even when passing strict: true to #validate!
     #
     # @see Scheme::NotStrict

@@ -1,3 +1,7 @@
+# 0.3.0
+
+- Add `merge` dsl to merge two `Scheme`
+
 # 0.2.6
 
 - Change validation to accept both symbolised and stringified input ánd validations
@@ -8,11 +12,11 @@
 
 # 0.2.4
 
-- Change messages for `assert_media_types_registered` to be more informative and consistent.
+- Change messages for `assert_media_types_registered` to be more informative and consistent
 
 # 0.2.3
 
-- Fix an issue with `Hash#compact` which was introduce in 2.4+. Now works with Ruby 2.3.
+- Fix an issue with `Hash#compact` which was introduce in 2.4+. Now works with Ruby 2.3
 
 # 0.2.2
 

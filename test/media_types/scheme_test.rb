@@ -69,7 +69,8 @@ module MediaTypes
           end
 
           version 2 do
-            attribute :bar, Numeric
+            attribute :foo, String
+            merge find(TestMediaType.to_constructable.view('create').version(1))
           end
         end
       end

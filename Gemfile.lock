@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    media_types (0.2.6)
+    media_types (0.3.0)
 
 GEM
   remote: https://rubygems.org/
