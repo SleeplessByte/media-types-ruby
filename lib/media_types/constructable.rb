@@ -89,7 +89,7 @@ module MediaTypes
     def valid?(output, **validation_opts)
       __getobj__.valid?(
         output,
-        version: opts[:version],
+        self,
         **validation_opts
       )
     end
@@ -97,7 +97,7 @@ module MediaTypes
     def validate!(output, **validation_opts)
       __getobj__.validate!(
         output,
-        version: opts[:version],
+        self,
         **validation_opts
       )
     end
