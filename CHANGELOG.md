@@ -1,3 +1,7 @@
+# 0.2.4
+
+- Change messages for `assert_media_types_registered` to be more informative and consistent.
+
 # 0.2.3
 
 - Fix an issue with `Hash#compact` which was introduce in 2.4+. Now works with Ruby 2.3.

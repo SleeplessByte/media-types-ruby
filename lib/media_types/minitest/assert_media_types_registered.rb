@@ -105,6 +105,8 @@ module MediaTypes
       mock = Minitest::Mock.new
       uncalled = expected_types_hash.dup
 
+      failed = []
+
       uncalled.length.times do
         mock.expect(:call, nil) do |registerable|
           type = registerable.to_s
@@ -112,20 +114,24 @@ module MediaTypes
           synonyms = registerable.synonyms
 
           options = uncalled.delete(type)
-          options && options == [symbol, synonyms] || raise(
-            MockExpectationError,
-            format(
-              'Called with [type: %<type>s, symbol: %<symbol>s, synonyms: %<synonyms>s]' + "\n"\
-              'Resolved options: [%<resolved>s]' + "\n"\
-              'Uncalled options: [%<uncalled>s]',
-              type: type,
-              symbol: symbol,
-              synonyms: synonyms,
-              resolved: options,
-              uncalled: uncalled
+          return true if options && options == [symbol, synonyms] && pass
+
+          failed <<
+            MockExpectationError.new(
+              format(
+                'Call failed to match expectations:' + "\n"\
+                '+++ actual [type: %<type>s, symbol: %<symbol>s, synonyms: %<synonyms>s]' + "\n"\
+                '--- expected [type: %<type>s, symbol: %<resolved_symbol>s, synonyms: %<resolved_synonyms>s]',
+                type: type,
+                symbol: symbol,
+                synonyms: synonyms,
+                resolved_symbol: options&.first,
+                resolved_synonyms: options&.last
+              )
             )
-          )
         end
+
+        false
       end
 
       MediaTypes.stub(:register, mock) do
@@ -136,7 +142,24 @@ module MediaTypes
         end
       end
 
-      assert_mock mock
+      messages = failed.map(&:message)
+      uncalled.each do |type, options|
+        messages << format(
+          'Call did not occur:' + "\n"\
+          '--- expected: [type: %<type>s, symbol: %<resolved_symbol>s, synonyms: %<resolved_synonyms>s]',
+          type: type,
+          resolved_symbol: options&.first,
+          resolved_synonyms: options&.last
+        )
+      end
+
+      if messages.length.positive?
+        flunk messages.join(",\n")
+      else
+        pass
+      end
+
+      assert mock
     end
     # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
   end
