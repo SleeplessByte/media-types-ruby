@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
 
   spec.summary       = 'Library to create media type definitions, schemes and validations'
   spec.description   = 'Media Types as mime types are not easily supported by frameworks such as rails. '
-  spec.homepage      = 'https://github.com/SleeplessBytes/media-types-ruby'
+  spec.homepage      = 'https://github.com/SleeplessByte/media-types-ruby'
 
   # Specify which files should be added to the gem when it is released.
   # The `git ls-files -z` loads the files in the RubyGem that have been added into git.

@@ -1,3 +1,12 @@
+# 0.2.2
+
+- Fix an issue with `Registrar#versions`
+- Fix link in the gemspec to Github
+
+# 0.2.1
+
+- Fix an issue with `Constructable#valid?` and `Constructable#validate!` 
+
 # 0.2.0
 
 Breaking changes to update public API and usage

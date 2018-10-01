@@ -3,7 +3,7 @@
 require_relative '../test_helper'
 
 module MediaTypes
-  class BaseTest < Minitest::Test
+  class ExampleTest < Minitest::Test
 
     include MediaTypes::Assertions
 
@@ -30,7 +30,7 @@ module MediaTypes
 
         type_alias 'test.alias'
 
-        versions((1...2).to_a)
+        versions(*(1...2).to_a)
 
         suffix :json
         suffix :xml

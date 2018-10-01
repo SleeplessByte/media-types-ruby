@@ -84,10 +84,10 @@ module MediaTypes
     ##
     # Registers +versions+
     #
-    # @param [*Numeric, Array<Numeric>] versions the versions to register
+    # @param [*Numeric] versions the versions to register
     #
     def versions(*versions)
-      registered_versions.push(*Array(versions))
+      registered_versions.push(*versions)
       self
     end
 
