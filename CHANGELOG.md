@@ -1,3 +1,7 @@
+# 0.4.1
+
+- Use strings for `:_links`, matching the other validation keys
+
 # 0.4.0
 
 - Simplify `assert_media_type_format` by dumping views completely

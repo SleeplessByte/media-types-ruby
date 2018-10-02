@@ -12,13 +12,13 @@ module MediaTypes
         scheme.attribute :href, String, allow_nil: allow_nil
         scheme.instance_exec(&block) if block_given?
 
-        links[key] = scheme
+        links[String(key)] = scheme
       end
 
       def validate!(output, options, **_opts)
         links.all? do |key, value|
           value.validate!(
-            output[key],
+            output[key] || output[key.to_sym],
             options.trace(key).exhaustive!
           )
         end

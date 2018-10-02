@@ -344,9 +344,9 @@ module MediaTypes
     #   # => true
     #
     def link(*args, **opts, &block)
-      validations.fetch(:_links) do
+      validations.fetch('_links') do
         Links.new.tap do |links|
-          validations[:_links] = links
+          validations['_links'] = links
         end
       end.link(*args, **opts, &block)
     end
