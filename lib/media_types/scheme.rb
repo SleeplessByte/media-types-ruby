@@ -58,12 +58,14 @@ module MediaTypes
     #
     # @see MissingValidation
     #
-    def initialize(allow_empty: false, force: nil)
+    def initialize(allow_empty: false, force: nil, &block)
       self.validations = {}
       self.allow_empty = allow_empty
       self.force = force
 
       validations.default = MissingValidation.new
+
+      instance_exec(&block) if block_given?
     end
 
     ##
@@ -213,10 +215,7 @@ module MediaTypes
         return validations.default = scheme
       end
 
-      scheme = Scheme.new(allow_empty: allow_empty, force: force)
-      scheme.instance_exec(&block)
-
-      validations.default = scheme
+      validations.default = Scheme.new(allow_empty: allow_empty, force: force, &block)
     end
 
     ##
@@ -225,7 +224,7 @@ module MediaTypes
     # @param [Scheme] scheme the scheme to merge into this
     #
     def merge(scheme, &block)
-      self.validations = validations.merge(scheme.send(:validations).dup)
+      self.validations = validations.merge(scheme.send(:validations).clone)
       instance_exec(&block) if block_given?
     end
 
@@ -307,10 +306,7 @@ module MediaTypes
         )
       end
 
-      scheme = Scheme.new(allow_empty: allow_empty, force: force)
-      scheme.instance_exec(&block)
-
-      validations[String(key)] = scheme
+      validations[String(key)] = Scheme.new(allow_empty: allow_empty, force: force, &block)
     end
 
     ##
@@ -419,7 +415,7 @@ module MediaTypes
         return yield(->(_) {})
       end
 
-      exhaustive_keys = keys.dup.map(&:to_s)
+      exhaustive_keys = keys.clone.map(&:to_s)
       # noinspection RubyScope
       result = yield ->(key) { exhaustive_keys.delete(String(key)) }
       return result if exhaustive_keys.empty?

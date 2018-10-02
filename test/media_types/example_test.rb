@@ -4,9 +4,6 @@ require_relative '../test_helper'
 
 module MediaTypes
   class ExampleTest < Minitest::Test
-
-    include MediaTypes::Assertions
-
     class TestMediaType
       include MediaTypes::Dsl
 

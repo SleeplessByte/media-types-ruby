@@ -1,3 +1,11 @@
+# 0.4.0
+
+- Simplify `assert_media_type_format` by dumping views completely
+- Add test for `merge`
+- Add test for nested blocks in `validations` using `view` and `version` nesting
+- Add test for `validatable?`
+- Add block passing to `Scheme.new`
+
 # 0.3.0
 
 - Add `merge` dsl to merge two `Scheme`

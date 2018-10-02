@@ -4,7 +4,8 @@ require_relative '../test_helper'
 
 module MediaTypes
   class SchemeTest < Minitest::Test
-    class TestMediaType
+
+    class TestSchemeType
       include MediaTypes::Dsl
 
       def self.base_format
@@ -70,7 +71,7 @@ module MediaTypes
 
           version 2 do
             attribute :foo, String
-            merge find(TestMediaType.to_constructable.view('create').version(1))
+            merge find(TestSchemeType.to_constructable.view('create').version(1))
           end
         end
       end
@@ -80,13 +81,15 @@ module MediaTypes
         view 'collection', :my_medias
         view 'create', :create_my_media
 
-        versions((1..2).to_a)
+        versions 1, 2
 
         type_alias 'scheme.alias'
 
         suffix :xml
         suffix :json
       end
+
+      freeze
     end
 
     PASSING_DATA = {
@@ -122,68 +125,107 @@ module MediaTypes
     }.freeze
 
     def test_it_validates
-      assert TestMediaType.valid?(PASSING_DATA)
-      assert TestMediaType.validate!(PASSING_DATA)
+      assert TestSchemeType.valid?(PASSING_DATA)
+      assert TestSchemeType.validate!(PASSING_DATA)
+
+      assert_media_type_format TestSchemeType, PASSING_DATA
+    end
+
+    def test_it_validates_constructable
+      assert TestSchemeType.to_constructable.validate!(PASSING_DATA)
+      assert TestSchemeType.to_constructable.valid?(PASSING_DATA)
+
+      assert_media_type_format TestSchemeType.to_constructable, PASSING_DATA
+    end
+
+    def test_it_is_validatable
+      assert TestSchemeType.validatable?
+      assert TestSchemeType.to_constructable.validatable?
+    end
+
+    def test_unknown_view_is_not_validatable
+      refute TestSchemeType.to_constructable.view('x').validatable?
+    end
+
+    def test_unknown_view_validates
+      assert TestSchemeType.to_constructable.view('x').valid?(PASSING_DATA)
+      assert TestSchemeType.to_constructable.view('x').validate!(PASSING_DATA)
+      assert_media_type_format TestSchemeType.to_constructable.view('x'), nil
+    end
+
+    def test_nested_validations
+      assert_media_type_format(
+        TestSchemeType.to_constructable.view('create').version(1),
+        bar: 'version1'
+      )
+    end
+
+    def test_merge
+      assert_media_type_format(
+        TestSchemeType.to_constructable.view('create').version(2),
+        foo: 'merging with',
+        bar: 'version1'
+      )
     end
 
     def test_it_is_strict_by_default
       assert_raises Scheme::StrictValidationError do
-        TestMediaType.validate!(PASSING_DATA.dup.merge(boom: 'chakalaka'))
+        TestSchemeType.validate!(PASSING_DATA.dup.merge(boom: 'chakalaka'))
       end
     end
 
     def test_it_is_exhaustive_by_default
       assert_raises Scheme::ExhaustedOutputError do
-        TestMediaType.validate!(MediaTypes::Hash.new(PASSING_DATA.dup).slice(:str, :maybe_num))
+        TestSchemeType.validate!(MediaTypes::Hash.new(PASSING_DATA.dup).slice(:str, :maybe_num))
       end
     end
 
     def test_it_allows_nil_with_wrapper
-      assert TestMediaType.validate!(PASSING_DATA.dup.merge(maybe_num: nil))
+      assert TestSchemeType.validate!(PASSING_DATA.dup.merge(maybe_num: nil))
     end
 
     def test_it_allows_nil_with_option
-      assert TestMediaType.validate!(PASSING_DATA.dup.merge(maybe_object: nil))
+      assert TestSchemeType.validate!(PASSING_DATA.dup.merge(maybe_object: nil))
     end
 
     def test_it_fails_on_empty_collection
       assert_raises Scheme::ValidationError do
-        TestMediaType.validate!(PASSING_DATA.dup.merge(collection: []))
+        TestSchemeType.validate!(PASSING_DATA.dup.merge(collection: []))
       end
     end
 
     def test_it_fails_on_empty_open_collection
       assert_raises Scheme::ValidationError do
-        TestMediaType.validate!(PASSING_DATA.dup.merge(open_collection: []))
+        TestSchemeType.validate!(PASSING_DATA.dup.merge(open_collection: []))
       end
     end
 
     def test_it_allows_empty_collection_with_option
-      assert TestMediaType.validate!(PASSING_DATA.dup.merge(maybe_empty_collection: []))
+      assert TestSchemeType.validate!(PASSING_DATA.dup.merge(maybe_empty_collection: []))
     end
 
     def test_it_fails_on_empty_non_strict_collection
       assert_raises Scheme::ValidationError do
-        TestMediaType.validate!(PASSING_DATA.dup.merge(collection_with_unknown_keys: {}))
+        TestSchemeType.validate!(PASSING_DATA.dup.merge(collection_with_unknown_keys: {}))
       end
     end
 
     def test_it_fails_on_incorrect_attribute_type
       assert_raises Scheme::ValidationError do
-        TestMediaType.validate!(PASSING_DATA.dup.merge(str: 42))
+        TestSchemeType.validate!(PASSING_DATA.dup.merge(str: 42))
       end
     end
 
     def test_it_fails_on_single_collection_value
       assert_raises Scheme::ValidationError do
-        TestMediaType.validate!(PASSING_DATA.dup.merge(key_with_defined_scheme: [{ defined: 'me' }]))
+        TestSchemeType.validate!(PASSING_DATA.dup.merge(key_with_defined_scheme: [{ defined: 'me' }]))
       end
     end
 
     def test_it_allows_for_versioned_validation
-      assert TestMediaType.validate!(
+      assert TestSchemeType.validate!(
         MediaTypes::Hash.new(PASSING_DATA.dup).slice(:str),
-        TestMediaType.to_constructable.version(1)
+        TestSchemeType.to_constructable.version(1)
       )
     end
   end

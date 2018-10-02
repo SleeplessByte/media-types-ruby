@@ -38,8 +38,10 @@ module MediaTypes
     # @param [lambda] default the lambda if nothing can be found
     # @return [Scheme] the scheme for the given +media_type+
     #
-    def find(media_type, default = -> { Scheme::NotStrict.new })
-      registry.fetch(String(media_type)) { default.call }
+    def find(media_type, default = -> { Scheme.new(allow_empty: true) { not_strict } })
+      registry.fetch(String(media_type)) do
+        default.call
+      end
     end
 
     def method_missing(method_name, *arguments, &block)

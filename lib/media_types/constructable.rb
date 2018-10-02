@@ -77,13 +77,16 @@ module MediaTypes
 
     def to_str(qualifier = nil)
       # TODO: remove warning by slicing out these arguments if they don't appear in the format
-      qualified(qualifier, @to_str ||= format(
-        opts.fetch(:format),
-        version: opts.fetch(:version),
-        suffix: opts.fetch(:suffix) { :json },
-        type: opts.fetch(:type),
-        view: format_view(opts[:view])
-      ))
+      qualified(
+        qualifier,
+        format(
+          opts.fetch(:format),
+          version: opts.fetch(:version),
+          suffix: opts.fetch(:suffix) { :json },
+          type: opts.fetch(:type),
+          view: format_view(opts[:view])
+        )
+      )
     end
 
     def valid?(output, **validation_opts)
@@ -102,6 +105,10 @@ module MediaTypes
       )
     end
 
+    def validatable?
+      __getobj__.validatable?(self)
+    end
+
     alias inspect to_str
     alias to_s to_str
 
@@ -116,7 +123,7 @@ module MediaTypes
     attr_accessor :opts
 
     def with(more_opts)
-      Hash(opts).merge(more_opts).dup
+      Hash(opts).clone.merge(more_opts)
     end
 
     def qualified(qualifier, media_type)

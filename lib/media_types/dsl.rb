@@ -21,7 +21,9 @@ module MediaTypes
     module ClassMethods
 
       def to_constructable
-        media_type_constructable.dup
+        media_type_constructable.dup.tap do |constructable|
+          constructable.__setobj__(self)
+        end
       end
 
       def valid?(output, media_type = to_constructable, **opts)
@@ -30,6 +32,10 @@ module MediaTypes
 
       def validate!(output, media_type = to_constructable, **opts)
         validations.find(String(media_type)).validate(output, backtrace: ['.'], **opts)
+      end
+
+      def validatable?(media_type = to_constructable)
+        validations.find(String(media_type), -> { nil })
       end
 
       def register
@@ -42,23 +48,25 @@ module MediaTypes
       private
 
       def media_type(name, defaults: {})
-        self.media_type_constructable =
-          Constructable.new(self, format: base_format, type: name)
-                       .version(defaults.fetch(:version) { nil })
-                       .suffix(defaults.fetch(:suffix) { nil })
-                       .view(defaults.fetch(:view) { nil })
+        self.media_type_constructable = Constructable.new(self, format: base_format, type: name)
+                                                     .version(defaults.fetch(:version) { nil })
+                                                     .suffix(defaults.fetch(:suffix) { nil })
+                                                     .view(defaults.fetch(:view) { nil })
       end
 
       def defaults(&block)
+        return media_type_constructable unless block_given?
         self.media_type_constructable = Defaults.new(to_constructable, &block).to_constructable
       end
 
       def registrations(symbol = nil, &block)
-        self.media_type_registrar = media_type_registrar || Registrar.new(self, symbol: symbol, &block)
+        return media_type_registrar unless block_given?
+        self.media_type_registrar = Registrar.new(self, symbol: symbol, &block)
       end
 
       def validations(&block)
-        self.media_type_validations = media_type_validations || Validations.new(to_constructable, &block)
+        return media_type_validations unless block_given?
+        self.media_type_validations = Validations.new(to_constructable, &block)
       end
     end
   end

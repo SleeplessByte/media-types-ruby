@@ -3,17 +3,7 @@
 module MediaTypes
   module Assertions
     def assert_media_type_format(media_type, output, **opts)
-      if media_type.collection?
-        output[:_embedded].each do |embedded|
-          assert_media_type_format(media_type.view(nil), embedded, **opts)
-        end
-        return
-      end
-
-      if media_type.index?
-        return output[:_index] # TODO: sub_schema the "self" link
-      end
-
+      return pass unless media_type.validatable?
       assert media_type.validate!(output, **opts)
     end
   end
