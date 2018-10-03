@@ -37,6 +37,10 @@ You can define media types by inheriting from this base type, or create your own
 require 'media_types'
 
 class Venue < MediaTypes::Base
+  def self.base_format
+    'application/vnd.mydomain.%<type>s.v%<version>.s%<view>s+%<suffix>s'
+  end
+  
   media_type 'venue', defaults: { suffix: :json, version: 2 }
 
   validations do
@@ -84,10 +88,6 @@ class Venue < MediaTypes::Base
     
     suffix :json
     suffix :xml
-  end
-  
-  def self.base_format
-    'application/vnd.mydomain.%<type>s.v%<version>.s%<view>s+%<suffix>s'
   end
 end
 ```
