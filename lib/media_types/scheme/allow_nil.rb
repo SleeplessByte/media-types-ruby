@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'delegate'
+require 'media_types/scheme/any_of'
 
 module MediaTypes
   class Scheme

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'media_types/scheme/errors'
+
 module MediaTypes
   class Scheme
     class MissingValidation

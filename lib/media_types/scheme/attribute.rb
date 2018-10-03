@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require 'media_types/scheme/errors'
+require 'media_types/scheme/allow_nil'
+
 module MediaTypes
   class Scheme
     class Attribute
@@ -14,7 +17,7 @@ module MediaTypes
       # @param [TrueClass, FalseClass] allow_nil if true, nil? is allowed
       #
       def initialize(type, allow_nil: false)
-        self.type = allow_nil ? AllowNil(type) : type
+        self.type = allow_nil ? Scheme.AllowNil(type) : type
 
         freeze
       end

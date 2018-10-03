@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'media_types/scheme/missing_validation'
+
 module MediaTypes
   class Scheme
     class Rules < DelegateClass(::Hash)

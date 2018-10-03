@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'media_types/scheme/rules'
+require 'media_types/scheme/rules_exhausted_guard'
 
 module MediaTypes
   class Scheme
