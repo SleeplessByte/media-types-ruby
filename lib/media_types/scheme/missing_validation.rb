@@ -12,11 +12,18 @@ module MediaTypes
 
       def raise_strict!(key:, backtrace:, strict_keys:)
         raise StrictValidationError, format(
-          'Unknown key %<key>s in output at [%<backtrace>s]. Expected one of: %<strict_keys>s',
+          "Unknown key %<key>s in data.\n" \
+          "\tFound at: %<backtrace>s\n" \
+          "\tExpected:\n\n" \
+          '%<strict_keys>s',
           key: key.inspect,
           backtrace: backtrace.join('->'),
-          strict_keys: strict_keys
+          strict_keys: strict_keys.inspect(1)
         )
+      end
+
+      def inspect
+        '((raise when strict))'
       end
 
     end

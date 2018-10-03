@@ -45,6 +45,14 @@ module MediaTypes
         self
       end
 
+      ##
+      # Returns the keys that are not options
+      #
+      # @see #add
+      # #see #merge
+      #
+      # @return [Array<Symbol>] required keys
+      #
       def required
         clone.tap do |cloned|
           optional_keys.each do |key|
@@ -59,13 +67,38 @@ module MediaTypes
         end
       end
 
+      ##
+      # Merges another set of rules into a clone of this one
+      #
+      # @param [Rules, ::Hash] the other rules
+      # @return [Rules] a clone
+      #
       def merge(rules)
-        __getobj__.merge!(rules)
-        self
+        clone.instance_exec do
+          __setobj__(__getobj__.merge(rules))
+          if rules.respond_to?(:optional_keys, true)
+            optional_keys.push(*rules.send(:optional_keys))
+          end
+
+          self
+        end
       end
 
-      def inspect
-        "[Scheme::Rules n=#{keys.length} default=#{default}]"
+      def inspect(indent = 0)
+        prefix = '  ' * indent
+        [
+          "#{prefix}[Rules n=#{keys.length} optional=#{optional_keys.length}]",
+          "#{prefix}  #{inspect_format_attribute(indent, '*', default)}",
+          *keys.map { |key| "#{prefix}  #{inspect_format_attribute(indent, key)}" },
+          "#{prefix}[/Rules]"
+        ].join("\n")
+      end
+
+      def inspect_format_attribute(indent, key, value = self[key])
+        [
+          [key.to_s, optional_keys.include?(key) && '(optional)' || nil].compact.join(' '),
+          value.is_a?(Scheme) || value.is_a?(Rules) ? "\n#{value.inspect(indent + 2)}" : value.inspect
+        ].join(': ')
       end
 
       alias get []

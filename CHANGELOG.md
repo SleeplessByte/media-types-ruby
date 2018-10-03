@@ -1,3 +1,8 @@
+# 0.5.1
+
+- Fix merging optional attributes
+- Change `#inspect` to look like a tree
+
 # 0.5.0
 
 - Change internal representation of key to symbol

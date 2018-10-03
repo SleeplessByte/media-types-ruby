@@ -8,7 +8,7 @@ module MediaTypes
       end
 
       def inspect
-        '[Scheme::NotStrict]'
+        '((noop: not strict))'
       end
     end
   end

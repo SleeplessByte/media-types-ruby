@@ -351,8 +351,13 @@ module MediaTypes
       end.link(*args, **opts, &block)
     end
 
-    def inspect
-      "[Scheme]#{rules}[/Scheme]"
+    def inspect(indentation = 0)
+      tabs = '  ' * indentation
+      [
+        "#{tabs}[Scheme]",
+        rules.inspect(indentation + 1),
+        "#{tabs}[/Scheme]"
+      ].join("\n")
     end
 
     private

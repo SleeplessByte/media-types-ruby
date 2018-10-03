@@ -16,6 +16,18 @@ module MediaTypes
       end
     end
 
+    class << self
+      # noinspection RubyClassMethodNamingConvention
+      ##
+      # Allows +it+ to be any of the wrapped +klazzes+
+      #
+      # @param [Array<Class>] klazzes the classes that are valid for +it+
+      # @return [CaseEqualityWithList]
+      def AnyOf(*klazzes) # rubocop:disable Naming/MethodName
+        CaseEqualityWithList.new(klazzes)
+      end
+    end
+
     # noinspection RubyInstanceMethodNamingConvention
     ##
     # Allows +it+ to be any of the wrapped +klazzes+
@@ -23,7 +35,7 @@ module MediaTypes
     # @param [Array<Class>] klazzes the classes that are valid for +it+
     # @return [CaseEqualityWithList]
     def AnyOf(*klazzes) # rubocop:disable Naming/MethodName
-      CaseEqualityWithList.new(klazzes)
+      self.class.AnyOf(*klazzes)
     end
   end
 end
