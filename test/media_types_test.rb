@@ -12,6 +12,7 @@ class MediaTypesTest < Minitest::Test
       Constructable
       Defaults
       Dsl
+      Formatter
       Hash
       Object
       Registrar
