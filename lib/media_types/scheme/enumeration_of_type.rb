@@ -25,6 +25,10 @@ module MediaTypes
           validate_items!(output, options)
       end
 
+      def inspect
+        "[Scheme::EnumerationOfType #{item_type} collection=#{enumeration_type} empty=#{allow_empty}]"
+      end
+
       private
 
       attr_accessor :allow_empty, :enumeration_type, :item_type

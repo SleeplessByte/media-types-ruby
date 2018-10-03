@@ -7,7 +7,7 @@ module MediaTypes
       def validate!(_output, options, context:, **_opts)
         # Check that no unknown keys are present
         return true unless options.strict
-        raise_strict!(key: context.key, strict_keys: context.validations, backtrace: options.backtrace)
+        raise_strict!(key: context.key, strict_keys: context.rules, backtrace: options.backtrace)
       end
 
       def raise_strict!(key:, backtrace:, strict_keys:)

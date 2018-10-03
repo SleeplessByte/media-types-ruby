@@ -87,7 +87,7 @@ class Venue < MediaTypes::Base
   end
   
   def self.base_format
-    'application/vnd.mydomain.%<type>s.v%<version>s%<view>s+%<suffix>s'
+    'application/vnd.mydomain.%<type>s.v%<version>.s%<view>s+%<suffix>s'
   end
 end
 ```
@@ -105,6 +105,7 @@ Adds an attribute to the schema, if a +block+ is given, uses that to test agains
 | key | `Symbol` | the attribute name |
 | opts | `Hash` | options to pass to `Scheme` or `Attribute` |
 | type | `Class`, `===`, Scheme | The type of the value, can be anything that responds to `===`,  or scheme to use if no `&block` is given. Defaults to `String` without a `&block` and to Hash with a `&block`. |
+| optional: | `TrueClass`, `FalseClass` | if true, key may be absent, defaults to `false` |
 | &block | `Block` | defines the scheme of the value of this attribute |
 
 #### Add an attribute named foo, expecting a string
@@ -147,7 +148,7 @@ Allow for any key. The `&block` defines the Schema for each value.
 |-------|------|-------------|
 | scheme | `Scheme`, `NilClass` | scheme to use if no `&block` is given |
 | allow_empty: | `TrueClass`, `FalsClass` | if true, empty (no key/value present) is allowed |
-| force: | `Class`, | forces the validated value to have this type, defaults to `Hash` |
+| expected_type: | `Class`, | forces the validated value to have this type, defaults to `Hash`. Use `Object` if either `Hash` or `Array` is fine |
 | &block | `Block` | defines the scheme of the value of this attribute |
 
 #### Add a collection named foo, expecting any key with a defined value
@@ -196,8 +197,9 @@ Expect a collection such as an array or hash. The `&block` defines the Schema fo
 |-------|------|-------------|
 | key | `Symbol` | key of the collection (same as `#attribute`) |
 | scheme | `Scheme`, `NilClass`, `Class` | scheme to use if no `&block` is given or `Class` of each item in the  |
-| allow_empty: | `TrueClass`, `FalsClass` | if true, empty (no key/value present) is allowed |
-| force: | `Class`, | forces the validated value to have this type, defaults to `Array` |
+| allow_empty: | `TrueClass`, `FalseClass` | if true, empty (no key/value present) is allowed |
+| expected_type: | `Class`, | forces the validated value to have this type, defaults to `Array`. Use `Object` if either `Array` or `Hash` is fine. |
+| optional: | `TrueClass`, `FalseClass` | if true, key may be absent, defaults to `false` |
 | &block | `Block` | defines the scheme of the value of this attribute |
 
 
@@ -235,7 +237,14 @@ MyMedia.valid?({ foo: [{ required: 'test', number: 42 }, { required: 'other', nu
 
 ### `link`
 
-Expect a link
+Expect a link with a required `href: String` attribute
+
+| param | type | description |
+|-------|------|-------------|
+| key | `Symbol` | key of the link (same as `#attribute`) |
+| allow_nil: | `TrueClass`, `FalseClass` | if true, value may be nil |
+| optional: | `TrueClass`, `FalseClass` | if true, key may be absent, defaults to `false` |
+| &block | `Block` | defines the scheme of the value of this attribute, in addition to the `href` attribute |
 
 #### Links as defined in HAL, JSON-Links and other specs
 ```Ruby
@@ -289,11 +298,34 @@ MyMedia.valid?({ _links: { image: { href: 'https://image.org/{md5}', templated: 
 If your type has a validations, you can now use this media type for validation:
 
 ```Ruby
-Venue.valid?({ ... })
+Venue.valid?({
+  #...
+})
 # => true if valid, false otherwise
 
-Venue.validate!({ ... })
+Venue.validate!({
+  # /*...*/ 
+})
 # => raises if it's not valid
+```
+
+If an array is passed, check the scheme for each value, unless the scheme is defined as expecting a hash:
+```Ruby
+expected_hash = Scheme.new(expected_type: Hash) { attribute(:foo) }
+expected_object = Scheme.new { attribute(:foo) } 
+
+expected_hash.valid?({ foo: 'string' })
+# => true
+
+expected_hash.valid?([{ foo: 'string' }])
+# => false
+
+
+expected_object.valid?({ foo: 'string' })
+# => true
+
+expected_object.valid?([{ foo: 'string' }])
+# => true
 ```
 
 ## Formatting for headers

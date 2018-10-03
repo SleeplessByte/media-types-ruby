@@ -3,6 +3,8 @@
 require 'delegate'
 require 'singleton'
 
+require 'media_types/formatter'
+
 module MediaTypes
   class Constructable < SimpleDelegator
 
@@ -13,22 +15,22 @@ module MediaTypes
 
     def type(name = NO_ARG)
       return opts[:type] if name == NO_ARG
-      Constructable.new(__getobj__, **with(type: name))
+      with(type: name)
     end
 
     def version(version = NO_ARG)
       return opts[:version] if version == NO_ARG
-      Constructable.new(__getobj__, **with(version: version))
+      with(version: version)
     end
 
     def view(view = NO_ARG)
       return opts[:view] if view == NO_ARG
-      Constructable.new(__getobj__, **with(view: view))
+      with(view: view)
     end
 
     def suffix(suffix = NO_ARG)
       return opts[:suffix] if suffix == NO_ARG
-      Constructable.new(__getobj__, **with(suffix: suffix))
+      with(suffix: suffix)
     end
 
     def collection
@@ -79,13 +81,7 @@ module MediaTypes
       # TODO: remove warning by slicing out these arguments if they don't appear in the format
       qualified(
         qualifier,
-        format(
-          opts.fetch(:format),
-          version: opts.fetch(:version),
-          suffix: opts.fetch(:suffix) { :json },
-          type: opts.fetch(:type),
-          view: format_view(opts[:view])
-        )
+        Formatter.call(opts)
       )
     end
 
@@ -123,16 +119,16 @@ module MediaTypes
     attr_accessor :opts
 
     def with(more_opts)
-      Hash(opts).clone.merge(more_opts)
+      merged_options = Kernel::Hash(opts).clone.tap do |cloned|
+        cloned.merge!(more_opts)
+      end
+
+      Constructable.new(__getobj__, **merged_options)
     end
 
     def qualified(qualifier, media_type)
       return media_type unless qualifier
       format('%<media_type>s; q=%<q>s', media_type: media_type, q: qualifier)
-    end
-
-    def format_view(view)
-      MediaTypes::Object.new(view).present? && ".#{view}" || ''
     end
   end
 end

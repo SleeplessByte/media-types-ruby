@@ -35,6 +35,10 @@ module MediaTypes
               )
       end
 
+      def inspect
+        "[Scheme::Attribute type=#{type} nil=#{allow_nil}]"
+      end
+
       private
 
       attr_accessor :allow_nil, :type

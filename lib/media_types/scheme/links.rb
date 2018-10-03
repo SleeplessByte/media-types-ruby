@@ -1,27 +1,33 @@
 # frozen_string_literal: true
 
+require 'media_types/scheme/rules'
+
 module MediaTypes
   class Scheme
     class Links
       def initialize
-        self.links = {}
+        self.links = Rules.new(allow_empty: false, expected_type: ::Hash)
       end
 
-      def link(key, allow_nil: false, &block)
-        scheme = Scheme.new
-        scheme.attribute :href, String, allow_nil: allow_nil
-        scheme.instance_exec(&block) if block_given?
+      def link(key, allow_nil: false, optional: false, &block)
+        links.add(
+          key,
+          Scheme.new do
+            attribute :href, String, allow_nil: allow_nil
+            instance_exec(&block) if block_given?
+          end,
+          optional: optional
+        )
 
-        links[String(key)] = scheme
+        self
       end
 
       def validate!(output, options, **_opts)
-        links.all? do |key, value|
-          value.validate!(
-            output[key] || output[key.to_sym],
-            options.trace(key).exhaustive!
-          )
-        end
+        RulesExhaustedGuard.call(output, options, rules: links)
+      end
+
+      def inspect
+        "[Scheme::Links #{links.keys}]"
       end
 
       private

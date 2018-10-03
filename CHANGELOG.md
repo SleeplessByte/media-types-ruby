@@ -1,3 +1,22 @@
+# 0.5.0
+
+- Change internal representation of key to symbol
+- Change default type from `nil` to `Object`, removing special behaviour for nil
+- Add `Rules` class to handle normalization of keys and handling `rules` (`Scheme`, `Attribute`, etc)
+- Add guard classes to handle guard behaviour (`OutputEmptyGuard`, `OutputTypeGuard` and `RulesExhaustedGuard`)
+- Add `optional:` keywords to most dsl (`attribute`, `collection`, `any`, `link`)
+- Add `Formatter` class to handle formatting of the `Constructable#to_s`
+- Add behaviour to strip leading dot (`.`) or plus (`+`) from `+%<var>` if `var` is nil, fixing weird media types
+- Add behaviour to remove format variable values if format variable is not present, fixing warnings
+- Add `inspect` for most public classes
+- Add second argument for type or scheme to `any` dsl, mimicking `collection`
+- Add tests for most dsl, common permutations
+- Rename `force` to `expected_type`
+- Remove `format_view` behaviour where it adds a dot (`.`) if a view is present
+- Remove special iteration behaviour for `Links` (`link` dsl), allowing them to be optional, or non-exhaustive
+- Raise error if `self.base_format` is not available at time of `Dsl.media_type` call
+- Fix `expected_type` guard for arrays, nil, or arrays with nil.
+
 # 0.4.1
 
 - Use strings for `:_links`, matching the other validation keys

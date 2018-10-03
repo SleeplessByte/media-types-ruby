@@ -10,6 +10,10 @@ module MediaTypes
       def ===(other)
         any? { |it| it === other } # rubocop:disable Style/CaseEquality
       end
+
+      def inspect
+        "[Scheme::AnyOf(#{__getobj__})]"
+      end
     end
 
     # noinspection RubyInstanceMethodNamingConvention

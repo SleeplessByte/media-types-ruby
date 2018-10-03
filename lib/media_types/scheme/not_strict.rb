@@ -6,6 +6,10 @@ module MediaTypes
       def validate!(*_args, **_opts)
         true
       end
+
+      def inspect
+        '[Scheme::NotStrict]'
+      end
     end
   end
 end

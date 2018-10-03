@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 module MediaTypes
   class Scheme
     class EnumerationContext
-      def initialize(validations:)
-        self.validations = validations
+      def initialize(rules:)
+        self.rules = rules
       end
 
       def enumerate(val)
@@ -10,7 +12,7 @@ module MediaTypes
         self
       end
 
-      attr_accessor :validations, :key
+      attr_accessor :rules, :key
     end
   end
 end

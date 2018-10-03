@@ -10,7 +10,7 @@ module MediaTypes
       class << self
         protected
 
-        BASE_TEXT_FORMAT = 'application/vnd.domain.test.%<type>s.v%<version>s%<view>s+%<suffix>s'
+        BASE_TEXT_FORMAT = 'application/vnd.domain.test.%<type>s.v%<version>s.%<view>s+%<suffix>s'
 
         def base_format
           BASE_TEXT_FORMAT
@@ -36,7 +36,7 @@ module MediaTypes
 
     def test_the_default_media_type
       assert_equal format(
-        'application/vnd.domain.test.%<type>s.v%<version>s%<view>s+%<suffix>s',
+        'application/vnd.domain.test.%<type>s.v%<version>s.%<view>s+%<suffix>s',
         type: 'test',
         version: 2,
         view: nil,
@@ -46,7 +46,7 @@ module MediaTypes
 
     def test_alter_version_mime_type
       assert_equal format(
-        'application/vnd.domain.test.%<type>s.v%<version>s%<view>s+%<suffix>s',
+        'application/vnd.domain.test.%<type>s.v%<version>s.%<view>s+%<suffix>s',
         type: 'test',
         version: 1,
         view: nil,
@@ -56,7 +56,7 @@ module MediaTypes
 
     def test_alter_suffix_mime_type
       assert_equal format(
-        'application/vnd.domain.test.%<type>s.v%<version>s%<view>s+%<suffix>s',
+        'application/vnd.domain.test.%<type>s.v%<version>s.%<view>s+%<suffix>s',
         type: 'test',
         version: 2,
         view: nil,
@@ -66,20 +66,20 @@ module MediaTypes
 
     def test_alter_view_mime_type
       assert_equal format(
-        'application/vnd.domain.test.%<type>s.v%<version>s%<view>s+%<suffix>s',
+        'application/vnd.domain.test.%<type>s.v%<version>s.%<view>s+%<suffix>s',
         type: 'test',
         version: 2,
-        view: '.custom',
+        view: 'custom',
         suffix: :xml
       ), TestMediaType.to_constructable.view('custom').to_s
     end
 
     def test_alter_mime_type_chains
       assert_equal format(
-        'application/vnd.domain.test.%<type>s.v%<version>s%<view>s+%<suffix>s',
+        'application/vnd.domain.test.%<type>s.v%<version>s.%<view>s+%<suffix>s',
         type: 'test',
         version: 4,
-        view: '.other',
+        view: 'other',
         suffix: :json
       ), TestMediaType.to_constructable.view('other').version(4).suffix(:json).to_s
     end
@@ -87,10 +87,10 @@ module MediaTypes
     %i[index collection create].each do |predefined|
       define_method format('test_mime_type_predefined_%<predefined>s', predefined: predefined) do
         assert_equal format(
-          'application/vnd.domain.test.%<type>s.v%<version>s%<view>s+%<suffix>s',
+          'application/vnd.domain.test.%<type>s.v%<version>s.%<view>s+%<suffix>s',
           type: 'test',
           version: 2,
-          view: '.' + String(predefined),
+          view: predefined,
           suffix: :xml
         ), TestMediaType.to_constructable.public_send(predefined).to_s
       end

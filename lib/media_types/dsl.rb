@@ -48,6 +48,13 @@ module MediaTypes
       private
 
       def media_type(name, defaults: {})
+
+        unless defined?(:base_format)
+          define_method(:base_format) do
+            raise format('Implement the class method "base_format" in %<klass>s', klass: self)
+          end
+        end
+
         self.media_type_constructable = Constructable.new(self, format: base_format, type: name)
                                                      .version(defaults.fetch(:version) { nil })
                                                      .suffix(defaults.fetch(:suffix) { nil })
