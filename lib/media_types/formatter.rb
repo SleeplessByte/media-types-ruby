@@ -27,10 +27,11 @@ module MediaTypes
     def rework_template(filtered_arguments)
       filtered_arguments.reduce(template) do |reworked, (key, value)|
         next reworked if MediaTypes::Object.new(value).present?
-        start_of_template_variable = "%<#{key}>"
 
-        # noinspection RubyBlockToMethodReference
-        reworked.gsub("[\\.+](#{start_of_template_variable})") { start_of_template_variable }
+        reworked.gsub(/[.+](%<[A-z]+>)/) do |match|
+          partial_format = "%<#{key}>"
+          match.include?(partial_format) ? partial_format : match
+        end
       end
     end
 

@@ -1,3 +1,7 @@
+# 0.5.4
+
+- Fix formatter reworked template when fields are not present
+
 # 0.5.3
 
 - Remove `require 'awesome_print'` in library code as it's marked as a development dependency only

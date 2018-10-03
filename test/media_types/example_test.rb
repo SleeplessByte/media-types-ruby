@@ -36,7 +36,7 @@ module MediaTypes
 
     def test_the_default_media_type
       assert_equal format(
-        'application/vnd.domain.test.%<type>s.v%<version>s.%<view>s+%<suffix>s',
+        'application/vnd.domain.test.%<type>s.v%<version>s%<view>s+%<suffix>s',
         type: 'test',
         version: 2,
         view: nil,
@@ -46,7 +46,7 @@ module MediaTypes
 
     def test_alter_version_mime_type
       assert_equal format(
-        'application/vnd.domain.test.%<type>s.v%<version>s.%<view>s+%<suffix>s',
+        'application/vnd.domain.test.%<type>s.v%<version>s%<view>s+%<suffix>s',
         type: 'test',
         version: 1,
         view: nil,
@@ -56,7 +56,7 @@ module MediaTypes
 
     def test_alter_suffix_mime_type
       assert_equal format(
-        'application/vnd.domain.test.%<type>s.v%<version>s.%<view>s+%<suffix>s',
+        'application/vnd.domain.test.%<type>s.v%<version>s%<view>s+%<suffix>s',
         type: 'test',
         version: 2,
         view: nil,
