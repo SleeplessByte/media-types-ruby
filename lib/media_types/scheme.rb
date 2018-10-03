@@ -17,8 +17,6 @@ require 'media_types/scheme/output_empty_guard'
 require 'media_types/scheme/output_type_guard'
 require 'media_types/scheme/rules_exhausted_guard'
 
-require 'awesome_print'
-
 module MediaTypes
   ##
   # Media Type Schemes can validate content to a media type, by itself. Used by the `validations` dsl.

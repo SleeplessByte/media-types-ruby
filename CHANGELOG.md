@@ -1,3 +1,11 @@
+# 0.5.3
+
+- Remove `require 'awesome_print'` in library code as it's marked as a development dependency only
+
+# 0.5.2
+
+- Add requires in files with missing requires
+
 # 0.5.1
 
 - Fix merging optional attributes
