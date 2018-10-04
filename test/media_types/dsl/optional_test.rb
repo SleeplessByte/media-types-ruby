@@ -134,6 +134,78 @@ module MediaTypes
         # Expects foo to be an Array
         refute OptionalCollection.valid?(foo: nil), 'Expected input to be invalid'
       end
+
+      class OptionalAttributeInsideAttribute
+        include MediaTypes::Dsl
+
+        def self.base_format
+          'application/vnd.trailervote.test'
+        end
+
+        media_type 'test'
+
+        validations do
+          attribute :foo do
+            attribute :bar, Numeric, optional: true
+          end
+        end
+      end
+
+      def test_optional_attribute_inside_attribute
+        assert OptionalAttributeInsideAttribute.validatable?(OptionalAttributeInsideAttribute.to_constructable),
+               'Expected media type to be validatable'
+        assert OptionalAttributeInsideAttribute.validate!(foo: { bar: 42 }), 'Expected input to be valid'
+        # Bar is optional, leaving no required keys
+        assert OptionalAttributeInsideAttribute.validate!(foo: {}), 'Expected input to be valid'
+
+        # Expects bar to be Numeric
+        refute OptionalAttributeInsideAttribute.valid?(foo: { bar: 'string' }), 'Expected input to be invalid'
+        # Expects foo to be a Hash
+        refute OptionalAttributeInsideAttribute.valid?(foo: [{ bar: 42 }]), 'Expected input to be invalid'
+        # Expects foo not to be empty
+        refute OptionalAttributeInsideAttribute.valid?(foo: []), 'Expected input to be invalid'
+        # Expects foo to be a Hash
+        refute OptionalAttributeInsideAttribute.valid?(foo: [nil]), 'Expected input to be invalid'
+        # Expects foo to be a Hash
+        refute OptionalAttributeInsideAttribute.valid?(foo: nil), 'Expected input to be invalid'
+      end
+
+      class OptionalAttributeInsideOptionalAttribute
+        include MediaTypes::Dsl
+
+        def self.base_format
+          'application/vnd.trailervote.test'
+        end
+
+        media_type 'test'
+
+        validations do
+          attribute :foo, optional: true do
+            attribute :bar, Numeric, optional: true
+          end
+        end
+      end
+
+      def test_optional_attribute_inside_optional_attribute
+        assert OptionalAttributeInsideOptionalAttribute.validatable?(OptionalAttributeInsideOptionalAttribute.to_constructable),
+               'Expected media type to be validatable'
+        assert OptionalAttributeInsideOptionalAttribute.validate!(foo: { bar: 42 }), 'Expected input to be valid'
+        # Bar is optional, leaving no required keys
+        assert OptionalAttributeInsideOptionalAttribute.validate!(foo: {}), 'Expected input to be valid'
+        # Foo is optional, leaving no required keys
+        assert OptionalAttributeInsideOptionalAttribute.validate!({}), 'Expected input to be valid'
+
+        # Expects bar to be Numeric
+        refute OptionalAttributeInsideOptionalAttribute.valid?(foo: { bar: 'string' }), 'Expected input to be invalid'
+        # Expects foo to be a Hash
+        refute OptionalAttributeInsideOptionalAttribute.valid?(foo: [{ bar: 42 }]), 'Expected input to be invalid'
+        # Expects foo not to be empty
+        refute OptionalAttributeInsideOptionalAttribute.valid?(foo: []), 'Expected input to be invalid'
+        # Expects foo to be a Hash
+        refute OptionalAttributeInsideOptionalAttribute.valid?(foo: [nil]), 'Expected input to be invalid'
+        # Expects foo to be a Hash
+        refute OptionalAttributeInsideOptionalAttribute.valid?(foo: nil), 'Expected input to be invalid'
+      end
     end
   end
 end

@@ -1,3 +1,7 @@
+# 0.5.5
+
+- Fix an issue with `attribute(optional:, &block)` not passing `optional:` to the created `collection`.
+
 # 0.5.4
 
 - Fix formatter reworked template when fields are not present

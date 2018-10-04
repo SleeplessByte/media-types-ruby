@@ -33,7 +33,11 @@ module MediaTypes
       end
 
       def raise_empty!(backtrace:)
-        raise EmptyOutputError, format('Expected output, got empty at %<backtrace>s', backtrace: backtrace.join('->'))
+        raise EmptyOutputError, format(
+          'Expected output, got empty at %<backtrace>s. Required are: %<required>s.',
+          backtrace: backtrace.join('->'),
+          required: rules.required.keys
+        )
       end
     end
   end

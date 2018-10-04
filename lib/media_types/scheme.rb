@@ -150,7 +150,7 @@ module MediaTypes
     #
     def attribute(key, type = String, optional: false, **opts, &block)
       if block_given?
-        return collection(key, expected_type: ::Hash, **opts, &block)
+        return collection(key, expected_type: ::Hash, optional: optional, **opts, &block)
       end
 
       if type.is_a?(Scheme)
