@@ -115,7 +115,8 @@ module MediaTypes
     # @param key [Symbol] the attribute name
     # @param opts [Hash] options to pass to Scheme or Attribute
     # @param type [Class, #===, Scheme] The type of the value, can be anything that responds to #===,
-    #   or scheme to use if no +&block+ is given. Defaults to String without a +&block+ and to Hash with a +&block+.
+    #   or scheme to use if no +&block+ is given. Defaults to Object without a +&block+ and to Hash with a +&block+.
+    #   or scheme to use if no +&block+ is given. Defaults to Object without a +&block+ and to Hash with a +&block+.
     #
     # @see Scheme::Attribute
     # @see Scheme
@@ -148,7 +149,7 @@ module MediaTypes
     #   MyMedia.valid?({ foo: { bar: 'my-string' }})
     #   # => true
     #
-    def attribute(key, type = String, optional: false, **opts, &block)
+    def attribute(key, type = ::Object, optional: false, **opts, &block)
       if block_given?
         return collection(key, expected_type: ::Hash, optional: optional, **opts, &block)
       end
