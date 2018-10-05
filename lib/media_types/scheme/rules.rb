@@ -88,6 +88,8 @@ module MediaTypes
 
       def inspect(indent = 0)
         prefix = '  ' * indent
+        return "#{prefix}[Error]Depth limit reached[/Error]" if indent > 5_000
+
         [
           "#{prefix}[Rules n=#{keys.length} optional=#{optional_keys.length}]",
           "#{prefix}  #{inspect_format_attribute(indent, '*', default)}",
