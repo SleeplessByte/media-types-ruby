@@ -59,21 +59,28 @@ module MediaTypes
                                                      .version(defaults.fetch(:version) { nil })
                                                      .suffix(defaults.fetch(:suffix) { nil })
                                                      .view(defaults.fetch(:view) { nil })
+        self
       end
 
       def defaults(&block)
         return media_type_constructable unless block_given?
         self.media_type_constructable = Defaults.new(to_constructable, &block).to_constructable
+
+        self
       end
 
       def registrations(symbol = nil, &block)
         return media_type_registrar unless block_given?
         self.media_type_registrar = Registrar.new(self, symbol: symbol, &block)
+
+        self
       end
 
       def validations(&block)
         return media_type_validations unless block_given?
         self.media_type_validations = Validations.new(to_constructable, &block)
+
+        self
       end
     end
   end

@@ -9,7 +9,7 @@ module MediaTypes
       include MediaTypes::Dsl
 
       def self.base_format
-        'application/vnd.domain.test.%<type>s.v%<version>s%<view>s+%<suffix>s'
+        'application/vnd.domain.test.%<type>s.v%<version>s.%<view>s+%<suffix>s'
       end
 
       media_type 'scheme'

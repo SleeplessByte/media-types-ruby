@@ -1,3 +1,11 @@
+# 0.6.0
+
+- Change default expected type for `attribute` to Object
+- Remove default `actionpack` calls for `.register`
+- Add integration for registering with `actionpack` (rails)
+- Add integration for registering with `http` (http.rb)
+- Fix stack overflow for cyclic schema
+
 # 0.5.5
 
 - Fix an issue with `attribute(optional:, &block)` not passing `optional:` to the created `collection`.

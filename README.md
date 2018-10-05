@@ -4,6 +4,8 @@
 [![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg)](http://opensource.org/licenses/MIT) 
 [![Maintainability](https://api.codeclimate.com/v1/badges/6f2dc1fb37ecb98c4363/maintainability)](https://codeclimate.com/github/SleeplessByte/media-types-ruby/maintainability)
 
+Media Types based on  scheme, with versioning, views, suffixes and validations. Integrations available for [Rails](https://github.com/rails/rails) / ActionPack and [http.rb](https://github.com/httprb/http).
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -25,8 +27,7 @@ Or install it yourself as:
 By default there are no media types registered or defined, except for an abstract base type.
 
 ## Definition
-You can define media types by inheriting from this base type, or create your own base type with a class method
-`.base_format` that is used to create the final media type string by injecting formatted parameters:
+You can define media types by inheriting from this base type, or create your own base type with a class method `.base_format` that is used to create the final media type string by injecting formatted parameters:
 
 - `%<type>s`: the type `media_type` received
 - `%<version>s`: the version, defaults to `:current_version`
@@ -104,7 +105,7 @@ Adds an attribute to the schema, if a +block+ is given, uses that to test agains
 |-------|------|-------------|
 | key | `Symbol` | the attribute name |
 | opts | `Hash` | options to pass to `Scheme` or `Attribute` |
-| type | `Class`, `===`, Scheme | The type of the value, can be anything that responds to `===`,  or scheme to use if no `&block` is given. Defaults to `String` without a `&block` and to Hash with a `&block`. |
+| type | `Class`, `===`, Scheme | The type of the value, can be anything that responds to `===`,  or scheme to use if no `&block` is given. Defaults to `Object` without a `&block` and to Hash with a `&block`. |
 | optional: | `TrueClass`, `FalseClass` | if true, key may be absent, defaults to `false` |
 | &block | `Block` | defines the scheme of the value of this attribute |
 
@@ -261,23 +262,6 @@ MyMedia.valid?({ _links: { self: { href: 'https://example.org/s' }, image: { hre
 # => true
 ```
 
-
-#### Link with extra attributes
-```Ruby
-class MyMedia
-  include MediaTypes::Dsl
-
-  validations do
-    link :image do
-      attribute :templated, TrueClass
-    end
-  end
-end
-
-MyMedia.valid?({ _links: { self: { href: 'https://example.org/s' }, image: { href: 'https://image.org/i' }} })
-# => true
-```
-
 #### Link with extra attributes
 ```Ruby
 class MyMedia
@@ -351,27 +335,48 @@ Venue.mime_type.view('active').to_s
 # => "application/vnd.mydomain.venue.v2.active+json"
 ```
 
-## Register in Rails or Rack
-Define a `registrations` block on your media type, indicating the symbol for the base type (`registrations :symbol do`)
-and inside use the registrations dsl to define which media types to register. `versions array_of_numbers` determines which versions, 
-`suffix name` adds a suffix, `type_alias name` adds an alias and `view name, symbol` adds a view.
+## Integrations
+The integrations are not loaded by default, so you need to require them:
+```ruby
+# For Rails / ActionPack
+require 'media_types/integrations/actionpack'
 
-As long as `action_dispatch` is available, you can register the mime type with `action_dispatch/http/mime_type`:
-```Ruby
-Venue.register
-# => Mime type is now available using the symbol, or lookup the actual mimetype
+# For HTTP.rb
+require 'media_types/integrations/http' 
 ```
 
-You can do this in the `mime_types` initializer, or anywhere before your controllers are instantiated. Yes, the symbol
-(by default `<type>_v<version>_<suffix>`) can now be used in your `format` blocks, or as extension in the url.
+Define a `registrations` block on your media type, indicating the symbol for the base type (`registrations :symbol do`) and inside use the registrations dsl to define which media types to register. `versions array_of_numbers` determines which versions, `suffix name` adds a suffix, `type_alias name` adds an alias and `view name, symbol` adds a view.
+
+```Ruby
+Venue.register
+```
+
+### Rails
+Load the `actionpack` integration and call `.register` on all the media types you want to be available in Rails. You can do this in the `mime_types` initializer, or anywhere before your controllers are instantiated. Yes, the symbol (by default `<type>_v<version>_<suffix>`) can now be used in your `format` blocks, or as extension in the url.
+
+Rails only has a default serializer for `application/json`, and content with your `+json` media types (or different once) will not be deserialized by default. A way to overcome this is to set the JSON parameter parser for all new symbols. `.register` gives you back an array of `Registerable` objects that responds to `#to_sym` to get that symbol.
+
+```ruby
+symbols = Venue.register.map(&:to_sym)
+
+original_parsers = ActionDispatch::Request.parameter_parsers
+new_parser = original_parsers[Mime[:json].symbol]
+new_parsers = original_parsers.merge(Hash[*symbols.map { |s| [s, new_parser] }])
+ActionDispatch::Request.parameter_parsers = new_parsers
+```
+
+If you want to validate the content-type and not have your errors be `Rack::Error` but be handled by your controllers, leave this out and add a `before_action` to your controller that deserializes + validates for you.
+
+### HTTP.rb
+Load the `http` integration and call `.register` on all media types you want to be able to serialize and deserialize. The media type validations will run both before serialization and after deserialization.
+
+Currently uses `oj` under the hood and this can not be changed.
 
 ## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests. You can
-also run `bin/console` for an interactive prompt that will allow you to experiment.
+After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the
-version number in `version.rb`, call `bundle exec rake release` to create a new git tag, push git commits and tags, and
+To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, call `bundle exec rake release` to create a new git tag, push git commits and tags, and
 push the `.gem` file to rubygems.org.
 
 ## Contributing
