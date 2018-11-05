@@ -59,9 +59,11 @@ GEM
       builder
       minitest (>= 5.0)
       ruby-progressbar
+    nokogiri (1.8.4)
+      mini_portile2 (~> 2.3.0)
     nokogiri (1.8.4-x64-mingw32)
       mini_portile2 (~> 2.3.0)
-    oj (3.6.11)
+    oj (3.7.0)
     public_suffix (3.0.3)
     rack (2.0.5)
     rack-test (1.1.0)
@@ -83,9 +85,11 @@ GEM
       thread_safe (~> 0.1)
     unf (0.1.4)
       unf_ext
+    unf_ext (0.0.7.5)
     unf_ext (0.0.7.5-x64-mingw32)
 
 PLATFORMS
+  ruby
   x64-mingw32
 
 DEPENDENCIES
