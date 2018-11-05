@@ -35,7 +35,7 @@ GEM
     domain_name (0.5.20180417)
       unf (>= 0.0.5, < 1.0.0)
     erubi (1.7.1)
-    http (3.3.0)
+    http (4.0.0)
       addressable (~> 2.3)
       http-cookie (~> 1.0)
       http-form_data (~> 2.0)
@@ -59,6 +59,8 @@ GEM
       builder
       minitest (>= 5.0)
       ruby-progressbar
+    nokogiri (1.8.4)
+      mini_portile2 (~> 2.3.0)
     nokogiri (1.8.4-x64-mingw32)
       mini_portile2 (~> 2.3.0)
     oj (3.6.11)
@@ -83,9 +85,11 @@ GEM
       thread_safe (~> 0.1)
     unf (0.1.4)
       unf_ext
+    unf_ext (0.0.7.5)
     unf_ext (0.0.7.5-x64-mingw32)
 
 PLATFORMS
+  ruby
   x64-mingw32
 
 DEPENDENCIES
