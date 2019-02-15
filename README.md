@@ -377,7 +377,7 @@ Currently uses `oj` under the hood and this can not be changed.
 ## Related
 
 - [`MediaTypes::Serialization`](https://github.com/XPBytes/media_types-serialization): :cyclone: Add media types supported serialization using your favourite serializer
-- [`MediaTypes::Validation`](https://github.com/XPBYtes/media_type-validation): :heavy_exclamation_mark: Response validations according to a media-type
+- [`MediaTypes::Validation`](https://github.com/XPBytes/media_types-validation): :heavy_exclamation_mark: Response validations according to a media-type
 
 ## Development
 
