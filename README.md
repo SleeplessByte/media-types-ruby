@@ -37,7 +37,9 @@ You can define media types by inheriting from this base type, or create your own
 ```Ruby
 require 'media_types'
 
-class Venue < MediaTypes::Base
+class Venue
+  include MediaTypes::Dsl
+  
   def self.base_format
     'application/vnd.mydomain.%<type>s.v%<version>.s%<view>s+%<suffix>s'
   end
@@ -371,6 +373,11 @@ If you want to validate the content-type and not have your errors be `Rack::Erro
 Load the `http` integration and call `.register` on all media types you want to be able to serialize and deserialize. The media type validations will run both before serialization and after deserialization.
 
 Currently uses `oj` under the hood and this can not be changed.
+
+## Related
+
+- [`MediaTypes::Serialization`](https://github.com/XPBytes/media_types-serialization): :cyclone: Add media types supported serialization using your favourite serializer
+- [`MediaTypes::Validation`](https://github.com/XPBYtes/media_type-validation): :heavy_exclamation_mark: Response validations according to a media-type
 
 ## Development
 
