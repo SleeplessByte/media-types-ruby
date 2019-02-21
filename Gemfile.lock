@@ -35,7 +35,7 @@ GEM
     domain_name (0.5.20180417)
       unf (>= 0.0.5, < 1.0.0)
     erubi (1.7.1)
-    http (4.0.4)
+    http (4.0.5)
       addressable (~> 2.3)
       http-cookie (~> 1.0)
       http-form_data (~> 2.0)
