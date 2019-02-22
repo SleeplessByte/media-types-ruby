@@ -73,7 +73,7 @@ GEM
       nokogiri (>= 1.6)
     rails-html-sanitizer (1.0.4)
       loofah (~> 2.2, >= 2.2.2)
-    rake (10.5.0)
+    rake (12.3.2)
     ruby-progressbar (1.10.0)
     simplecov (0.16.1)
       docile (~> 1.1)
@@ -102,7 +102,7 @@ DEPENDENCIES
   minitest-ci
   minitest-reporters
   oj
-  rake (~> 10.0)
+  rake (~> 12.3)
   simplecov
 
 BUNDLED WITH
