@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    media_types (0.6.0)
+    media_types (0.6.1)
 
 GEM
   remote: https://rubygems.org/
@@ -44,9 +44,9 @@ GEM
       domain_name (~> 0.5)
     http-form_data (2.1.1)
     http_parser.rb (0.6.0)
-    i18n (1.5.3)
+    i18n (1.6.0)
       concurrent-ruby (~> 1.0)
-    json (2.1.0)
+    json (2.2.0)
     loofah (2.2.3)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
@@ -95,7 +95,7 @@ PLATFORMS
 DEPENDENCIES
   actionpack
   awesome_print
-  bundler (~> 1.16)
+  bundler (~> 2)
   http
   media_types!
   minitest (~> 5.0)
@@ -106,4 +106,4 @@ DEPENDENCIES
   simplecov
 
 BUNDLED WITH
-   1.16.5
+   2.0.1

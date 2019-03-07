@@ -1,3 +1,8 @@
+# 0.6.1
+
+- Fix no `validations` error on `validatable?` (now returns `false`)
+- Update `bundler` to `2.x`
+
 # 0.6.0
 
 - Change default expected type for `attribute` to Object
@@ -16,7 +21,7 @@
 
 # 0.5.3
 
-- Remove `require 'awesome_print'` in library code as it's marked as a development dependency only
+- Remove `require 'awesome_print'` in library code as it's marked as a development dependency onlvy
 
 # 0.5.2
 

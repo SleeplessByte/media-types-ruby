@@ -35,6 +35,8 @@ module MediaTypes
       end
 
       def validatable?(media_type = to_constructable)
+        return false unless validations
+
         validations.find(String(media_type), -> { nil })
       end
 
