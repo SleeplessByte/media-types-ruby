@@ -63,7 +63,7 @@ GEM
       mini_portile2 (~> 2.4.0)
     nokogiri (1.10.2-x64-mingw32)
       mini_portile2 (~> 2.4.0)
-    oj (3.7.10)
+    oj (3.7.12)
     public_suffix (3.0.3)
     rack (2.0.6)
     rack-test (1.1.0)
