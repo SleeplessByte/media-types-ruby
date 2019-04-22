@@ -59,9 +59,9 @@ GEM
       builder
       minitest (>= 5.0)
       ruby-progressbar
-    nokogiri (1.10.2)
+    nokogiri (1.10.3)
       mini_portile2 (~> 2.4.0)
-    nokogiri (1.10.2-x64-mingw32)
+    nokogiri (1.10.3-x64-mingw32)
       mini_portile2 (~> 2.4.0)
     oj (3.7.12)
     public_suffix (3.0.3)
