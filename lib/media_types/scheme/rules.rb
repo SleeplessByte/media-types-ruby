@@ -91,7 +91,7 @@ module MediaTypes
         return "#{prefix}[Error]Depth limit reached[/Error]" if indent > 5_000
 
         [
-          "#{prefix}[Rules n=#{keys.length} optional=#{optional_keys.length}]",
+          "#{prefix}[Rules n=#{keys.length} optional=#{optional_keys.length} allow_empty=#{allow_empty?}]",
           "#{prefix}  #{inspect_format_attribute(indent, '*', default)}",
           *keys.map { |key| "#{prefix}  #{inspect_format_attribute(indent, key)}" },
           "#{prefix}[/Rules]"

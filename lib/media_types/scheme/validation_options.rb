@@ -11,6 +11,10 @@ module MediaTypes
         self.backtrace = backtrace
       end
 
+      def inspect
+        "backtrack: #{backtrace.inspect}, strict: #{strict.inspect}, exhaustive: #{exhaustive}"
+      end
+
       def with_backtrace(backtrace)
         ValidationOptions.new(exhaustive: exhaustive, strict: strict, backtrace: backtrace)
       end

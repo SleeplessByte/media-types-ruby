@@ -59,12 +59,18 @@ module MediaTypes
       end
 
       def validate_items!(output, options)
+        index = -1
         output.all? do |item|
+          index += 1
           next true if item_type === item # rubocop:disable Style/CaseEquality
+          if item_type.is_a?(Scheme)
+            item_type.validate(item, options.trace("[#{index}]"))
+            next true
+          end
           raise ValidationError,
                 format(
                   'Expected collection item as %<type>s, got %<actual>s at [%<backtrace>s]',
-                  type: item_type,
+                  type: item_type.inspect,
                   actual: item.inspect,
                   backtrace: options.backtrace.join('->')
                 )

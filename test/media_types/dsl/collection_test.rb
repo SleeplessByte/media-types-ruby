@@ -72,7 +72,7 @@ module MediaTypes
 
         media_type 'test'
 
-        scheme = MediaTypes::Scheme.new(expected_type: Array) do
+        scheme = MediaTypes::Scheme.new do
           attribute :bar, Numeric
         end
 
@@ -104,7 +104,7 @@ module MediaTypes
 
         media_type 'test'
 
-        scheme = MediaTypes::Scheme.new(expected_type: Array) do
+        scheme = MediaTypes::Scheme.new() do
           attribute :bar, Numeric
         end
 
@@ -114,9 +114,9 @@ module MediaTypes
       end
 
       def test_empty_collection_from_scheme
-        assert CollectionSchemeType.validatable?(CollectionSchemeType.to_constructable),
+        assert CollectionSchemeTypeEmpty.validatable?(CollectionSchemeTypeEmpty.to_constructable),
                'Expected media type to be validatable'
-        assert CollectionSchemeType.validate!(foo: []), 'Expected input to be valid'
+        assert CollectionSchemeTypeEmpty.validate!(foo: []), 'Expected input to be valid'
       end
 
       class CollectionOptionsType
