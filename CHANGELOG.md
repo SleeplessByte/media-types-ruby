@@ -1,3 +1,7 @@
+# 0.6.2
+
+- Fix handling empty collections
+
 # 0.6.1
 
 - Fix no `validations` error on `validatable?` (now returns `false`)
