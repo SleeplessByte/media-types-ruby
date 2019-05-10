@@ -290,10 +290,6 @@ module MediaTypes
     #
     def collection(key, scheme = nil, allow_empty: false, expected_type: ::Array, optional: false, &block)
       unless block_given?
-        if scheme.is_a?(Scheme)
-          return rules.add(key, scheme, optional: optional)
-        end
-
         return rules.add(
           key,
           EnumerationOfType.new(

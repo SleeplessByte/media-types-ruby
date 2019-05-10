@@ -72,7 +72,7 @@ module MediaTypes
 
         media_type 'test'
 
-        scheme = MediaTypes::Scheme.new(expected_type: Array) do
+        scheme = MediaTypes::Scheme.new do
           attribute :bar, Numeric
         end
 
@@ -93,6 +93,30 @@ module MediaTypes
         refute CollectionSchemeType.valid?(foo: []), 'Expected input to be invalid'
         refute CollectionSchemeType.valid?(foo: [nil]), 'Expected input to be invalid'
         refute CollectionSchemeType.valid?(foo: nil), 'Expected input to be invalid'
+      end
+
+      class CollectionSchemeTypeEmpty
+        include MediaTypes::Dsl
+
+        def self.base_format
+          'application/vnd.trailervote.test'
+        end
+
+        media_type 'test'
+
+        scheme = MediaTypes::Scheme.new() do
+          attribute :bar, Numeric
+        end
+
+        validations do
+          collection :foo, scheme, allow_empty: true
+        end
+      end
+
+      def test_empty_collection_from_scheme
+        assert CollectionSchemeTypeEmpty.validatable?(CollectionSchemeTypeEmpty.to_constructable),
+               'Expected media type to be validatable'
+        assert CollectionSchemeTypeEmpty.validate!(foo: []), 'Expected input to be valid'
       end
 
       class CollectionOptionsType
