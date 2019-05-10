@@ -59,9 +59,7 @@ module MediaTypes
       end
 
       def validate_items!(output, options)
-        index = -1
-        output.all? do |item|
-          index += 1
+        output.each_with_index.all? do |item, index|
           next true if item_type === item # rubocop:disable Style/CaseEquality
           if item_type.is_a?(Scheme)
             item_type.validate(item, options.trace("[#{index}]"))
