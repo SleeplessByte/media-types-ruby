@@ -11,6 +11,8 @@ module MediaTypes
       base.extend ClassMethods
       base.class_eval do
         class << self
+          attr_accessor :media_type_name_for, :media_type_combinations
+
           private
 
           attr_accessor :media_type_constructable, :symbol_base, :media_type_registrar, :media_type_validations
@@ -26,18 +28,26 @@ module MediaTypes
         end
       end
 
-      def valid?(output, media_type = to_constructable, **opts)
-        validations.find(String(media_type)).valid?(output, backtrace: ['.'], **opts)
+      def valid?(output, **opts)
+        to_constructable.valid?(output, **opts)
       end
 
-      def validate!(output, media_type = to_constructable, **opts)
-        validations.find(String(media_type)).validate(output, backtrace: ['.'], **opts)
+      def valid_unsafe?(output, media_type = to_constructable, **opts)
+        validations.find(media_type).valid?(output, backtrace: ['.'], **opts)
+      end
+      
+      def validate!(output, **opts)
+        to_constructable.validate!(output, **opts)
+      end
+
+      def validate_unsafe!(output, media_type = to_constructable, **opts)
+        validations.find(media_type).validate(output, backtrace: ['.'], **opts)
       end
 
       def validatable?(media_type = to_constructable)
         return false unless validations
 
-        validations.find(String(media_type), -> { nil })
+        validations.find(media_type, -> { nil })
       end
 
       def register
@@ -46,8 +56,52 @@ module MediaTypes
           registerable
         end
       end
+      
+      def view(v)
+        to_constructable.view(v)
+      end
+      def version(v)
+        to_constructable.version(v)
+      end
+      def suffix(s)
+        to_constructable.suffix(s)
+      end
+
+      def identifier_format
+        self.media_type_name_for = Proc.new do |type:, view:, version:, suffix:|
+          yield(type: type, view: view, version: version, suffix: suffix)
+        end
+      end
+
+      def identifier
+        to_constructable.to_s
+      end
+
+      def available_validations
+        self.media_type_combinations.map do |a|
+          _, view, version, suffix = a
+          view(view).version(version).suffix(suffix)
+        end
+      end
 
       private
+
+      def name(name, defaults: {})
+        if self.media_type_name_for.nil?
+          self.media_type_name_for = Proc.new do |type:, view:, version:, suffix:|
+            raise format('Implement the class method "organisation" in %<klass>s', klass: self) unless defined?(:organisation)
+            raise ArgumentError, 'Unable to create a name for a schema with a nil name.' if type.nil?
+            raise ArgumentError, 'Unable to create a name for a schema with a nil organisation.' if organisation.nil?
+
+            result = "application/vnd.#{organisation}.#{type}"
+            result += ".v#{version}" unless version.nil?
+            result += ".#{view}" unless view.nil?
+            result += "+#{suffix}" unless suffix.nil?
+            result
+          end
+        end
+        self.media_type_constructable = Constructable.new(self, type: name).suffix(defaults.fetch('suffix') { nil })
+      end
 
       def media_type(name, defaults: {})
 
@@ -56,8 +110,11 @@ module MediaTypes
             raise format('Implement the class method "base_format" in %<klass>s', klass: self)
           end
         end
+        self.media_type_name_for = Proc.new do |type:, view:, version:, suffix:|
+          Formatter.call({format: base_format, type: type, view: view, version: version, suffix: suffix})
+        end
 
-        self.media_type_constructable = Constructable.new(self, format: base_format, type: name)
+        self.media_type_constructable = Constructable.new(self, type: name)
                                                      .version(defaults.fetch(:version) { nil })
                                                      .suffix(defaults.fetch(:suffix) { nil })
                                                      .view(defaults.fetch(:view) { nil })

@@ -25,7 +25,7 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency 'actionpack'
   spec.add_development_dependency 'awesome_print'
-  spec.add_development_dependency 'bundler', '~> 2'
+  spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'http'
   spec.add_development_dependency 'minitest', '~> 5.0'
   spec.add_development_dependency 'minitest-ci'

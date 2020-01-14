@@ -346,6 +346,21 @@ module MediaTypes
       end.link(*args, **opts, &block)
     end
 
+    ##
+    # Mark object as a valid empty object
+    #
+    # @example Empty object
+    #
+    #   class MyMedia
+    #     include MediaTypes::Dsl
+    #
+    #     validations do
+    #       empty
+    #     end
+    #   end
+    def empty
+    end
+
     def inspect(indentation = 0)
       tabs = '  ' * indentation
       [

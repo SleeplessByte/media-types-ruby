@@ -25,7 +25,7 @@ module MediaTypes
     #
     def initialize(media_type, registry = {}, scheme = Scheme.new, &block)
       self.media_type = media_type
-      self.registry = registry.merge!(media_type.to_s => scheme)
+      self.registry = registry.merge!(media_type.as_key => scheme)
       self.scheme = scheme
 
       instance_exec(&block) if block_given?
@@ -39,13 +39,16 @@ module MediaTypes
     # @return [Scheme] the scheme for the given +media_type+
     #
     def find(media_type, default = -> { Scheme.new(allow_empty: true) { not_strict } })
-      registry.fetch(String(media_type)) do
+      registry.fetch(media_type.as_key) do
         default.call
       end
     end
 
     def method_missing(method_name, *arguments, &block)
       if scheme.respond_to?(method_name)
+        media_type.__getobj__.media_type_combinations ||= Set.new
+        media_type.__getobj__.media_type_combinations.add(media_type.as_key)
+      
         return scheme.send(method_name, *arguments, &block)
       end
 

@@ -6,6 +6,8 @@
 
 Media Types based on  scheme, with versioning, views, suffixes and validations. Integrations available for [Rails](https://github.com/rails/rails) / ActionPack and [http.rb](https://github.com/httprb/http).
 
+This library makes it easy to define schemas that can be used to validate JSON objects based on their Content-Type.
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -24,7 +26,31 @@ Or install it yourself as:
 
 ## Usage
 
-By default there are no media types registered or defined, except for an abstract base type.
+Define a validation:
+
+```ruby
+require 'media_types'
+
+class FooValidator
+  include MediaTypes::Dsl
+
+  def self.organisation
+    'example'
+  end
+
+  name 'foo'
+
+  validations do
+    attribute :foo, String
+  end
+end
+```
+
+Validate an object:
+
+```ruby
+FooValidator.validate!({ foo: 'bar' })
+```
 
 ## Definition
 You can define media types by inheriting from this base type, or create your own base type with a class method `.base_format` that is used to create the final media type string by injecting formatted parameters:
@@ -315,25 +341,25 @@ expected_object.valid?([{ foo: 'string' }])
 ```
 
 ## Formatting for headers
-Any media type object can be coerced in valid string to be used with `Content-Type` or `Accept`:
+Any media type object can be converted in valid string to be used with `Content-Type` or `Accept`:
 
 ```Ruby
-Venue.mime_type.to_s
+Venue.mime_type.identifier
 # => "application/vnd.mydomain.venue.v2+json"
 
-Venue.mime_type.version(1).to_s
+Venue.mime_type.version(1).identifier
 # => "application/vnd.mydomain.venue.v1+json"
 
-Venue.mime_type.version(1).suffix(:xml).to_s
+Venue.mime_type.version(1).suffix(:xml).identifier
 # => "application/vnd.mydomain.venue.v1+xml"
 
 Venue.mime_type.to_s(0.2)
 # => "application/vnd.mydomain.venue.v2+json; q=0.2"
 
-Venue.mime_type.collection.to_s
+Venue.mime_type.collection.identifier
 # => "application/vnd.mydomain.venue.v2.collection+json"
 
-Venue.mime_type.view('active').to_s
+Venue.mime_type.view('active').identifier
 # => "application/vnd.mydomain.venue.v2.active+json"
 ```
 
