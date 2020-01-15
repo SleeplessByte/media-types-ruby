@@ -8,11 +8,11 @@ module MediaTypes
     class TestSchemeType
       include MediaTypes::Dsl
 
-      def self.base_format
-        'application/vnd.domain.test.%<type>s.v%<version>s.%<view>s+%<suffix>s'
+      def self.organisation
+        'domain'
       end
 
-      media_type 'scheme'
+      name 'scheme'
 
       defaults do
         version 2

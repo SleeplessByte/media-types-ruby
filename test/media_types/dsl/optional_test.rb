@@ -9,11 +9,11 @@ module MediaTypes
       class OptionalAttribute
         include MediaTypes::Dsl
 
-        def self.base_format
-          'application/vnd.trailervote.test'
+        def self.organisation
+          'trailervote'
         end
 
-        media_type 'test'
+        name 'test'
 
         validations do
           attribute :bar
@@ -36,11 +36,11 @@ module MediaTypes
       class OptionalAttributeInsideAny
         include MediaTypes::Dsl
 
-        def self.base_format
-          'application/vnd.trailervote.test'
+        def self.organisation
+          'trailervote'
         end
 
-        media_type 'test'
+        name 'test'
 
         validations do
           any do
@@ -66,11 +66,11 @@ module MediaTypes
       class OptionalAttributeInsideCollection
         include MediaTypes::Dsl
 
-        def self.base_format
-          'application/vnd.trailervote.test'
+        def self.organisation
+          'trailervote'
         end
 
-        media_type 'test'
+        name 'test'
 
         validations do
           collection :foo do
@@ -103,11 +103,11 @@ module MediaTypes
       class OptionalCollection
         include MediaTypes::Dsl
 
-        def self.base_format
-          'application/vnd.trailervote.test'
+        def self.organisation
+          'trailervote'
         end
 
-        media_type 'test'
+        name 'test'
 
         validations do
           collection :foo, optional: true do
@@ -138,11 +138,11 @@ module MediaTypes
       class OptionalAttributeInsideAttribute
         include MediaTypes::Dsl
 
-        def self.base_format
-          'application/vnd.trailervote.test'
+        def self.organisation
+          'trailervote'
         end
 
-        media_type 'test'
+        name 'test'
 
         validations do
           attribute :foo do
@@ -173,11 +173,11 @@ module MediaTypes
       class OptionalAttributeInsideOptionalAttribute
         include MediaTypes::Dsl
 
-        def self.base_format
-          'application/vnd.trailervote.test'
+        def self.organisation
+          'trailervote'
         end
 
-        media_type 'test'
+        name 'test'
 
         validations do
           attribute :foo, optional: true do

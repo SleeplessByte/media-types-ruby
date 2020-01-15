@@ -9,11 +9,11 @@ module MediaTypes
       class SingleLink
         include MediaTypes::Dsl
 
-        def self.base_format
-          'application/vnd.trailervote.test'
+        def self.organisation
+          'trailervote'
         end
 
-        media_type 'test'
+        name 'test'
 
         validations do
           link :self
@@ -37,11 +37,11 @@ module MediaTypes
       class LinkWithAttribute
         include MediaTypes::Dsl
 
-        def self.base_format
-          'application/vnd.trailervote.test'
+        def self.organisation
+          'trailervote'
         end
 
-        media_type 'test'
+        name 'test'
 
         validations do
           link :self do
@@ -71,11 +71,11 @@ module MediaTypes
       class OptionalLink
         include MediaTypes::Dsl
 
-        def self.base_format
-          'application/vnd.trailervote.test'
+        def self.organisation
+          'trailervote'
         end
 
-        media_type 'test'
+        name 'test'
 
         validations do
           link :self, optional: true

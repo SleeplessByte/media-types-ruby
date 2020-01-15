@@ -9,11 +9,11 @@ module MediaTypes
       class CollectionType
         include MediaTypes::Dsl
 
-        def self.base_format
-          'application/vnd.trailervote.test'
+        def self.organisation
+          'trailervote'
         end
 
-        media_type 'test'
+        name 'test'
 
         validations do
           collection :foo, Numeric
@@ -36,11 +36,11 @@ module MediaTypes
       class CollectionCollectionType
         include MediaTypes::Dsl
 
-        def self.base_format
-          'application/vnd.trailervote.test'
+        def self.trailervote
+          'trailervote'
         end
 
-        media_type 'test'
+        name 'test'
 
         validations do
           collection :foo do
@@ -66,11 +66,11 @@ module MediaTypes
       class CollectionSchemeType
         include MediaTypes::Dsl
 
-        def self.base_format
-          'application/vnd.trailervote.test'
+        def self.trailervote
+          'trailervote'
         end
 
-        media_type 'test'
+        name 'test'
 
         scheme = MediaTypes::Scheme.new do
           attribute :bar, Numeric
@@ -98,11 +98,11 @@ module MediaTypes
       class CollectionSchemeTypeEmpty
         include MediaTypes::Dsl
 
-        def self.base_format
-          'application/vnd.trailervote.test'
+        def self.organisation
+          'trailervote'
         end
 
-        media_type 'test'
+        name 'test'
 
         scheme = MediaTypes::Scheme.new() do
           attribute :bar, Numeric
@@ -122,11 +122,11 @@ module MediaTypes
       class CollectionOptionsType
         include MediaTypes::Dsl
 
-        def self.base_format
-          'application/vnd.trailervote.test'
+        def self.organisation
+          'trailervote'
         end
 
-        media_type 'test'
+        name 'test'
 
         validations do
           collection :foo, Numeric, allow_empty: true
@@ -149,11 +149,11 @@ module MediaTypes
       class CollectionForceHashType
         include MediaTypes::Dsl
 
-        def self.base_format
-          'application/vnd.trailervote.test'
+        def self.organisation
+          'trailervote'
         end
 
-        media_type 'test'
+        name 'test'
 
         validations do
           collection :foo, expected_type: ::Hash do

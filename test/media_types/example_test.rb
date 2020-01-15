@@ -10,14 +10,12 @@ module MediaTypes
       class << self
         protected
 
-        BASE_TEXT_FORMAT = 'application/vnd.domain.test.%<type>s.v%<version>s.%<view>s+%<suffix>s'
-
-        def base_format
-          BASE_TEXT_FORMAT
+        def self.organisation
+          domain
         end
       end
 
-      media_type 'test', defaults: { suffix: :xml, version: 2 }
+      name 'test', defaults: { suffix: :xml }
 
       registrations :base do
         view 'collection', :tests

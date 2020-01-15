@@ -9,11 +9,11 @@ module MediaTypes
       class NotStrictType
         include MediaTypes::Dsl
 
-        def self.base_format
-          'application/vnd.trailervote.test'
+        def self.organisation
+          'trailervote'
         end
 
-        media_type 'test'
+        name 'test'
 
         validations do
           attribute :foo, Numeric
@@ -35,11 +35,11 @@ module MediaTypes
       class NotStrictCollectionType
         include MediaTypes::Dsl
 
-        def self.base_format
-          'application/vnd.trailervote.test'
+        def self.organisation
+          'trailervote'
         end
 
-        media_type 'test'
+        name 'test'
 
         validations do
           collection :foo do
