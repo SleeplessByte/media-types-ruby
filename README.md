@@ -52,13 +52,7 @@ Validate an object:
 FooValidator.validate!({ foo: 'bar' })
 ```
 
-## Definition
-You can define media types by inheriting from this base type, or create your own base type with a class method `.base_format` that is used to create the final media type string by injecting formatted parameters:
-
-- `%<type>s`: the type `media_type` received
-- `%<version>s`: the version, defaults to `:current_version`
-- `%<view>s`: the view, defaults to <empty>
-- `%<suffix>s`: the suffix
+## Full example
 
 ```Ruby
 require 'media_types'
@@ -66,22 +60,24 @@ require 'media_types'
 class Venue
   include MediaTypes::Dsl
   
-  def self.base_format
-    'application/vnd.mydomain.%<type>s.v%<version>s.%<view>s+%<suffix>s'
+  def self.organisation
+    'mydomain'
   end
   
-  media_type 'venue', defaults: { suffix: :json, version: 2 }
+  media_type 'venue', defaults: { suffix: :json }
 
   validations do
-    attribute :name, String
-    collection :location do
-      attribute :latitude, Numeric
-      attribute :longitude, Numeric
-      attribute :altitude, AllowNil(Numeric)
-    end
+    version 2 do
+      attribute :name, String
+      collection :location do
+        attribute :latitude, Numeric
+        attribute :longitude, Numeric
+        attribute :altitude, AllowNil(Numeric)
+      end
 
-    link :self
-    link :route, allow_nil: true
+      link :self
+      link :route, allow_nil: true
+    end
     
     version 1 do
       attribute :name, String
@@ -123,7 +119,7 @@ end
 
 ## Schema Definitions
 
-If you define a scheme using `current_scheme { }`, you may use any of the following dsl:
+If you include 'MediaTypes::Dsl' in your class you can use the following functions within a `validation do` block to define your schema:
 
 ### `attribute`
 
