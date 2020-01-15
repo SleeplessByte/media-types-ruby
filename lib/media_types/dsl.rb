@@ -100,7 +100,7 @@ module MediaTypes
             result
           end
         end
-        self.media_type_constructable = Constructable.new(self, type: name).suffix(defaults.fetch('suffix') { nil })
+        self.media_type_constructable = Constructable.new(self, type: name).suffix(defaults.fetch(:suffix) { nil })
       end
 
       def defaults(&block)
