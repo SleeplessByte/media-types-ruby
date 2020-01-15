@@ -396,6 +396,64 @@ Load the `http` integration and call `.register` on all media types you want to 
 
 Currently uses `oj` under the hood and this can not be changed.
 
+## API
+
+A defined schema has the following functions available:
+
+### `valid?`
+
+Example: `Venue.valid?({ foo: 'bar' })`
+
+Allows passing in validation options as a second parameter.
+
+### `validate!`
+
+Example: `Venue.validate!({ foo: 'bar' })`
+
+Allows passing in validation options as a second parameter.
+
+### `validatable?`
+
+Example: `Venue.version(42).validatable?`
+
+Tests wether the current configuration of the schema has a validation defined.
+
+### `register`
+
+Example: `Venue.register`
+
+Registers the media type to the registry.
+
+### `view`
+
+Example: `Venue.view('create')`
+
+Returns a schema validator configured with the specified view.
+
+### `version`
+
+Example: `Venue.version(42)`
+
+Returns a schema validator configured with the specified version.
+
+### `suffix`
+
+Example: `Venue.suffix(:json)`
+
+Returns a schema validator configured with the specified suffix.
+
+### `identifier`
+
+Example: `Venue.version(2).identifier` (returns `'application/vnd.application.venue.v2'`)
+
+Returns the IANA compatible [Media Type Identifier](https://en.wikipedia.org/wiki/Media_type) for the configured schema.
+
+### `available_validations`
+
+Example: `Venue.available_validations`
+
+Returns a list of all the schemas that are defined.
+
 ## Related
 
 - [`MediaTypes::Serialization`](https://github.com/XPBytes/media_types-serialization): :cyclone: Add media types supported serialization using your favourite serializer
