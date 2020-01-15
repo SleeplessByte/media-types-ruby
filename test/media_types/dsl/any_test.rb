@@ -9,42 +9,49 @@ module MediaTypes
       class AnyType
         include MediaTypes::Dsl
 
-        def self.base_format
-          'application/vnd.trailervote.test'
+        def self.organisation
+          'trailervote'
         end
 
-        media_type 'test'
+        name 'test'
 
         validations do
           any Numeric
+
+          assert_pass <<-FIXTURE
+          { "foo": 42, "bar": 43 }
+          FIXTURE
+
+          assert_pass '{"foo": 42}'
+          # Any also means none, there are no required keys
+          assert_pass '{}'
+
+          # Expects any value to be a Numeric, not a Hash
+          assert_fail <<-FIXTURE
+          { "foo": { "bar": "string" } }
+          FIXTURE
+        
+          # Expects any value to be Numeric, not a Hash
+          assert_fail '{"foo": {}}'
+          # Expects any value to be Numeric, not a NilClass
+          assert_fail '{"foo": null}'
+          # Expects any value to be Numeric, not Array
+          assert_fail '{"foo": [42]}'
         end
       end
 
       def test_any_of_type
         assert AnyType.validatable?(AnyType.to_constructable), 'Expected media type to be validatable'
-        assert AnyType.validate!(foo: 42, bar: 43), 'Expected input to be valid'
-        assert AnyType.validate!(foo: 42), 'Expected input to be valid'
-        # Any also means none, there are no required keys
-        assert AnyType.validate!({}), 'Expected input to be valid'
-
-        # Expects any value to be a Numeric, not a Hash
-        refute AnyType.valid?(foo: { bar: 'string' }), 'Expected input to be invalid'
-        # Expects any value to be Numeric, not a Hash
-        refute AnyType.valid?(foo: {}), 'Expected input to be invalid'
-        # Expects any value to be Numeric, not NilClass
-        refute AnyType.valid?(foo: nil), 'Expected input to be invalid'
-        # Expects any value to be Numeric, not Array
-        refute AnyType.valid?(foo: [42]), 'Expected input to be invalid'
       end
 
       class AnyOfScheme
         include MediaTypes::Dsl
 
-        def self.base_format
-          'application/vnd.trailervote.test'
+        def self.organisation
+          'trailervote'
         end
 
-        media_type 'test'
+        name 'test'
 
         validations do
           any do
@@ -78,11 +85,11 @@ module MediaTypes
       class AnyWithOptions
         include MediaTypes::Dsl
 
-        def self.base_format
-          'application/vnd.trailervote.test'
+        def self.organisation
+          'trailervote'
         end
 
-        media_type 'test'
+        name 'test'
 
         validations do
           any allow_empty: true do
@@ -116,11 +123,11 @@ module MediaTypes
       class AnyWithOptionsOrNil
         include MediaTypes::Dsl
 
-        def self.base_format
-          'application/vnd.trailervote.test'
+        def self.organisation
+          'trailervote'
         end
 
-        media_type 'test'
+        name 'test'
 
         validations do
           # Same as AllowNil(::Hash)
@@ -155,11 +162,11 @@ module MediaTypes
       class AnyWithScheme
         include MediaTypes::Dsl
 
-        def self.base_format
-          'application/vnd.trailervote.test'
+        def self.organisation
+          'trailervote'
         end
 
-        media_type 'test'
+        name 'test'
 
         scheme = MediaTypes::Scheme.new(expected_type: ::Hash) do
           attribute :bar, Numeric
@@ -195,11 +202,11 @@ module MediaTypes
       class AnyWithForce
         include MediaTypes::Dsl
 
-        def self.base_format
-          'application/vnd.trailervote.test'
+        def self.organisation
+          'trailervote'
         end
 
-        media_type 'test'
+        name 'test'
 
         validations do
           any expected_type: ::Array do

@@ -17,7 +17,12 @@ require 'media_types/scheme/output_empty_guard'
 require 'media_types/scheme/output_type_guard'
 require 'media_types/scheme/rules_exhausted_guard'
 
+require 'json'
+
 module MediaTypes
+  class AssertionError < StandardError
+  end
+
   ##
   # Media Type Schemes can validate content to a media type, by itself. Used by the `validations` dsl.
   #
@@ -368,6 +373,23 @@ module MediaTypes
         rules.inspect(indentation + 1),
         "#{tabs}[/Scheme]"
       ].join("\n")
+    end
+
+    def assert_pass(fixture)
+      json = JSON.parse(fixture)
+
+      validate(json)
+    end
+    
+    def assert_fail(fixture)
+      json = JSON.parse(fixture)
+
+      begin
+        validate(json)
+      rescue MediaTypes::Scheme::ValidationError
+        return
+      end
+      raise AssertionError
     end
 
     private

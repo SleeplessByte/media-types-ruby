@@ -103,24 +103,6 @@ module MediaTypes
         self.media_type_constructable = Constructable.new(self, type: name).suffix(defaults.fetch('suffix') { nil })
       end
 
-      def media_type(name, defaults: {})
-
-        unless defined?(:base_format)
-          define_method(:base_format) do
-            raise format('Implement the class method "base_format" in %<klass>s', klass: self)
-          end
-        end
-        self.media_type_name_for = Proc.new do |type:, view:, version:, suffix:|
-          Formatter.call({format: base_format, type: type, view: view, version: version, suffix: suffix})
-        end
-
-        self.media_type_constructable = Constructable.new(self, type: name)
-                                                     .version(defaults.fetch(:version) { nil })
-                                                     .suffix(defaults.fetch(:suffix) { nil })
-                                                     .view(defaults.fetch(:view) { nil })
-        self
-      end
-
       def defaults(&block)
         return media_type_constructable unless block_given?
         self.media_type_constructable = Defaults.new(to_constructable, &block).to_constructable
