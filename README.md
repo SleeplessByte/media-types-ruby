@@ -31,17 +31,17 @@ Define a validation:
 ```ruby
 require 'media_types'
 
-class FooValidator
-  include MediaTypes::Dsl
+module Acme
+  MediaTypes::set_organisation Acme, 'acme'
 
-  def self.organisation
-    'example'
-  end
+  class FooValidator
+    include MediaTypes::Dsl
 
-  use_name 'foo'
+    use_name 'foo'
 
-  validations do
-    attribute :foo, String
+    validations do
+      attribute :foo, String
+    end
   end
 end
 ```
@@ -49,7 +49,7 @@ end
 Validate an object:
 
 ```ruby
-FooValidator.validate!({ foo: 'bar' })
+Acme::FooValidator.validate!({ foo: 'bar' })
 ```
 
 ## Full example
