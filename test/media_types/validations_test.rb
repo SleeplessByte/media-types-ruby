@@ -12,7 +12,7 @@ module MediaTypes
         'domain'
       end
 
-      name 'scheme'
+      use_name 'scheme'
 
       defaults do
         version 2

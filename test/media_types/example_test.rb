@@ -15,7 +15,7 @@ module MediaTypes
         end
       end
 
-      name 'test', defaults: { suffix: :xml }
+      use_name 'test', defaults: { suffix: :xml }
 
       registrations :base do
         view 'collection', :tests

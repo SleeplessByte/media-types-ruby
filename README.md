@@ -38,7 +38,7 @@ class FooValidator
     'example'
   end
 
-  name 'foo'
+  use_name 'foo'
 
   validations do
     attribute :foo, String

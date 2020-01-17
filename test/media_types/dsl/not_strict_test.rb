@@ -13,7 +13,7 @@ module MediaTypes
           'trailervote'
         end
 
-        name 'test'
+        use_name 'test'
 
         validations do
           attribute :foo, Numeric
@@ -39,7 +39,7 @@ module MediaTypes
           'trailervote'
         end
 
-        name 'test'
+        use_name 'test'
 
         validations do
           collection :foo do

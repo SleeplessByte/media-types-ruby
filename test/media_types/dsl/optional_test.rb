@@ -13,7 +13,7 @@ module MediaTypes
           'trailervote'
         end
 
-        name 'test'
+        use_name 'test'
 
         validations do
           attribute :bar
@@ -40,7 +40,7 @@ module MediaTypes
           'trailervote'
         end
 
-        name 'test'
+        use_name 'test'
 
         validations do
           any do
@@ -70,7 +70,7 @@ module MediaTypes
           'trailervote'
         end
 
-        name 'test'
+        use_name 'test'
 
         validations do
           collection :foo do
@@ -107,7 +107,7 @@ module MediaTypes
           'trailervote'
         end
 
-        name 'test'
+        use_name 'test'
 
         validations do
           collection :foo, optional: true do
@@ -142,7 +142,7 @@ module MediaTypes
           'trailervote'
         end
 
-        name 'test'
+        use_name 'test'
 
         validations do
           attribute :foo do
@@ -177,7 +177,7 @@ module MediaTypes
           'trailervote'
         end
 
-        name 'test'
+        use_name 'test'
 
         validations do
           attribute :foo, optional: true do

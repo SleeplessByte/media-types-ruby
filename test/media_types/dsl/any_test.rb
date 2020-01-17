@@ -13,7 +13,7 @@ module MediaTypes
           'trailervote'
         end
 
-        name 'test'
+        use_name 'test'
 
         validations do
           any Numeric
@@ -51,7 +51,7 @@ module MediaTypes
           'trailervote'
         end
 
-        name 'test'
+        use_name 'test'
 
         validations do
           any do
@@ -89,7 +89,7 @@ module MediaTypes
           'trailervote'
         end
 
-        name 'test'
+        use_name 'test'
 
         validations do
           any allow_empty: true do
@@ -127,7 +127,7 @@ module MediaTypes
           'trailervote'
         end
 
-        name 'test'
+        use_name 'test'
 
         validations do
           # Same as AllowNil(::Hash)
@@ -166,7 +166,7 @@ module MediaTypes
           'trailervote'
         end
 
-        name 'test'
+        use_name 'test'
 
         scheme = MediaTypes::Scheme.new(expected_type: ::Hash) do
           attribute :bar, Numeric
@@ -206,7 +206,7 @@ module MediaTypes
           'trailervote'
         end
 
-        name 'test'
+        use_name 'test'
 
         validations do
           any expected_type: ::Array do

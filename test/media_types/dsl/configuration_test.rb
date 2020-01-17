@@ -13,7 +13,7 @@ module MediaTypes
           'example'
         end
 
-        name 'test'
+        use_name 'test'
 
         validations do
           version 1 do

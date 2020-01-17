@@ -13,7 +13,7 @@ module MediaTypes
           'trailervote'
         end
 
-        name 'test'
+        use_name 'test'
 
         validations do
           attribute :foo, Numeric
@@ -37,7 +37,7 @@ module MediaTypes
           'trailervote'
         end
 
-        name 'test'
+        use_name 'test'
 
         validations do
           attribute :foo do
@@ -64,7 +64,7 @@ module MediaTypes
           'trailervote'
         end
 
-        name 'test'
+        use_name 'test'
 
         scheme = MediaTypes::Scheme.new do
           attribute :bar, Numeric
@@ -93,7 +93,7 @@ module MediaTypes
           'trailervote'
         end
 
-        name 'test'
+        use_name 'test'
 
         validations do
           attribute :foo, Numeric, allow_nil: true

@@ -7,6 +7,7 @@ require 'media_types/validations'
 
 module MediaTypes
   module Dsl
+
     def self.included(base)
       base.extend ClassMethods
       base.class_eval do
@@ -86,14 +87,21 @@ module MediaTypes
 
       private
 
-      def name(name, defaults: {})
+      def use_name(name, defaults: {})
         if self.media_type_name_for.nil?
           self.media_type_name_for = Proc.new do |type:, view:, version:, suffix:|
-            raise format('Implement the class method "organisation" in %<klass>s', klass: self) unless defined?(:organisation)
-            raise ArgumentError, 'Unable to create a name for a schema with a nil name.' if type.nil?
-            raise ArgumentError, 'Unable to create a name for a schema with a nil organisation.' if organisation.nil?
+            resolved_org = nil
+            if defined?(organisation)
+              resolved_org = organisation
+            else
+              resolved_org = MediaTypes::get_organisation(self)
 
-            result = "application/vnd.#{organisation}.#{type}"
+              raise format('Implement the class method "organisation" in %<klass>s or specify a global organisation using MediaTypes::set_organisation', klass: self) if resolved_org.nil?
+            end
+            raise ArgumentError, 'Unable to create a name for a schema with a nil name.' if type.nil?
+            raise ArgumentError, 'Unable to create a name for a schema with a nil organisation.' if resolved_org.nil?
+
+            result = "application/vnd.#{resolved_org}.#{type}"
             result += ".v#{version}" unless version.nil?
             result += ".#{view}" unless view.nil?
             result += "+#{suffix}" unless suffix.nil?
