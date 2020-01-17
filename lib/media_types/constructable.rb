@@ -119,7 +119,6 @@ module MediaTypes
     end
 
     def validatable?
-      self.media_type_combinations ||= Set.new
       return false unless media_type_combinations.include? as_key
       
       __getobj__.validatable?(self)
