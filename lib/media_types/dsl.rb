@@ -18,6 +18,7 @@ module MediaTypes
 
           attr_accessor :media_type_constructable, :symbol_base, :media_type_registrar, :media_type_validations
         end
+        base.media_type_combinations = Set.new
       end
     end
 
