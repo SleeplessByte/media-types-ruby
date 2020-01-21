@@ -10,14 +10,12 @@ module MediaTypes
       class << self
         protected
 
-        BASE_TEXT_FORMAT = 'application/vnd.domain.test.%<type>s.v%<version>s.%<view>s+%<suffix>s'
-
-        def base_format
-          BASE_TEXT_FORMAT
+        def organisation
+          'domain.test'
         end
       end
 
-      media_type 'test', defaults: { suffix: :xml, version: 2 }
+      use_name 'test', defaults: { suffix: :xml }
 
       registrations :base do
         view 'collection', :tests
@@ -36,9 +34,9 @@ module MediaTypes
 
     def test_the_default_media_type
       assert_equal format(
-        'application/vnd.domain.test.%<type>s.v%<version>s%<view>s+%<suffix>s',
+        'application/vnd.domain.test.%<type>s%<view>s+%<suffix>s',
         type: 'test',
-        version: 2,
+        version: nil,
         view: nil,
         suffix: :xml
       ), TestMediaType.to_constructable.to_s
@@ -56,9 +54,9 @@ module MediaTypes
 
     def test_alter_suffix_mime_type
       assert_equal format(
-        'application/vnd.domain.test.%<type>s.v%<version>s%<view>s+%<suffix>s',
+        'application/vnd.domain.test.%<type>s%<view>s+%<suffix>s',
         type: 'test',
-        version: 2,
+        version: nil,
         view: nil,
         suffix: :json
       ), TestMediaType.to_constructable.suffix(:json).to_s
@@ -66,9 +64,9 @@ module MediaTypes
 
     def test_alter_view_mime_type
       assert_equal format(
-        'application/vnd.domain.test.%<type>s.v%<version>s.%<view>s+%<suffix>s',
+        'application/vnd.domain.test.%<type>s.%<view>s+%<suffix>s',
         type: 'test',
-        version: 2,
+        version: nil,
         view: 'custom',
         suffix: :xml
       ), TestMediaType.to_constructable.view('custom').to_s
@@ -87,9 +85,9 @@ module MediaTypes
     %i[index collection create].each do |predefined|
       define_method format('test_mime_type_predefined_%<predefined>s', predefined: predefined) do
         assert_equal format(
-          'application/vnd.domain.test.%<type>s.v%<version>s.%<view>s+%<suffix>s',
+          'application/vnd.domain.test.%<type>s.%<view>s+%<suffix>s',
           type: 'test',
-          version: 2,
+          version: nil,
           view: predefined,
           suffix: :xml
         ), TestMediaType.to_constructable.public_send(predefined).to_s

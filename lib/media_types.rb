@@ -12,6 +12,19 @@ require 'media_types/views'
 require 'media_types/integrations'
 
 module MediaTypes
+  def self.set_organisation(mod, organisation)
+    @organisation_prefixes ||= {}
+    @organisation_prefixes[mod.name] = organisation
+  end
+
+  def self.get_organisation(mod)
+    name = mod.name
+    prefixes = @organisation_prefixes.keys.select { |p| name.start_with? p }
+    return nil unless prefixes.any?
+    best = prefixes.max_by { |p| p.length }
+
+    @organisation_prefixes[best]
+  end
 end
 
 

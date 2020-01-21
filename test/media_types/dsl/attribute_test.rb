@@ -9,62 +9,62 @@ module MediaTypes
       class AttributeType
         include MediaTypes::Dsl
 
-        def self.base_format
-          'application/vnd.trailervote.test'
+        def self.organisation
+          'trailervote'
         end
 
-        media_type 'test'
+        use_name 'test'
 
         validations do
           attribute :foo, Numeric
+
+          assert_pass '{"foo": 42}'
+          assert_fail '{"foo": "string"}'
+          assert_fail '{"foo": {}}'
+          assert_fail '{"foo": null}'
+          assert_fail '{"foo": [42]}'
         end
       end
 
       def test_attribute_as_type
         assert AttributeType.validatable?(AttributeType.to_constructable), 'Expected media type to be validatable'
-        assert AttributeType.validate!(foo: 42), 'Expected input to be valid'
-
-        refute AttributeType.valid?(foo: { bar: 'string' }), 'Expected input to be invalid'
-        refute AttributeType.valid?(foo: {}), 'Expected input to be invalid'
-        refute AttributeType.valid?(foo: nil), 'Expected input to be invalid'
-        refute AttributeType.valid?(foo: [42]), 'Expected input to be invalid'
       end
 
       class AttributeCollectionType
         include MediaTypes::Dsl
 
-        def self.base_format
-          'application/vnd.trailervote.test'
+        def self.organisation
+          'trailervote'
         end
 
-        media_type 'test'
+        use_name 'test'
 
         validations do
           attribute :foo do
             attribute :bar, Numeric
           end
+
+          assert_pass '{"foo": {"bar": 42}}'
+          assert_fail '{"foo": {"bar": "string"}}'
+          assert_fail '{"foo": {}}'
+          assert_fail '{"foo": null}'
+          assert_fail '{"foo": [{ "bar": "string"}]}'
         end
       end
 
       def test_attribute_with_block
         assert AttributeCollectionType.validatable?(AttributeCollectionType.to_constructable),
                'Expected media type to be validatable'
-        assert AttributeCollectionType.validate!(foo: { bar: 42 }), 'Expected input to be valid'
-
-        refute AttributeCollectionType.valid?(foo: { bar: 'string' }), 'Expected input to be invalid'
-        refute AttributeCollectionType.valid?(foo: {}), 'Expected input to be invalid'
-        refute AttributeCollectionType.valid?(foo: nil), 'Expected input to be invalid'
-        refute AttributeCollectionType.valid?(foo: [{ bar: 'string' }]), 'Expected input to be invalid'
       end
 
       class AttributeSchemeType
         include MediaTypes::Dsl
 
-        def self.base_format
-          'application/vnd.trailervote.test'
+        def self.organisation
+          'trailervote'
         end
 
-        media_type 'test'
+        use_name 'test'
 
         scheme = MediaTypes::Scheme.new do
           attribute :bar, Numeric
@@ -72,28 +72,28 @@ module MediaTypes
 
         validations do
           attribute :foo, scheme
+
+          assert_pass '{"foo": {"bar": 42}}'
+          assert_fail '{"foo": {"bar": "string"}}'
+          assert_fail '{"foo": {}}'
+          assert_fail '{"foo": null}'
+          assert_fail '{"foo": [{"bar": "string"}]}'
         end
       end
 
       def test_attribute_from_scheme
         assert AttributeSchemeType.validatable?(AttributeSchemeType.to_constructable),
                'Expected media type to be validatable'
-        assert AttributeSchemeType.validate!(foo: { bar: 42 }), 'Expected input to be valid'
-
-        refute AttributeSchemeType.valid?(foo: { bar: 'string' }), 'Expected input to be invalid'
-        refute AttributeSchemeType.valid?(foo: {}), 'Expected input to be invalid'
-        refute AttributeSchemeType.valid?(foo: nil), 'Expected input to be invalid'
-        refute AttributeSchemeType.valid?(foo: [{ bar: 'string' }]), 'Expected input to be invalid'
       end
 
       class AttributeOptionsType
         include MediaTypes::Dsl
 
-        def self.base_format
-          'application/vnd.trailervote.test+%<suffix>s'
+        def self.organisation
+          'trailervote'
         end
 
-        media_type 'test'
+        use_name 'test'
 
         validations do
           attribute :foo, Numeric, allow_nil: true

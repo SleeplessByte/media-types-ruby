@@ -6,6 +6,8 @@
 
 Media Types based on  scheme, with versioning, views, suffixes and validations. Integrations available for [Rails](https://github.com/rails/rails) / ActionPack and [http.rb](https://github.com/httprb/http).
 
+This library makes it easy to define schemas that can be used to validate JSON objects based on their Content-Type.
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -24,15 +26,33 @@ Or install it yourself as:
 
 ## Usage
 
-By default there are no media types registered or defined, except for an abstract base type.
+Define a validation:
 
-## Definition
-You can define media types by inheriting from this base type, or create your own base type with a class method `.base_format` that is used to create the final media type string by injecting formatted parameters:
+```ruby
+require 'media_types'
 
-- `%<type>s`: the type `media_type` received
-- `%<version>s`: the version, defaults to `:current_version`
-- `%<view>s`: the view, defaults to <empty>
-- `%<suffix>s`: the suffix
+module Acme
+  MediaTypes::set_organisation Acme, 'acme'
+
+  class FooValidator
+    include MediaTypes::Dsl
+
+    use_name 'foo'
+
+    validations do
+      attribute :foo, String
+    end
+  end
+end
+```
+
+Validate an object:
+
+```ruby
+Acme::FooValidator.validate!({ foo: 'bar' })
+```
+
+## Full example
 
 ```Ruby
 require 'media_types'
@@ -40,22 +60,24 @@ require 'media_types'
 class Venue
   include MediaTypes::Dsl
   
-  def self.base_format
-    'application/vnd.mydomain.%<type>s.v%<version>s.%<view>s+%<suffix>s'
+  def self.organisation
+    'mydomain'
   end
   
-  media_type 'venue', defaults: { suffix: :json, version: 2 }
+  media_type 'venue', defaults: { suffix: :json }
 
   validations do
-    attribute :name, String
-    collection :location do
-      attribute :latitude, Numeric
-      attribute :longitude, Numeric
-      attribute :altitude, AllowNil(Numeric)
-    end
+    version 2 do
+      attribute :name, String
+      collection :location do
+        attribute :latitude, Numeric
+        attribute :longitude, Numeric
+        attribute :altitude, AllowNil(Numeric)
+      end
 
-    link :self
-    link :route, allow_nil: true
+      link :self
+      link :route, allow_nil: true
+    end
     
     version 1 do
       attribute :name, String
@@ -97,7 +119,7 @@ end
 
 ## Schema Definitions
 
-If you define a scheme using `current_scheme { }`, you may use any of the following dsl:
+If you include 'MediaTypes::Dsl' in your class you can use the following functions within a `validation do` block to define your schema:
 
 ### `attribute`
 
@@ -315,25 +337,25 @@ expected_object.valid?([{ foo: 'string' }])
 ```
 
 ## Formatting for headers
-Any media type object can be coerced in valid string to be used with `Content-Type` or `Accept`:
+Any media type object can be converted in valid string to be used with `Content-Type` or `Accept`:
 
 ```Ruby
-Venue.mime_type.to_s
+Venue.mime_type.identifier
 # => "application/vnd.mydomain.venue.v2+json"
 
-Venue.mime_type.version(1).to_s
+Venue.mime_type.version(1).identifier
 # => "application/vnd.mydomain.venue.v1+json"
 
-Venue.mime_type.version(1).suffix(:xml).to_s
+Venue.mime_type.version(1).suffix(:xml).identifier
 # => "application/vnd.mydomain.venue.v1+xml"
 
 Venue.mime_type.to_s(0.2)
 # => "application/vnd.mydomain.venue.v2+json; q=0.2"
 
-Venue.mime_type.collection.to_s
+Venue.mime_type.collection.identifier
 # => "application/vnd.mydomain.venue.v2.collection+json"
 
-Venue.mime_type.view('active').to_s
+Venue.mime_type.view('active').identifier
 # => "application/vnd.mydomain.venue.v2.active+json"
 ```
 
@@ -373,6 +395,64 @@ If you want to validate the content-type and not have your errors be `Rack::Erro
 Load the `http` integration and call `.register` on all media types you want to be able to serialize and deserialize. The media type validations will run both before serialization and after deserialization.
 
 Currently uses `oj` under the hood and this can not be changed.
+
+## API
+
+A defined schema has the following functions available:
+
+### `valid?`
+
+Example: `Venue.valid?({ foo: 'bar' })`
+
+Allows passing in validation options as a second parameter.
+
+### `validate!`
+
+Example: `Venue.validate!({ foo: 'bar' })`
+
+Allows passing in validation options as a second parameter.
+
+### `validatable?`
+
+Example: `Venue.version(42).validatable?`
+
+Tests wether the current configuration of the schema has a validation defined.
+
+### `register`
+
+Example: `Venue.register`
+
+Registers the media type to the registry.
+
+### `view`
+
+Example: `Venue.view('create')`
+
+Returns a schema validator configured with the specified view.
+
+### `version`
+
+Example: `Venue.version(42)`
+
+Returns a schema validator configured with the specified version.
+
+### `suffix`
+
+Example: `Venue.suffix(:json)`
+
+Returns a schema validator configured with the specified suffix.
+
+### `identifier`
+
+Example: `Venue.version(2).identifier` (returns `'application/vnd.application.venue.v2'`)
+
+Returns the IANA compatible [Media Type Identifier](https://en.wikipedia.org/wiki/Media_type) for the configured schema.
+
+### `available_validations`
+
+Example: `Venue.available_validations`
+
+Returns a list of all the schemas that are defined.
 
 ## Related
 

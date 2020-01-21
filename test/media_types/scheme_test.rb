@@ -8,11 +8,11 @@ module MediaTypes
     class TestSchemeType
       include MediaTypes::Dsl
 
-      def self.base_format
-        'application/vnd.domain.test.%<type>s.v%<version>s.%<view>s+%<suffix>s'
+      def self.organisation
+        'domain'
       end
 
-      media_type 'scheme'
+      use_name 'scheme'
 
       defaults do
         version 2
@@ -147,12 +147,6 @@ module MediaTypes
       refute TestSchemeType.to_constructable.view('x').validatable?
     end
 
-    def test_unknown_view_validates
-      assert TestSchemeType.to_constructable.view('x').valid?(PASSING_DATA)
-      assert TestSchemeType.to_constructable.view('x').validate!(PASSING_DATA)
-      assert_media_type_format TestSchemeType.to_constructable.view('x'), nil
-    end
-
     def test_nested_validations
       assert_media_type_format(
         TestSchemeType.to_constructable.view('create').version(1),
@@ -220,13 +214,6 @@ module MediaTypes
       assert_raises Scheme::ValidationError do
         TestSchemeType.validate!(PASSING_DATA.dup.merge(key_with_defined_scheme: [{ defined: 'me' }]))
       end
-    end
-
-    def test_it_allows_for_versioned_validation
-      assert TestSchemeType.validate!(
-        MediaTypes::Hash.new(PASSING_DATA.dup).slice(:str),
-        TestSchemeType.to_constructable.version(1)
-      )
     end
   end
 end

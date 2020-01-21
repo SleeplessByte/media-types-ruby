@@ -73,20 +73,35 @@ module MediaTypes
       to_str.split(pattern, *limit)
     end
 
+    def as_key
+      [type, view, version, suffix]
+    end
+
     def hash
-      to_str.hash
+      as_key.hash
     end
 
     def to_str(qualifier = nil)
-      # TODO: remove warning by slicing out these arguments if they don't appear in the format
       qualified(
         qualifier,
-        Formatter.call(opts)
+        __getobj__.media_type_name_for.call(
+          type: opts[:type],
+          view: opts[:view],
+          version: opts[:version],
+          suffix: opts[:suffix],
+        )
       )
+    end
+    
+    def available_validations
+      return [] if !validatable?
+      [self]
     end
 
     def valid?(output, **validation_opts)
-      __getobj__.valid?(
+      raise ArgumentError, "Unable to validate #{to_s} type without a corresponding validation. Please mark objects that should be empty with 'empty'." unless validatable?
+
+      __getobj__.valid_unsafe?(
         output,
         self,
         **validation_opts
@@ -94,7 +109,9 @@ module MediaTypes
     end
 
     def validate!(output, **validation_opts)
-      __getobj__.validate!(
+      raise ArgumentError, "Unable to validate #{to_s} type without a corresponding validation. Please mark objects that should be empty with 'empty'." unless validatable?
+
+      __getobj__.validate_unsafe!(
         output,
         self,
         **validation_opts
@@ -102,11 +119,14 @@ module MediaTypes
     end
 
     def validatable?
+      return false unless media_type_combinations.include? as_key
+      
       __getobj__.validatable?(self)
     end
 
     alias inspect to_str
     alias to_s to_str
+    alias identifier to_str
 
     private
 
