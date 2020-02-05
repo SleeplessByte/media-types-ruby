@@ -27,8 +27,8 @@ jobs:
         #(cd debpkg; gem2tgz media_types.gem)
         #(cd debpkg; dh-make-ruby media_types-*.tar.gz)
         #(cd debpkg; dh-make-ruby media_types-*.tar.gz)
-        gem2deb pkg/media_types*.gem
-        mv ruby-media-types_*_all.deb ruby-media-types.deb
+        (cd pkg; gem2deb media_types*.gem)
+        mv pkg/ruby-media-types_*_all.deb ruby-media-types.deb
     - name: Upload gem
       uses: actions/upload-artifact@v1
       with:
