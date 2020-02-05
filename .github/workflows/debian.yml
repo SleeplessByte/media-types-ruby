@@ -1,0 +1,33 @@
+name: Debian
+
+on:
+  [push]
+        #  release:
+        #    types: [created]
+
+jobs:
+  build:
+
+    runs-on: debian-buster
+
+    steps:
+    - name: Install dependencies
+      run: |
+        apt-get update
+        DEBIAN_FRONTEND=noninteractive apt-get --yes install gem2deb bundler ruby-{actionpack,awesome-print,http,minitest,minitest-reporters,oj,simplecov}
+        rm Gemfile.lock || true
+        bundle install --local
+        bundle exec rake build
+        mv pkg/media_types-*.gem media_types.gem
+        gem2deb media_types.gem --offline
+        mv ruby-media-types_*_all.deb ruby-media-types.deb
+    - name: Upload gem
+      uses: actions/upload-artifact@v1
+      with:
+        name: media_types.gem
+        path: media_types.gem
+    - name: Upload deb
+      uses: actions/upload-artifact@v1
+      with:
+        name: ruby-media-types.deb
+        path: ruby-media-types.deb

@@ -25,12 +25,11 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency 'actionpack'
   spec.add_development_dependency 'awesome_print'
-  spec.add_development_dependency 'bundler', '~> 2'
+  spec.add_development_dependency 'bundler', '>= 1.17.3'
   spec.add_development_dependency 'http'
   spec.add_development_dependency 'minitest', '~> 5.0'
-  spec.add_development_dependency 'minitest-ci'
   spec.add_development_dependency 'minitest-reporters'
   spec.add_development_dependency 'oj'
-  spec.add_development_dependency 'rake', '~> 13.0'
+  spec.add_development_dependency 'rake', '>= 12.0'
   spec.add_development_dependency 'simplecov'
 end
