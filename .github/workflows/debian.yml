@@ -18,6 +18,7 @@ jobs:
         DEBIAN_FRONTEND=noninteractive sudo apt-get --yes install gem2deb bundler ruby-{actionpack,awesome-print,http,minitest,minitest-reporters,oj,simplecov}
         rm Gemfile.lock || true
         bundle install --local
+        sudo apt-file update
     - name: Build
       run: |
         bundle exec rake build
