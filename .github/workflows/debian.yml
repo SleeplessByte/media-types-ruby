@@ -11,12 +11,15 @@ jobs:
     runs-on: ubuntu-18.04
 
     steps:
+    - uses: actions/checkout@v1
     - name: Install dependencies
       run: |
         sudo apt-get update
         DEBIAN_FRONTEND=noninteractive sudo apt-get --yes install gem2deb bundler ruby-{actionpack,awesome-print,http,minitest,minitest-reporters,oj,simplecov}
         rm Gemfile.lock || true
         bundle install --local
+    - name: Build
+      run: |
         bundle exec rake build
         mv pkg/media_types-*.gem media_types.gem
         gem2deb media_types.gem --offline
