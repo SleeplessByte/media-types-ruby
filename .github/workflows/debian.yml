@@ -8,13 +8,13 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
 
     steps:
     - name: Install dependencies
       run: |
-        apt-get update
-        DEBIAN_FRONTEND=noninteractive apt-get --yes install gem2deb bundler ruby-{actionpack,awesome-print,http,minitest,minitest-reporters,oj,simplecov}
+        sudo apt-get update
+        DEBIAN_FRONTEND=noninteractive sudo apt-get --yes install gem2deb bundler ruby-{actionpack,awesome-print,http,minitest,minitest-reporters,oj,simplecov}
         rm Gemfile.lock || true
         bundle install --local
         bundle exec rake build
