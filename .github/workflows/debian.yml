@@ -19,7 +19,7 @@ jobs:
         rm Gemfile.lock || true
         bundle install --local
         sudo apt-file update
-        sudo gem install gem2deb
+        sudo gem install gem2deb -n '/usr/bin'
     - name: Build
       run: |
         bundle exec rake build
