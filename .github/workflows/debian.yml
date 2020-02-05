@@ -15,16 +15,19 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        DEBIAN_FRONTEND=noninteractive sudo apt-get --yes install build-essential apt-file python3-debian ruby-all-dev ruby ruby-setup rake devscripts bundler ruby-{actionpack,awesome-print,http,minitest,minitest-reporters,oj,simplecov}
+        DEBIAN_FRONTEND=noninteractive sudo apt-get --yes install gem2deb bundler ruby-{actionpack,awesome-print,http,minitest,minitest-reporters,oj,simplecov}
         rm Gemfile.lock || true
         bundle install --local
         sudo apt-file update
-        sudo gem install gem2deb -n '/usr/bin'
     - name: Build
       run: |
         bundle exec rake build
-        mv pkg/media_types-*.gem media_types.gem
-        gem2deb media_types.gem --offline
+        mkdir debpkg
+        cp pkg/media_types-*.gem media_types.gem
+        #(cd debpkg; gem2tgz media_types.gem)
+        #(cd debpkg; dh-make-ruby media_types-*.tar.gz)
+        #(cd debpkg; dh-make-ruby media_types-*.tar.gz)
+        gem2deb pkg/media_types*.gem
         mv ruby-media-types_*_all.deb ruby-media-types.deb
     - name: Upload gem
       uses: actions/upload-artifact@v1
