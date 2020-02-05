@@ -23,7 +23,7 @@ jobs:
       run: |
         bundle exec rake build
         mv pkg/media_types-*.gem media_types.gem
-        gem2deb media_types.gem --offline
+        sudo gem2deb media_types.gem --offline
         mv ruby-media-types_*_all.deb ruby-media-types.deb
     - name: Upload gem
       uses: actions/upload-artifact@v1
