@@ -14,11 +14,6 @@ module MediaTypes
 
       use_name 'scheme'
 
-      defaults do
-        version 2
-        suffix :json
-      end
-
       freeze
     end
 

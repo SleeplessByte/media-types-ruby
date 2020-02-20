@@ -28,11 +28,6 @@ module MediaTypes
       with(view: view)
     end
 
-    def suffix(suffix = NO_ARG)
-      return opts[:suffix] if suffix == NO_ARG
-      with(suffix: suffix)
-    end
-
     def collection
       view(COLLECTION_VIEW)
     end
@@ -74,11 +69,16 @@ module MediaTypes
     end
 
     def as_key
-      [type, view, version, suffix]
+      [type, view, version]
     end
 
     def hash
       as_key.hash
+    end
+
+    def suffix
+      schema = schema_for(self)
+      schema.type_attributes.fetch(:suffix, 'json')
     end
 
     def to_str(qualifier = nil)
@@ -88,7 +88,7 @@ module MediaTypes
           type: opts[:type],
           view: opts[:view],
           version: opts[:version],
-          suffix: opts[:suffix],
+          suffix: suffix
         )
       )
     end
