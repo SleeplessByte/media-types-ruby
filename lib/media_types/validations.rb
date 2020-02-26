@@ -79,5 +79,9 @@ module MediaTypes
     def view(view, &block)
       Validations.new(media_type.view(view), registry, &block)
     end
+
+    def suffix(name)
+      scheme.type_attributes[:suffix] = name
+    end
   end
 end

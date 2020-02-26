@@ -14,11 +14,6 @@ module MediaTypes
 
       use_name 'scheme'
 
-      defaults do
-        version 2
-        suffix :json
-      end
-
       validations do
         # "str" => String
         attribute :str, String
@@ -74,19 +69,6 @@ module MediaTypes
             merge find(TestSchemeType.to_constructable.view('create').version(1))
           end
         end
-      end
-
-      registrations :my_media do
-        view 'index', :my_media_urls
-        view 'collection', :my_medias
-        view 'create', :create_my_media
-
-        versions 1, 2
-
-        type_alias 'scheme.alias'
-
-        suffix :xml
-        suffix :json
       end
 
       freeze

@@ -7,8 +7,8 @@ require 'media_types/version'
 Gem::Specification.new do |spec|
   spec.name          = 'media_types'
   spec.version       = MediaTypes::VERSION
-  spec.authors       = ['Derk-Jan Karrenbeld']
-  spec.email         = ['derk-jan+github@karrenbeld.info']
+  spec.authors       = ['Derk-Jan Karrenbeld', 'Max Maton']
+  spec.email         = ['derk-jan+github@karrenbeld.info', 'info@maxmaton.nl']
 
   spec.summary       = 'Library to create media type definitions, schemes and validations'
   spec.description   = 'Media Types as mime types are not easily supported by frameworks such as rails. '
@@ -23,14 +23,12 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
 
-  spec.add_development_dependency 'actionpack'
   spec.add_development_dependency 'awesome_print'
-  spec.add_development_dependency 'bundler', '~> 2'
+  spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'http'
   spec.add_development_dependency 'minitest', '~> 5.0'
   spec.add_development_dependency 'minitest-ci'
   spec.add_development_dependency 'minitest-reporters'
-  spec.add_development_dependency 'oj'
   spec.add_development_dependency 'rake', '~> 13.0'
   spec.add_development_dependency 'simplecov'
 end
