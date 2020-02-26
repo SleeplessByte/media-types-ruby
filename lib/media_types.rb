@@ -9,7 +9,6 @@ require 'media_types/scheme'
 require 'media_types/dsl'
 
 require 'media_types/views'
-require 'media_types/integrations'
 
 module MediaTypes
   def self.set_organisation(mod, organisation)
