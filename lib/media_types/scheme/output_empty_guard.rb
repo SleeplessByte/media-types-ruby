@@ -21,7 +21,7 @@ module MediaTypes
       def call
         return unless MediaTypes::Object.new(output).empty?
         throw(:end, true) if allow_empty?
-        raise_empty!(backtrace: options.backtrace)
+        raise_empty!(backtrace: options.backtrace, found: options.scoped_output)
       end
 
       private
@@ -32,11 +32,12 @@ module MediaTypes
         rules.allow_empty? || rules.required.empty?
       end
 
-      def raise_empty!(backtrace:)
+      def raise_empty!(backtrace:, found:)
         raise EmptyOutputError, format(
-          'Expected output, got empty at %<backtrace>s. Required are: %<required>s.',
+          'Expected output, got empty at %<backtrace>s. Required are: %<required>s. Found: %<found>s',
           backtrace: backtrace.join('->'),
-          required: rules.required.keys
+          required: rules.required.keys,
+          found: found.keys,
         )
       end
     end

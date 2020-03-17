@@ -46,6 +46,7 @@ module MediaTypes
 
     def method_missing(method_name, *arguments, &block)
       if scheme.respond_to?(method_name)
+        media_type.__getobj__.media_type_combinations ||= Set.new
         media_type.__getobj__.media_type_combinations.add(media_type.as_key)
       
         return scheme.send(method_name, *arguments, &block)

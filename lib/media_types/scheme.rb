@@ -101,6 +101,7 @@ module MediaTypes
     #
     def validate(output, options = nil, **opts)
       options ||= ValidationOptions.new(**opts)
+      options.context = output
 
       catch(:end) do
         validate!(output, options, context: nil)

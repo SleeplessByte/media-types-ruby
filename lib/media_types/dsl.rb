@@ -47,7 +47,9 @@ module MediaTypes
       def validatable?(media_type = to_constructable)
         return false unless validations
 
-        validations.find(media_type, -> { nil })
+        resolved = validations.find(media_type, -> { nil })
+
+        !resolved.nil?
       end
 
       def register
@@ -112,7 +114,10 @@ module MediaTypes
       end
 
       def validations(&block)
-        return media_type_validations unless block_given?
+        unless block_given?
+          raise 'No validations defined' if media_type_validations.nil?
+          return media_type_validations
+        end
         self.media_type_validations = Validations.new(to_constructable, &block)
 
         self
