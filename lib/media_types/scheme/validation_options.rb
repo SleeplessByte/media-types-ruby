@@ -19,7 +19,7 @@ module MediaTypes
       def scoped_output
         current = context
 
-        backtrace.drop(1).first(backtrace.size - 2).each do |e|
+        backtrace.drop(1).first([0, backtrace.size - 2].max).each do |e|
           current = current[e] unless current.nil?
         end
 
