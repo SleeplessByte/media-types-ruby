@@ -64,7 +64,7 @@ class Venue
     'mydomain'
   end
   
-  media_type 'venue'
+  use_name 'venue'
 
   validations do
     version 2 do
