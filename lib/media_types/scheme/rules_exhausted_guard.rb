@@ -31,7 +31,7 @@ module MediaTypes
         result = iterate(->(key) { required_rules.remove(key) })
         return result if required_rules.empty?
 
-        raise_exhausted!(missing_keys: required_rules.keys, backtrace: options.backtrace)
+        raise_exhausted!(missing_keys: required_rules.keys, backtrace: options.backtrace, found: output)
       end
 
       def iterate(mark)
@@ -50,11 +50,12 @@ module MediaTypes
 
       attr_accessor :rules, :options, :output
 
-      def raise_exhausted!(missing_keys:, backtrace:)
+      def raise_exhausted!(missing_keys:, backtrace:, found:)
         raise ExhaustedOutputError, format(
-          'Missing keys in output: %<missing_keys>s at [%<backtrace>s]',
+          'Missing keys in output: %<missing_keys>s at [%<backtrace>s]. I did find: %<found>s',
           missing_keys: missing_keys,
-          backtrace: backtrace.join('->')
+          backtrace: backtrace.join('->'),
+          found: (found.is_a? Hash) ? found.keys : found.class.name,
         )
       end
     end
