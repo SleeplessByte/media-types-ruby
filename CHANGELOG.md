@@ -1,4 +1,5 @@
 # 2.0.0
+
  - Removed ability to set default suffix. All suffixes now default to `+json`.
  - Suffixes are now set for a given view and version instead of as a block.
  - Added `suffix :yoursuffix` command to override the default `:json` suffix.
@@ -6,6 +7,7 @@
  - Removed registrations block.
 
 # 1.0.0
+
  - Added the ability to do inline tests when defining validations using `assert_pass '<json>'` and `assert_fail '<json>'`.
  - `media_type` has been replaced with `use_name`.
  - It is no longer possible to set a default version. Please use `version <x> do` instead.
