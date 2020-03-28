@@ -55,7 +55,7 @@ module MediaTypes
           'Missing keys in output: %<missing_keys>s at [%<backtrace>s]. I did find: %<found>s',
           missing_keys: missing_keys,
           backtrace: backtrace.join('->'),
-          found: found.keys,
+          found: (found.is_a? Hash) ? found.keys : found.class.name,
         )
       end
     end
