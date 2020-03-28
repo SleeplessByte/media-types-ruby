@@ -23,7 +23,7 @@ module MediaTypes
           key: key.inspect,
           backtrace: backtrace.join('->'),
           strict_keys: strict_keys.keys,
-          found: found.keys
+          found: (found.is_a? Hash) ? found.keys : found.class.name
         )
       end
 
