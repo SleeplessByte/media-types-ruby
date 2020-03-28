@@ -37,7 +37,7 @@ module MediaTypes
           'Expected output, got empty at %<backtrace>s. Required are: %<required>s. Found: %<found>s',
           backtrace: backtrace.join('->'),
           required: rules.required.keys,
-          found: found.keys,
+          found: (found.is_a? Hash) ? found.keys : found.class.name,
         )
       end
     end
