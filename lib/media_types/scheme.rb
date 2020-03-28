@@ -56,9 +56,12 @@ module MediaTypes
     #
     def initialize(allow_empty: false, expected_type: ::Object, &block)
       self.rules = Rules.new(allow_empty: allow_empty, expected_type: expected_type)
+      self.type_attributes = {}
 
       instance_exec(&block) if block_given?
     end
+
+    attr_accessor :type_attributes
 
     ##
     # Checks if the +output+ is valid
@@ -98,6 +101,7 @@ module MediaTypes
     #
     def validate(output, options = nil, **opts)
       options ||= ValidationOptions.new(**opts)
+      options.context = output
 
       catch(:end) do
         validate!(output, options, context: nil)

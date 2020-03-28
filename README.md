@@ -1,5 +1,5 @@
 # MediaTypes
-[![Build Status](https://travis-ci.com/SleeplessByte/media-types-ruby.svg?branch=master)](https://travis-ci.com/SleeplessByte/media-types-ruby)
+[![Build Status](https://github.com/SleeplessByte/media-types-ruby/workflows/Ruby/badge.svg?branch=master)](https://github.com/SleeplessByte/media-types-ruby/actions?query=workflow%3ARuby)
 [![Gem Version](https://badge.fury.io/rb/media_types.svg)](https://badge.fury.io/rb/media_types)
 [![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg)](http://opensource.org/licenses/MIT) 
 [![Maintainability](https://api.codeclimate.com/v1/badges/6f2dc1fb37ecb98c4363/maintainability)](https://codeclimate.com/github/SleeplessByte/media-types-ruby/maintainability)
@@ -64,7 +64,7 @@ class Venue
     'mydomain'
   end
   
-  media_type 'venue', defaults: { suffix: :json }
+  use_name 'venue'
 
   validations do
     version 2 do
@@ -102,17 +102,6 @@ class Venue
         end
       end
     end
-  end
-
-  registrations :venue_json do
-    view 'create', :create_venue
-    view 'index', :venue_urls
-    view 'collection', :venue_collection
-    
-    versions [1,2]
-    
-    suffix :json
-    suffix :xml
   end
 end
 ```
@@ -346,9 +335,6 @@ Venue.mime_type.identifier
 Venue.mime_type.version(1).identifier
 # => "application/vnd.mydomain.venue.v1+json"
 
-Venue.mime_type.version(1).suffix(:xml).identifier
-# => "application/vnd.mydomain.venue.v1+xml"
-
 Venue.mime_type.to_s(0.2)
 # => "application/vnd.mydomain.venue.v2+json; q=0.2"
 
@@ -358,43 +344,6 @@ Venue.mime_type.collection.identifier
 Venue.mime_type.view('active').identifier
 # => "application/vnd.mydomain.venue.v2.active+json"
 ```
-
-## Integrations
-The integrations are not loaded by default, so you need to require them:
-```ruby
-# For Rails / ActionPack
-require 'media_types/integrations/actionpack'
-
-# For HTTP.rb
-require 'media_types/integrations/http' 
-```
-
-Define a `registrations` block on your media type, indicating the symbol for the base type (`registrations :symbol do`) and inside use the registrations dsl to define which media types to register. `versions array_of_numbers` determines which versions, `suffix name` adds a suffix, `type_alias name` adds an alias and `view name, symbol` adds a view.
-
-```Ruby
-Venue.register
-```
-
-### Rails
-Load the `actionpack` integration and call `.register` on all the media types you want to be available in Rails. You can do this in the `mime_types` initializer, or anywhere before your controllers are instantiated. Yes, the symbol (by default `<type>_v<version>_<suffix>`) can now be used in your `format` blocks, or as extension in the url.
-
-Rails only has a default serializer for `application/json`, and content with your `+json` media types (or different once) will not be deserialized by default. A way to overcome this is to set the JSON parameter parser for all new symbols. `.register` gives you back an array of `Registerable` objects that responds to `#to_sym` to get that symbol.
-
-```ruby
-symbols = Venue.register.map(&:to_sym)
-
-original_parsers = ActionDispatch::Request.parameter_parsers
-new_parser = original_parsers[Mime[:json].symbol]
-new_parsers = original_parsers.merge(Hash[*symbols.map { |s| [s, new_parser] }])
-ActionDispatch::Request.parameter_parsers = new_parsers
-```
-
-If you want to validate the content-type and not have your errors be `Rack::Error` but be handled by your controllers, leave this out and add a `before_action` to your controller that deserializes + validates for you.
-
-### HTTP.rb
-Load the `http` integration and call `.register` on all media types you want to be able to serialize and deserialize. The media type validations will run both before serialization and after deserialization.
-
-Currently uses `oj` under the hood and this can not be changed.
 
 ## API
 

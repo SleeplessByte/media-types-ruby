@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 require 'media_types/constructable'
-require 'media_types/defaults'
-require 'media_types/registrar'
 require 'media_types/validations'
 
 module MediaTypes
@@ -49,7 +47,9 @@ module MediaTypes
       def validatable?(media_type = to_constructable)
         return false unless validations
 
-        validations.find(media_type, -> { nil })
+        resolved = validations.find(media_type, -> { nil })
+
+        !resolved.nil?
       end
 
       def register
@@ -65,10 +65,7 @@ module MediaTypes
       def version(v)
         to_constructable.version(v)
       end
-      def suffix(s)
-        to_constructable.suffix(s)
-      end
-
+      
       def identifier_format
         self.media_type_name_for = Proc.new do |type:, view:, version:, suffix:|
           yield(type: type, view: view, version: version, suffix: suffix)
@@ -81,14 +78,18 @@ module MediaTypes
 
       def available_validations
         self.media_type_combinations.map do |a|
-          _, view, version, suffix = a
-          view(view).version(version).suffix(suffix)
+          _, view, version = a
+          view(view).version(version)
         end
+      end
+
+      def schema_for(constructable)
+        validations.find(constructable)
       end
 
       private
 
-      def use_name(name, defaults: {})
+      def use_name(name)
         if self.media_type_name_for.nil?
           self.media_type_name_for = Proc.new do |type:, view:, version:, suffix:|
             resolved_org = nil
@@ -109,25 +110,14 @@ module MediaTypes
             result
           end
         end
-        self.media_type_constructable = Constructable.new(self, type: name).suffix(defaults.fetch(:suffix) { nil })
-      end
-
-      def defaults(&block)
-        return media_type_constructable unless block_given?
-        self.media_type_constructable = Defaults.new(to_constructable, &block).to_constructable
-
-        self
-      end
-
-      def registrations(symbol = nil, &block)
-        return media_type_registrar unless block_given?
-        self.media_type_registrar = Registrar.new(self, symbol: symbol, &block)
-
-        self
+        self.media_type_constructable = Constructable.new(self, type: name)
       end
 
       def validations(&block)
-        return media_type_validations unless block_given?
+        unless block_given?
+          raise 'No validations defined' if media_type_validations.nil?
+          return media_type_validations
+        end
         self.media_type_validations = Validations.new(to_constructable, &block)
 
         self

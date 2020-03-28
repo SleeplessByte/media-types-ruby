@@ -14,16 +14,13 @@ module MediaTypes
 
       use_name 'scheme'
 
-      defaults do
-        version 2
-        suffix :json
-      end
-
       freeze
     end
 
     def test_it_is_not_validatable
-      refute TestSchemeType.validatable?
+      assert_raises RuntimeError do
+        TestSchemeType.validatable?
+      end
     end
   end
 end

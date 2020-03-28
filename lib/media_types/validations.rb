@@ -46,6 +46,7 @@ module MediaTypes
 
     def method_missing(method_name, *arguments, &block)
       if scheme.respond_to?(method_name)
+        media_type.__getobj__.media_type_combinations ||= Set.new
         media_type.__getobj__.media_type_combinations.add(media_type.as_key)
       
         return scheme.send(method_name, *arguments, &block)
@@ -78,6 +79,10 @@ module MediaTypes
     #
     def view(view, &block)
       Validations.new(media_type.view(view), registry, &block)
+    end
+
+    def suffix(name)
+      scheme.type_attributes[:suffix] = name
     end
   end
 end

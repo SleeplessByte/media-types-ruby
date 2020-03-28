@@ -10,12 +10,10 @@ class MediaTypesTest < Minitest::Test
   def test_it_requires
     %i[
       Constructable
-      Defaults
       Dsl
       Formatter
       Hash
       Object
-      Registrar
       Scheme
       Validations
     ].each do |klazz|
