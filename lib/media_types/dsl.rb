@@ -115,7 +115,7 @@ module MediaTypes
 
       def validations(&block)
         unless block_given?
-          raise 'No validations defined' if media_type_validations.nil?
+          raise "No validations defined for #{self.name}" if media_type_validations.nil?
           return media_type_validations
         end
         self.media_type_validations = Validations.new(to_constructable, &block)
