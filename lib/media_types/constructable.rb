@@ -69,7 +69,7 @@ module MediaTypes
     end
 
     def as_key
-      [type, view, version]
+      [type, view&.to_s, version]
     end
 
     def hash

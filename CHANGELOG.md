@@ -1,3 +1,7 @@
+# 2.0.1
+
+ - Views can now be accessed indifferently.
+
 # 2.0.0
 
  - Removed ability to set default suffix. All suffixes now default to `+json`.
