@@ -18,6 +18,8 @@ module MediaTypes
       end
 
       def call
+        #puts @rules
+        #puts "input: <#{output}>, type: <#{expected_type.name}>"
         return unless expected_type && !(expected_type === output) # rubocop:disable Style/CaseEquality
         raise_type_error!(type: output.class, backtrace: options.backtrace)
       end

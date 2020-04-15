@@ -86,10 +86,10 @@ module MediaTypes
         # Attribute bar is optional, leaving no required attributes, so it may be empty
         assert OptionalAttributeInsideCollection.validate!(foo: [{}]), 'Expected input to be valid'
         # Attribute bar is optional, leaving no required attributes, so there may be no items
-        assert OptionalAttributeInsideCollection.validate!(foo: []), 'Expected input to be invalid'
-        # Attribute bar is optional, leaving no required attributes, so there may be nil items
-        assert OptionalAttributeInsideCollection.validate!(foo: [nil]), 'Expected input to be invalid'
+        assert OptionalAttributeInsideCollection.validate!(foo: []), 'Expected input to be valid'
 
+        # Don't allow nil items
+        refute OptionalAttributeInsideCollection.valid?(foo: [nil]), 'Expected input to be invalid'
         # Expects bar to be Numeric
         refute OptionalAttributeInsideCollection.valid?(foo: [{ bar: 'string' }]), 'Expected input to be invalid'
         # Expects foo to be an Array

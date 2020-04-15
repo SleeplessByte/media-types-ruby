@@ -227,6 +227,8 @@ module MediaTypes
         refute AnyWithForce.valid?(foo: [{ bar: 'string' }]), 'Expected input to be invalid'
         # Expects any value to be an Array
         refute AnyWithForce.valid?(foo: { bar: 42 }), 'Expected input to be invalid'
+        # Don't allow nested arrays
+        refute AnyWithForce.valid?(foo: [[{ bar: 42 }]]), 'Expected input to be invalid'
         # Expects any value to be an Array
         refute AnyWithForce.valid?(foo: {}), 'Expected input to be invalid'
         # Expects any value to be an Array with an attribute bar

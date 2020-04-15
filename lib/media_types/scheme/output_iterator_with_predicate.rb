@@ -30,7 +30,7 @@ module MediaTypes
           return iterate { |*args, **opts| yield(*args, **opts) }
         end
 
-        true
+        raise "Internal consistency error, unexpected: #{enumerable.class}"
       end
 
       private
@@ -54,7 +54,10 @@ module MediaTypes
       end
 
       def iterate(&block)
-        Array(enumerable).each_with_index.all? do |array_like_element, i|
+        hash_rule = Rules.new(allow_empty: false, expected_type: ::Hash)
+
+        enumerable.each_with_index.all? do |array_like_element, i|
+          OutputTypeGuard.call(array_like_element, options.trace(1), rules: hash_rule)
           OutputIteratorWithPredicate.call(array_like_element, options.trace(i), rules: rules, &block)
         end
       end
