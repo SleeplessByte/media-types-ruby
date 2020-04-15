@@ -105,6 +105,7 @@ module MediaTypes
                'Expected media type to be validatable'
         assert AttributeOptionsType.validate!(foo: nil), 'Expected input to be valid'
         assert AttributeOptionsType.validate!(foo: 42), 'Expected input to be valid'
+        assert AttributeOptionsType.validate!({'foo': 42}), 'Expected input to be invalid'
 
         refute AttributeOptionsType.valid?(foo: { bar: 'string' }), 'Expected input to be invalid'
         refute AttributeOptionsType.valid?(foo: {}), 'Expected input to be invalid'
