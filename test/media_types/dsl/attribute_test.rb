@@ -106,12 +106,15 @@ module MediaTypes
         assert AttributeOptionsType.validate!(foo: nil), 'Expected input to be valid'
         assert AttributeOptionsType.validate!(foo: 42), 'Expected input to be valid'
 
-        assert AttributeOptionsType.valid?({'foo': 42}), 'Expected input to be invalid'
-        refute AttributeOptionsType.valid?({}), 'Expected input to be invalid'
         refute AttributeOptionsType.valid?(foo: { bar: 'string' }), 'Expected input to be invalid'
         refute AttributeOptionsType.valid?(foo: {}), 'Expected input to be invalid'
         refute AttributeOptionsType.valid?(foo: [42]), 'Expected input to be invalid'
         refute AttributeOptionsType.valid?(foo: [nil]), 'Expected input to be invalid'
+      end
+
+      def test_indifferent_access
+        assert AttributeSchemeType.valid?({'foo': 42}), 'Expected input to be invalid'
+        refute AttributeSchemeType.valid?({}), 'Expected input to be invalid'
       end
 
     end
