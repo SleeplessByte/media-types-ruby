@@ -29,6 +29,8 @@ module MediaTypes
         if array?
           return iterate { |*args, **opts| yield(*args, **opts) }
         end
+
+        true
       end
 
       private

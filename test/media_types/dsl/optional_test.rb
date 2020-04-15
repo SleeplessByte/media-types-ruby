@@ -88,7 +88,6 @@ module MediaTypes
         # Attribute bar is optional, leaving no required attributes, so there may be no items
         assert OptionalAttributeInsideCollection.validate!(foo: []), 'Expected input to be invalid'
         # Attribute bar is optional, leaving no required attributes, so there may be nil items
-        OptionalAttributeInsideCollection.validate!(foo: [nil])
         assert OptionalAttributeInsideCollection.validate!(foo: [nil]), 'Expected input to be invalid'
 
         # Expects bar to be Numeric
