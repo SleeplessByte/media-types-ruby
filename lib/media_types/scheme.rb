@@ -385,13 +385,13 @@ module MediaTypes
     end
 
     def assert_pass(fixture)
-      json = JSON.parse(fixture)
+      json = JSON.parse(fixture, { symbolize_names: true })
 
       validate(json)
     end
     
     def assert_fail(fixture)
-      json = JSON.parse(fixture)
+      json = JSON.parse(fixture, { symbolize_names: true })
 
       begin
         validate(json)
