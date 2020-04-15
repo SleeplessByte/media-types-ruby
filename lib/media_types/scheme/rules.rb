@@ -114,7 +114,8 @@ module MediaTypes
       attr_writer :expected_type
 
       def normalize_key(key)
-        String(key).to_sym
+        # Because default ruby hashes don't treat symbols and string equal we can't normalize them here.
+        key
       end
     end
   end

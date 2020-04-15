@@ -1,6 +1,7 @@
 # 2.0.1
 
  - Views can now be accessed indifferently.
+ - Attribute keys no longer match indifferently.
 
 # 2.0.0
 

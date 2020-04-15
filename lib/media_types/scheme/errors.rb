@@ -6,6 +6,12 @@ module MediaTypes
     # Base class for all validations errors
     class ValidationError < ArgumentError; end
 
+    # Raised when trying to register an attribute with a non-string key
+    class KeyTypeError < ArgumentError; end
+
+    # Raised when trying to register a key twice
+    class DuplicateKeyError < ArgumentError; end
+
     # Raised when it did not expect more data, but there was more left
     class StrictValidationError < ValidationError; end
 
