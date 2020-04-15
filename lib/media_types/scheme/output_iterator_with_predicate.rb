@@ -26,7 +26,11 @@ module MediaTypes
           return iterate_hash { |*args, **opts| yield(*args, **opts) }
         end
 
-        iterate { |*args, **opts| yield(*args, **opts) }
+        if array?
+          return iterate { |*args, **opts| yield(*args, **opts) }
+        end
+
+        raise "Internal consistency error, unexpected: #{enumerable.class}"
       end
 
       private
@@ -35,6 +39,10 @@ module MediaTypes
 
       def hash?
         enumerable.is_a?(::Hash) || enumerable.respond_to?(:key)
+      end
+
+      def array?
+        enumerable.is_a?(::Array)
       end
 
       def iterate_hash
@@ -46,7 +54,10 @@ module MediaTypes
       end
 
       def iterate(&block)
-        Array(enumerable).each_with_index.all? do |array_like_element, i|
+        hash_rule = Rules.new(allow_empty: false, expected_type: ::Hash)
+
+        enumerable.each_with_index.all? do |array_like_element, i|
+          OutputTypeGuard.call(array_like_element, options.trace(1), rules: hash_rule)
           OutputIteratorWithPredicate.call(array_like_element, options.trace(i), rules: rules, &block)
         end
       end

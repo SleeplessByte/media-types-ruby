@@ -1,6 +1,8 @@
 # 2.0.1
 
  - Views can now be accessed indifferently.
+ - Attribute keys no longer match indifferently.
+ - Fixed infinite loop when validating non-hash, non-array items.
 
 # 2.0.0
 

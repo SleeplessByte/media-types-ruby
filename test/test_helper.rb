@@ -25,7 +25,6 @@ require 'minitest/reporters'
 Minitest::Reporters.use!
 
 # Run at exit
-require 'minitest/ci' if ENV['CI']
 require 'minitest/autorun'
 require_relative './assertions'
 

@@ -22,13 +22,18 @@ module MediaTypes
           '%<found>s',
           key: key.inspect,
           backtrace: backtrace.join('->'),
-          strict_keys: strict_keys.keys,
-          found: (found.is_a? Hash) ? found.keys : found.class.name
+          strict_keys: keys_to_str(strict_keys.keys),
+          found: (found.respond_to? :keys) ? keys_to_str(found.keys) : found.class.name
         )
       end
 
       def inspect
         '((raise when strict))'
+      end
+
+      def keys_to_str(keys)
+        converted = keys.map { |k| k.is_a?(Symbol) ? ":#{k}" : "'#{k}'" }
+        "[#{converted.join ', '}]"
       end
 
     end
