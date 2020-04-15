@@ -26,7 +26,9 @@ module MediaTypes
           return iterate_hash { |*args, **opts| yield(*args, **opts) }
         end
 
-        iterate { |*args, **opts| yield(*args, **opts) }
+        if array?
+          return iterate { |*args, **opts| yield(*args, **opts) }
+        end
       end
 
       private
@@ -35,6 +37,10 @@ module MediaTypes
 
       def hash?
         enumerable.is_a?(::Hash) || enumerable.respond_to?(:key)
+      end
+
+      def array?
+        enumerable.is_a?(::Array)
       end
 
       def iterate_hash
