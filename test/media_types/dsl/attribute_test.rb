@@ -113,8 +113,8 @@ module MediaTypes
       end
 
       def test_indifferent_access
-        AttributeSchemeType.validate!({'foo': 42})#, 'Expected input to be invalid'
-        refute AttributeSchemeType.valid?({}), 'Expected input to be invalid'
+        AttributeType.validate!({'foo': 42})#, 'Expected input to be invalid'
+        refute AttributeType.valid?({}), 'Expected input to be invalid'
       end
 
     end
