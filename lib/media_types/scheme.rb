@@ -160,7 +160,7 @@ module MediaTypes
     #
     def attribute(key, type = ::Object, optional: false, **opts, &block)
       raise KeyTypeError, "Unexpected key type #{key.class.name}, please use either a symbol or string." unless key.is_a?(String) || key.is_a?(Symbol)
-      raise DuplicateKeyError, "An attribute with key #{key.to_s} has already been defined. Please remove one of the two." unless rules.has_key?(key)
+      raise DuplicateKeyError, "An attribute with key #{key.to_s} has already been defined. Please remove one of the two." if rules.has_key?(key)
       raise DuplicateKeyError, "A string attribute with the same string representation as the symbol :#{key.to_s} already exists. Please remove one of the two." if key.is_a?(Symbol)&& rules.has_key?(key.to_s)
       raise DuplicateKeyError, "A symbol attribute with the same string representation as the string '#{key}' already exists. Please remove one of the two." if key.is_a?(String) && rules.has_key?(key.to_sym)
 
