@@ -4,7 +4,7 @@
 [![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg)](http://opensource.org/licenses/MIT) 
 [![Maintainability](https://api.codeclimate.com/v1/badges/6f2dc1fb37ecb98c4363/maintainability)](https://codeclimate.com/github/SleeplessByte/media-types-ruby/maintainability)
 
-Media Types based on  scheme, with versioning, views, suffixes and validations. Integrations available for [Rails](https://github.com/rails/rails) / ActionPack and [http.rb](https://github.com/httprb/http).
+Media Types based on  scheme, with versioning, views, suffixes and validations.
 
 This library makes it easy to define schemas that can be used to validate JSON objects based on their Content-Type.
 
@@ -405,8 +405,7 @@ Returns a list of all the schemas that are defined.
 
 ## Related
 
-- [`MediaTypes::Serialization`](https://github.com/XPBytes/media_types-serialization): :cyclone: Add media types supported serialization using your favourite serializer
-- [`MediaTypes::Validation`](https://github.com/XPBytes/media_types-validation): :heavy_exclamation_mark: Response validations according to a media-type
+- [`MediaTypes::Serialization`](https://github.com/XPBytes/media_types-serialization): :cyclone: Add media types supported serialization to Rails.
 
 ## Development
 
