@@ -72,12 +72,13 @@ module MediaTypes
 
         validations do
           attribute :foo, scheme
-
-          assert_pass '{"foo": {"bar": 42}}'
+        
+          assert_pass '{"foo": {"bsar": 42}}'
           assert_fail '{"foo": {"bar": "string"}}'
           assert_fail '{"foo": {}}'
           assert_fail '{"foo": null}'
           assert_fail '{"foo": [{"bar": "string"}]}'
+          execute_assertions
         end
       end
 
@@ -85,6 +86,21 @@ module MediaTypes
         assert AttributeSchemeType.validatable?(AttributeSchemeType.to_constructable),
                'Expected media type to be validatable'
       end
+
+
+
+      the_ball= "O"
+      class Catch
+        # We want to be able to puts the_ball here
+        def my_method
+          # And here!
+        end
+      end
+
+
+
+
+
 
       class AttributeOptionsType
         include MediaTypes::Dsl

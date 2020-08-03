@@ -58,6 +58,8 @@ module MediaTypes
       self.rules = Rules.new(allow_empty: allow_empty, expected_type: expected_type)
       self.type_attributes = {}
 
+      @fixtures=[]
+
       instance_exec(&block) if block_given?
     end
 
@@ -385,20 +387,39 @@ module MediaTypes
     end
 
     def assert_pass(fixture)
-      json = JSON.parse(fixture, { symbolize_names: true })
+      object_to_store =
+          {fixture: fixture,
+           expect_to_pass: true
+          }
+      @fixtures << object_to_store
 
-      validate(json)
     end
     
     def assert_fail(fixture)
-      json = JSON.parse(fixture, { symbolize_names: true })
+      object_to_store =
+          {fixture: fixture,
+            expect_to_pass: false
+          }
+      @fixtures << object_to_store
+    end
 
-      begin
-        validate(json)
-      rescue MediaTypes::Scheme::ValidationError
-        return
+
+    def execute_assertions
+      @fixtures.each do |object|
+        fixture = object[:fixture]
+        expectation = object[:expect_to_pass]
+        json = JSON.parse(fixture, { symbolize_names: true })
+        if expectation == false
+          begin
+            validate(json)
+          rescue MediaTypes::Scheme::ValidationError
+            return
+          end
+          raise AssertionError
+        else
+          validate(json)
+        end
       end
-      raise AssertionError
     end
 
     private
