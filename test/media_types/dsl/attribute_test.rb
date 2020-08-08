@@ -23,6 +23,8 @@ module MediaTypes
           assert_fail '{"foo": {}}'
           assert_fail '{"foo": null}'
           assert_fail '{"foo": [42]}'
+
+          execute_assertions(AttributeType)
         end
       end
 
@@ -73,12 +75,13 @@ module MediaTypes
         validations do
           attribute :foo, scheme
         
-          assert_pass '{"foo": {"bsar": 42}}'
+          assert_pass '{"foo": {"bar": 42}}'
           assert_fail '{"foo": {"bar": "string"}}'
           assert_fail '{"foo": {}}'
           assert_fail '{"foo": null}'
           assert_fail '{"foo": [{"bar": "string"}]}'
-          execute_assertions
+
+          execute_assertions(AttributeSchemeType)
         end
       end
 

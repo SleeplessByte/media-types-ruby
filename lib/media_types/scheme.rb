@@ -59,11 +59,12 @@ module MediaTypes
       self.type_attributes = {}
 
       @fixtures=[]
+      @errors = []
 
       instance_exec(&block) if block_given?
     end
 
-    attr_accessor :type_attributes
+    attr_accessor :type_attributes, :fixtures,:errors
 
     ##
     # Checks if the +output+ is valid
@@ -103,11 +104,12 @@ module MediaTypes
     #
     def validate(output, options = nil, **opts)
       options ||= ValidationOptions.new(**opts)
-      options.context = output
-
+      options.context = output  
+    
       catch(:end) do
         validate!(output, options, context: nil)
       end
+    
     end
 
     #
@@ -404,25 +406,34 @@ module MediaTypes
     end
 
 
-    def execute_assertions
+    def execute_assertions(media_type_class)
       @fixtures.each do |object|
-        fixture = object[:fixture]
-        expectation = object[:expect_to_pass]
-        json = JSON.parse(fixture, { symbolize_names: true })
-        if expectation == false
-          begin
-            validate(json)
-          rescue MediaTypes::Scheme::ValidationError
-            return
-          end
-          raise AssertionError
-        else
-          validate(json)
-        end
+         json = JSON.parse(object[:fixture], { symbolize_names: true })
+        object[:expect_to_pass] ? process_assert_pass(json,media_type_class) : process_assert_fail(json,media_type_class)  
       end
+      raise AssertionError, @errors if !@errors.empty?
     end
 
     private
+    
+    def process_assert_fail(json, media_type_class)
+      expectation_met = false      
+          begin
+            validate(json)           
+          rescue MediaTypes::Scheme::ValidationError
+            expectation_met = true
+          end 
+          @errors << "Fixture: #{json} expected to fail validation check in #{media_type_class}, but it did not" if expectation_met == false
+    end
+
+    def process_assert_pass(json, media_type_class)
+      begin
+        validate(json)
+        rescue MediaTypes::Scheme::ValidationError
+        expectation_met = false
+        @errors << "Fixture: #{json} expected to pass validation check in #{media_type_class}, but it did not" if expectation_met == false 
+      end
+    end
 
     attr_accessor :rules
   end

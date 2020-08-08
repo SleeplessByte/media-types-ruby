@@ -37,9 +37,11 @@ module MediaTypes
           assert_fail '{"foo": null}'
           # Expects any value to be Numeric, not Array
           assert_fail '{"foo": [42]}'
+         
+          execute_assertions(AnyType)
         end
       end
-
+    
       def test_any_of_type
         assert AnyType.validatable?(AnyType.to_constructable), 'Expected media type to be validatable'
       end
