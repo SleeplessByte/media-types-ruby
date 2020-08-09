@@ -448,7 +448,6 @@ If an error gets raised, you will get a list of all the fixtures that failed to 
         end
       end
 ```
-
 ## Related
 
 - [`MediaTypes::Serialization`](https://github.com/XPBytes/media_types-serialization): :cyclone: Add media types supported serialization to Rails.
