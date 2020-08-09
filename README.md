@@ -411,7 +411,6 @@ The first two of these methods take in a fixture (as shown below) & store checks
 If an error gets raised, you will get a list of all the fixtures that failed to meet expections returned to you.
 
 ```ruby
-
       class AnyType
         include MediaTypes::Dsl
 
