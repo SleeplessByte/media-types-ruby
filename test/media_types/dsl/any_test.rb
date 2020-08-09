@@ -41,7 +41,7 @@ module MediaTypes
           execute_assertions(AnyType)
         end
       end
-    
+
       def test_any_of_type
         assert AnyType.validatable?(AnyType.to_constructable), 'Expected media type to be validatable'
       end
