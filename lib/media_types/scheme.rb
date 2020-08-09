@@ -104,12 +104,11 @@ module MediaTypes
     #
     def validate(output, options = nil, **opts)
       options ||= ValidationOptions.new(**opts)
-      options.context = output  
-    
+      options.context = output
+
       catch(:end) do
         validate!(output, options, context: nil)
       end
-    
     end
 
     #
@@ -390,25 +389,25 @@ module MediaTypes
 
     def assert_pass(fixture)
       object_to_store =
-          {fixture: fixture,
-           expect_to_pass: true
-          }
+        {fixture: fixture,
+          expect_to_pass: true
+        }
       @fixtures << object_to_store
 
     end
     
     def assert_fail(fixture)
       object_to_store =
-          {fixture: fixture,
-            expect_to_pass: false
-          }
+        {fixture: fixture,
+          expect_to_pass: false
+        }
       @fixtures << object_to_store
     end
 
 
     def execute_assertions(media_type_class)
       @fixtures.each do |object|
-         json = JSON.parse(object[:fixture], { symbolize_names: true })
+        json = JSON.parse(object[:fixture], { symbolize_names: true })
         object[:expect_to_pass] ? process_assert_pass(json,media_type_class) : process_assert_fail(json,media_type_class)  
       end
       raise AssertionError, @errors if !@errors.empty?
@@ -418,12 +417,12 @@ module MediaTypes
     
     def process_assert_fail(json, media_type_class)
       expectation_met = false      
-          begin
-            validate(json)           
-          rescue MediaTypes::Scheme::ValidationError
-            expectation_met = true
-          end 
-          @errors << "Fixture: #{json} expected to fail validation check in #{media_type_class}, but it did not" if expectation_met == false
+        begin
+          validate(json)           
+        rescue MediaTypes::Scheme::ValidationError
+          expectation_met = true
+        end 
+      @errors << "Fixture: #{json} expected to fail validation check in #{media_type_class}, but it did not" if expectation_met == false
     end
 
     def process_assert_pass(json, media_type_class)

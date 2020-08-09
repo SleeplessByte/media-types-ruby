@@ -114,13 +114,13 @@ If you include 'MediaTypes::Dsl' in your class you can use the following functio
 
 Adds an attribute to the schema, if a +block+ is given, uses that to test against instead of +type+
 
-| param | type | description |
-|-------|------|-------------|
-| key | `Symbol` | the attribute name |
-| opts | `Hash` | options to pass to `Scheme` or `Attribute` |
-| type | `Class`, `===`, Scheme | The type of the value, can be anything that responds to `===`,  or scheme to use if no `&block` is given. Defaults to `Object` without a `&block` and to Hash with a `&block`. |
-| optional: | `TrueClass`, `FalseClass` | if true, key may be absent, defaults to `false` |
-| &block | `Block` | defines the scheme of the value of this attribute |
+| param     | type                      | description                                                                                                                                                                    |
+| --------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| key       | `Symbol`                  | the attribute name                                                                                                                                                             |
+| opts      | `Hash`                    | options to pass to `Scheme` or `Attribute`                                                                                                                                     |
+| type      | `Class`, `===`, Scheme    | The type of the value, can be anything that responds to `===`,  or scheme to use if no `&block` is given. Defaults to `Object` without a `&block` and to Hash with a `&block`. |
+| optional: | `TrueClass`, `FalseClass` | if true, key may be absent, defaults to `false`                                                                                                                                |
+| &block    | `Block`                   | defines the scheme of the value of this attribute                                                                                                                              |
 
 #### Add an attribute named foo, expecting a string
 ```Ruby
@@ -158,12 +158,12 @@ MyMedia.valid?({ foo: { bar: 'my-string' }})
 ### `any`
 Allow for any key. The `&block` defines the Schema for each value.
 
-| param | type | description |
-|-------|------|-------------|
-| scheme | `Scheme`, `NilClass` | scheme to use if no `&block` is given |
-| allow_empty: | `TrueClass`, `FalsClass` | if true, empty (no key/value present) is allowed |
-| expected_type: | `Class`, | forces the validated value to have this type, defaults to `Hash`. Use `Object` if either `Hash` or `Array` is fine |
-| &block | `Block` | defines the scheme of the value of this attribute |
+| param          | type                     | description                                                                                                        |
+| -------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------------ |
+| scheme         | `Scheme`, `NilClass`     | scheme to use if no `&block` is given                                                                              |
+| allow_empty:   | `TrueClass`, `FalsClass` | if true, empty (no key/value present) is allowed                                                                   |
+| expected_type: | `Class`,                 | forces the validated value to have this type, defaults to `Hash`. Use `Object` if either `Hash` or `Array` is fine |
+| &block         | `Block`                  | defines the scheme of the value of this attribute                                                                  |
 
 #### Add a collection named foo, expecting any key with a defined value
 ```Ruby
@@ -207,14 +207,14 @@ MyMedia.valid?({ foo: [{ required: 'test', bar: 42 }] })
 ### `collection`
 Expect a collection such as an array or hash. The `&block` defines the Schema for each item in that collection.
 
-| param | type | description |
-|-------|------|-------------|
-| key | `Symbol` | key of the collection (same as `#attribute`) |
-| scheme | `Scheme`, `NilClass`, `Class` | scheme to use if no `&block` is given or `Class` of each item in the  |
-| allow_empty: | `TrueClass`, `FalseClass` | if true, empty (no key/value present) is allowed |
-| expected_type: | `Class`, | forces the validated value to have this type, defaults to `Array`. Use `Object` if either `Array` or `Hash` is fine. |
-| optional: | `TrueClass`, `FalseClass` | if true, key may be absent, defaults to `false` |
-| &block | `Block` | defines the scheme of the value of this attribute |
+| param          | type                          | description                                                                                                          |
+| -------------- | ----------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| key            | `Symbol`                      | key of the collection (same as `#attribute`)                                                                         |
+| scheme         | `Scheme`, `NilClass`, `Class` | scheme to use if no `&block` is given or `Class` of each item in the                                                 |
+| allow_empty:   | `TrueClass`, `FalseClass`     | if true, empty (no key/value present) is allowed                                                                     |
+| expected_type: | `Class`,                      | forces the validated value to have this type, defaults to `Array`. Use `Object` if either `Array` or `Hash` is fine. |
+| optional:      | `TrueClass`, `FalseClass`     | if true, key may be absent, defaults to `false`                                                                      |
+| &block         | `Block`                       | defines the scheme of the value of this attribute                                                                    |
 
 
 #### Collection with an array of string
@@ -253,12 +253,12 @@ MyMedia.valid?({ foo: [{ required: 'test', number: 42 }, { required: 'other', nu
 
 Expect a link with a required `href: String` attribute
 
-| param | type | description |
-|-------|------|-------------|
-| key | `Symbol` | key of the link (same as `#attribute`) |
-| allow_nil: | `TrueClass`, `FalseClass` | if true, value may be nil |
-| optional: | `TrueClass`, `FalseClass` | if true, key may be absent, defaults to `false` |
-| &block | `Block` | defines the scheme of the value of this attribute, in addition to the `href` attribute |
+| param      | type                      | description                                                                            |
+| ---------- | ------------------------- | -------------------------------------------------------------------------------------- |
+| key        | `Symbol`                  | key of the link (same as `#attribute`)                                                 |
+| allow_nil: | `TrueClass`, `FalseClass` | if true, value may be nil                                                              |
+| optional:  | `TrueClass`, `FalseClass` | if true, key may be absent, defaults to `false`                                        |
+| &block     | `Block`                   | defines the scheme of the value of this attribute, in addition to the `href` attribute |
 
 #### Links as defined in HAL, JSON-Links and other specs
 ```Ruby
@@ -402,6 +402,52 @@ Returns the IANA compatible [Media Type Identifier](https://en.wikipedia.org/wik
 Example: `Venue.available_validations`
 
 Returns a list of all the schemas that are defined.
+
+## Using Assertions in MediaTypes
+
+When using this library to make your own media types, you can use the methods `assert_pass`, `assert_fail` and `execute_assertions(MediaType)` to run checks that your new Media type matches your expectations.
+
+The first two of these methods take in a fixture (as shown below) & store checks you want to carry out when `execute_assertions(MediaType)`  gets called. 
+If an error gets raised, you will get a list of all the fixtures that failed to meet expections returned to you.
+
+```ruby
+
+      class AnyType
+        include MediaTypes::Dsl
+
+        def self.organisation
+          'trailervote'
+        end
+
+        use_name 'test'
+
+        validations do
+          any Numeric
+
+          assert_pass <<-FIXTURE
+          { "foo": 42, "bar": 43 }
+          FIXTURE
+
+          assert_pass '{"foo": 42}'
+          # Any also means none, there are no required keys
+          assert_pass '{}'
+
+          # Expects any value to be a Numeric, not a Hash
+          assert_fail <<-FIXTURE
+          { "foo": { "bar": "string" } }
+          FIXTURE
+        
+          # Expects any value to be Numeric, not a Hash
+          assert_fail '{"foo": {}}'
+          # Expects any value to be Numeric, not a NilClass
+          assert_fail '{"foo": null}'
+          # Expects any value to be Numeric, not Array
+          assert_fail '{"foo": [42]}'
+         
+          execute_assertions(AnyType)
+        end
+      end
+```
 
 ## Related
 
