@@ -58,13 +58,14 @@ module MediaTypes
       self.rules = Rules.new(allow_empty: allow_empty, expected_type: expected_type)
       self.type_attributes = {}
 
-      @fixtures=[]
+      @fixtures = []
       @errors = []
+      @assertions_executed = false
 
       instance_exec(&block) if block_given?
     end
 
-    attr_accessor :type_attributes, :fixtures,:errors
+    attr_accessor :type_attributes, :fixtures,:errors, :assertions_executed
 
     ##
     # Checks if the +output+ is valid
@@ -406,11 +407,13 @@ module MediaTypes
 
 
     def execute_assertions(media_type_class)
+      self.assertions_executed = true  
       @fixtures.each do |object|
         json = JSON.parse(object[:fixture], { symbolize_names: true })
         object[:expect_to_pass] ? process_assert_pass(json,media_type_class) : process_assert_fail(json,media_type_class)  
       end
       raise AssertionError, @errors if !@errors.empty?
+      media_type_class
     end
 
     private

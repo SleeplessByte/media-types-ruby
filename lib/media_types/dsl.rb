@@ -10,11 +10,11 @@ module MediaTypes
       base.extend ClassMethods
       base.class_eval do
         class << self
-          attr_accessor :media_type_name_for, :media_type_combinations
+          attr_accessor :media_type_name_for, :media_type_combinations, :media_type_validations
 
           private
 
-          attr_accessor :media_type_constructable, :symbol_base, :media_type_registrar, :media_type_validations
+          attr_accessor :media_type_constructable, :symbol_base, :media_type_registrar
         end
         base.media_type_combinations = Set.new
       end
@@ -37,6 +37,7 @@ module MediaTypes
       end
       
       def validate!(output, **opts)
+        assert_sane! unless self.media_type_validations.scheme.assertions_executed
         to_constructable.validate!(output, **opts)
       end
 
@@ -85,6 +86,10 @@ module MediaTypes
 
       def schema_for(constructable)
         validations.find(constructable)
+      end
+
+      def assert_sane!
+        self.media_type_validations.execute_assertions(self.class)
       end
 
       private

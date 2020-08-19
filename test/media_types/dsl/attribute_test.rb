@@ -121,6 +121,11 @@ module MediaTypes
         refute AttributeType.valid?({}), 'Expected input to be invalid'
       end
 
+      [AttributeType, AttributeCollectionType, AttributeSchemeType, AttributeOptionsType].each do |type|
+        define_method "test_#{type.name}_media_type_sanity" do
+          assert_media_type type
+        end
+      end
     end
   end
 end

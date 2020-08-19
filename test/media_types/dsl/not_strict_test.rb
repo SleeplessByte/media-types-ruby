@@ -62,6 +62,12 @@ module MediaTypes
         refute NotStrictCollectionType.valid?(foo: [nil]), 'Expected input to be invalid'
         refute NotStrictCollectionType.valid?(foo: nil), 'Expected input to be invalid'
       end
+
+      [NotStrictType,NotStrictCollectionType].each do |type|
+        define_method "test_#{type.name}_media_type_sanity" do
+          assert_media_type type
+        end
+      end
     end
   end
 end

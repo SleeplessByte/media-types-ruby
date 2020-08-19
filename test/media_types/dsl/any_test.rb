@@ -30,15 +30,13 @@ module MediaTypes
           assert_fail <<-FIXTURE
           { "foo": { "bar": "string" } }
           FIXTURE
-        
+
           # Expects any value to be Numeric, not a Hash
           assert_fail '{"foo": {}}'
           # Expects any value to be Numeric, not a NilClass
           assert_fail '{"foo": null}'
           # Expects any value to be Numeric, not Array
           assert_fail '{"foo": [42]}'
-         
-          execute_assertions(AnyType)
         end
       end
 
@@ -239,6 +237,12 @@ module MediaTypes
         refute AnyWithForce.valid?(foo: [nil]), 'Expected input to be invalid'
         # Expects any value to be an Array
         refute AnyWithForce.valid?(foo: nil), 'Expected input to be invalid'
+      end
+
+      [AnyType, AnyOfScheme, AnyWithOptions, AnyWithOptionsOrNil, AnyWithScheme, AnyWithForce].each do |type|
+        define_method "test_#{type.name}_media_type_sanity" do
+          assert_media_type type
+        end
       end
     end
   end

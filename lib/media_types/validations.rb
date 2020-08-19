@@ -31,6 +31,7 @@ module MediaTypes
       instance_exec(&block) if block_given?
     end
 
+    attr_reader :scheme
     ##
     # Looks up the validations for Constructable
     #
@@ -61,7 +62,8 @@ module MediaTypes
 
     private
 
-    attr_accessor :media_type, :registry, :scheme
+    attr_accessor :media_type, :registry
+    attr_writer :scheme
 
     ##
     # Switches the inner block to a specific version

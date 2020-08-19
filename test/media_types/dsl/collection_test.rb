@@ -176,6 +176,11 @@ module MediaTypes
         refute CollectionForceHashType.valid?(foo: nil), 'Expected input to be invalid'
       end
 
+      [CollectionType, CollectionCollectionType,CollectionSchemeType,CollectionSchemeTypeEmpty,CollectionOptionsType,CollectionForceHashType].each do |type|
+        define_method "test_#{type.name}_media_type_sanity" do
+          assert_media_type type
+        end
+      end
     end
   end
 end
