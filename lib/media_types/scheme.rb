@@ -25,8 +25,8 @@ module MediaTypes
 
   class MediaTypeValidationError < StandardError
     attr_reader :msg
-    def initialize(json,media_type_class)
-      @msg = "Fixture: #{json} expected to fail validation check in #{media_type_class}, but it did not"
+    def initialize(json,media_type_class,expectation)
+      @msg = "Fixture: #{json} expected to #{expectation ? "pass" : "fail"} validation check in #{media_type_class}, but it did not"
     end
   end
 
@@ -432,7 +432,7 @@ module MediaTypes
       rescue MediaTypes::Scheme::ValidationError
         expectation_met = true
       end 
-      @errors << "Fixture: #{json} expected to fail validation check in #{media_type_class}, but it did not" if expectation_met == false
+      @errors << MediaTypeValidationError.new(json,media_type_class,false) if expectation_met == false
     end
 
     def process_assert_pass(json, media_type_class)
@@ -440,7 +440,7 @@ module MediaTypes
         validate(json)
         rescue MediaTypes::Scheme::ValidationError
         expectation_met = false
-        @errors << MediaTypeValidationError.new(json,media_type_class) if expectation_met == false 
+        @errors << MediaTypeValidationError.new(json,media_type_class,true) if expectation_met == false 
       end
     end
 
