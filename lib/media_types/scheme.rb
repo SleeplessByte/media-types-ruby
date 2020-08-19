@@ -419,7 +419,7 @@ module MediaTypes
         json = JSON.parse(object[:fixture], { symbolize_names: true })
         object[:expect_to_pass] ? process_assert_pass(json,media_type_class) : process_assert_fail(json,media_type_class)  
       end
-      raise AssertionError, @errors.map { |error| error.msg } if !@errors.empty?
+      raise AssertionError, @errors.map { |error| error.msg } unless @errors.empty?
       media_type_class
     end
 
