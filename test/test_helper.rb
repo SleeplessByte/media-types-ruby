@@ -30,8 +30,4 @@ require_relative './assertions'
 
 class Minitest::Test < Minitest::Runnable
   include MediaTypes::Assertions
-
-  def assert_media_type(media_type)
-    assert media_type.media_type_validations.execute_assertions(media_type)
-  end
 end
