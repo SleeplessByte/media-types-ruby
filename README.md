@@ -405,48 +405,49 @@ Returns a list of all the schemas that are defined.
 
 ## Using Assertions in MediaTypes
 
-When using this library to make your own media types, you can use the methods `assert_pass`, `assert_fail` and `execute_assertions(MediaType)` to run checks that your new Media type matches your expectations.
+When using this library to make your own media types, you can use the methods `assert_pass`, `assert_fail` and `assert_sane!` to run checks that your new Media Type matches your expectations.
 
-The first two of these methods take in a fixture (as shown below) & store checks you want to carry out when `execute_assertions(MediaType)`  gets called. 
+The first two of these methods take in a fixture (as shown below) & store checks you want to carry out when `assert_sane!`  gets called. 
 If an error gets raised, you will get a list of all the fixtures that failed to meet expections returned to you.
 
-```ruby
-      class AnyType
-        include MediaTypes::Dsl
+```Ruby
+class AnyType
+  include MediaTypes::Dsl
 
-        def self.organisation
-          'trailervote'
-        end
+  def self.organisation
+    'trailervote'
+  end
 
-        use_name 'test'
+  use_name 'test'
 
-        validations do
-          any Numeric
+  validations do
+    any Numeric
 
-          assert_pass <<-FIXTURE
-          { "foo": 42, "bar": 43 }
-          FIXTURE
+    assert_pass <<-FIXTURE
+    { "foo": 42, "bar": 43 }
+    FIXTURE
 
-          assert_pass '{"foo": 42}'
-          # Any also means none, there are no required keys
-          assert_pass '{}'
+    assert_pass '{"foo": 42}'
+    # Any also means none, there are no required keys
+    assert_pass '{}'
 
-          # Expects any value to be a Numeric, not a Hash
-          assert_fail <<-FIXTURE
-          { "foo": { "bar": "string" } }
-          FIXTURE
-        
-          # Expects any value to be Numeric, not a Hash
-          assert_fail '{"foo": {}}'
-          # Expects any value to be Numeric, not a NilClass
-          assert_fail '{"foo": null}'
-          # Expects any value to be Numeric, not Array
-          assert_fail '{"foo": [42]}'
-         
-          execute_assertions(AnyType)
-        end
-      end
+    # Expects any value to be a Numeric, not a Hash
+    assert_fail <<-FIXTURE
+    { "foo": { "bar": "string" } }
+    FIXTURE
+  
+    # Expects any value to be Numeric, not a Hash
+    assert_fail '{"foo": {}}'
+    # Expects any value to be Numeric, not a NilClass
+    assert_fail '{"foo": null}'
+    # Expects any value to be Numeric, not Array
+    assert_fail '{"foo": [42]}'
+  end
+  assert_sane!
+end
 ```
+Note that while `assert_pass` and `assert_fail` are methods for use inside the validations block, `assert_sane!` is a method that the `AnyType` class itself has access to.
+
 ## Related
 
 - [`MediaTypes::Serialization`](https://github.com/XPBytes/media_types-serialization): :cyclone: Add media types supported serialization to Rails.
