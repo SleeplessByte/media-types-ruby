@@ -23,6 +23,13 @@ module MediaTypes
   class AssertionError < StandardError
   end
 
+  class MediaTypeValidationError < StandardError
+    attr_reader :msg
+    def initialize(json,media_type_class)
+      @msg = "Fixture: #{json} expected to fail validation check in #{media_type_class}, but it did not"
+    end
+  end
+
   ##
   # Media Type Schemes can validate content to a media type, by itself. Used by the `validations` dsl.
   #
@@ -389,18 +396,18 @@ module MediaTypes
     end
 
     def assert_pass(fixture)
-      object_to_store =
-        {fixture: fixture,
-          expect_to_pass: true
+      object_to_store = {
+        fixture: fixture,
+        expect_to_pass: true
         }
       @fixtures << object_to_store
 
     end
     
     def assert_fail(fixture)
-      object_to_store =
-        {fixture: fixture,
-          expect_to_pass: false
+      object_to_store = {
+        fixture: fixture,
+        expect_to_pass: false
         }
       @fixtures << object_to_store
     end
@@ -412,7 +419,7 @@ module MediaTypes
         json = JSON.parse(object[:fixture], { symbolize_names: true })
         object[:expect_to_pass] ? process_assert_pass(json,media_type_class) : process_assert_fail(json,media_type_class)  
       end
-      raise AssertionError, @errors if !@errors.empty?
+      raise AssertionError, @errors.map { |error| error.msg } if !@errors.empty?
       media_type_class
     end
 
@@ -420,11 +427,11 @@ module MediaTypes
     
     def process_assert_fail(json, media_type_class)
       expectation_met = false      
-        begin
-          validate(json)           
-        rescue MediaTypes::Scheme::ValidationError
-          expectation_met = true
-        end 
+      begin
+        validate(json)           
+      rescue MediaTypes::Scheme::ValidationError
+        expectation_met = true
+      end 
       @errors << "Fixture: #{json} expected to fail validation check in #{media_type_class}, but it did not" if expectation_met == false
     end
 
@@ -433,7 +440,7 @@ module MediaTypes
         validate(json)
         rescue MediaTypes::Scheme::ValidationError
         expectation_met = false
-        @errors << "Fixture: #{json} expected to pass validation check in #{media_type_class}, but it did not" if expectation_met == false 
+        @errors << MediaTypeValidationError.new(json,media_type_class) if expectation_met == false 
       end
     end
 
