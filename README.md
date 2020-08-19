@@ -407,7 +407,7 @@ Returns a list of all the schemas that are defined.
 
 When using this library to make your own media types, you can use the methods `assert_pass`, `assert_fail` and `assert_sane!` to run checks that your new Media Type matches your expectations.
 
-The first two of these methods take in a fixture (as shown below) & store checks you want to carry out when `assert_sane!`  gets called. 
+The first two of these methods take in a fixture (as shown below) & store checks you want to carry out when `assert_sane!` gets called. 
 If an error gets raised, you will get a list of all the fixtures that failed to meet expections returned to you.
 
 ```Ruby
