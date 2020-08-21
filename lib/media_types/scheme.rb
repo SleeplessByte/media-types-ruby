@@ -66,13 +66,12 @@ module MediaTypes
       self.type_attributes = {}
 
       @fixtures = []
-      @errors = []
-      @assertions_executed = false
+      @asserted_sane = false
 
       instance_exec(&block) if block_given?
     end
 
-    attr_accessor :type_attributes, :fixtures,:errors, :assertions_executed
+    attr_accessor :type_attributes, :fixtures,:asserted_sane
 
     ##
     # Checks if the +output+ is valid
@@ -414,13 +413,14 @@ module MediaTypes
 
 
     def execute_assertions(media_type_class)
-      self.assertions_executed = true  
+      errors = []
       @fixtures.each do |object|
         json = JSON.parse(object[:fixture], { symbolize_names: true })
-        object[:expect_to_pass] ? process_assert_pass(json,media_type_class) : process_assert_fail(json,media_type_class)  
+        output =  object[:expect_to_pass] ? process_assert_pass(json,media_type_class) : process_assert_fail(json,media_type_class)  
+        errors << output unless output == nil
       end
-      raise AssertionError, @errors.map { |error| error.msg } unless @errors.empty?
-      media_type_class
+      raise AssertionError, errors.map { |error| error.msg } unless errors.empty?
+      @asserted_sane = true
     end
 
     private
@@ -432,16 +432,16 @@ module MediaTypes
       rescue MediaTypes::Scheme::ValidationError
         expectation_met = true
       end 
-      @errors << MediaTypeValidationError.new(json,media_type_class,false) if expectation_met == false
+      MediaTypeValidationError.new(json,media_type_class,false) if expectation_met == false
     end
 
     def process_assert_pass(json, media_type_class)
       begin
         validate(json)
-        rescue MediaTypes::Scheme::ValidationError
-        expectation_met = false
-        @errors << MediaTypeValidationError.new(json,media_type_class,true) if expectation_met == false 
+      rescue MediaTypes::Scheme::ValidationError
+        error = MediaTypeValidationError.new(json,media_type_class,true)
       end
+      error
     end
 
     attr_accessor :rules

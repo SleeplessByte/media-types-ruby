@@ -37,8 +37,9 @@ module MediaTypes
       end
       
       def validate!(output, **opts)
-        assert_sane! unless self.media_type_validations.scheme.assertions_executed
-        to_constructable.validate!(output, **opts)
+        target_scheme = self.media_type_validations.scheme
+        assert_sane! unless target_scheme.asserted_sane
+        to_constructable.validate!(output, **opts) if target_scheme.asserted_sane
       end
 
       def validate_unsafe!(output, media_type = to_constructable, **opts)
