@@ -410,7 +410,7 @@ When using this library to make your own media types, you can use the methods `a
 The first two of these methods take in a fixture (as shown below) & store checks you want to carry out when `assert_sane!` gets called. 
 If an error gets raised, you will get a list of all the fixtures that failed to meet expections returned to you.
 
-Additionally, the first time the `validate!` method gets called to check a Media Type fixture, the collection of checks queued up by `assert_pass` and `assert_fail` for the Media Type in question will get carried out as well.
+Alternatively, the first time the `validate!` method gets called to check a Media Type fixture, the collection of checks queued up by `assert_pass` and `assert_fail` for the Media Type in question will get carried out as well.
 
 ```Ruby
 class AnyType
