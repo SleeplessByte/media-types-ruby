@@ -24,7 +24,6 @@ module MediaTypes
           assert_fail '{"foo": null}'
           assert_fail '{"foo": [42]}'
 
-          execute_assertions(AttributeType)
         end
       end
 

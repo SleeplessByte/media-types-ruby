@@ -71,7 +71,7 @@ module MediaTypes
       instance_exec(&block) if block_given?
     end
 
-    attr_accessor :type_attributes, :fixtures,:asserted_sane
+    attr_accessor :type_attributes, :fixtures, :asserted_sane
 
     ##
     # Checks if the +output+ is valid
