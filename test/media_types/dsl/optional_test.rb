@@ -208,9 +208,7 @@ module MediaTypes
       end
 
       [OptionalAttribute,OptionalAttributeInsideAny,OptionalAttributeInsideCollection,OptionalCollection,OptionalAttributeInsideAttribute,OptionalAttributeInsideOptionalAttribute].each do |type|
-        define_method "test_#{type.name}_media_type_sanity" do
-          assert_media_type type
-        end
+       build_fixture_tests type  
       end
     end
   end
