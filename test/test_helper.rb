@@ -39,7 +39,7 @@ class Minitest::Test < Minitest::Runnable
       output =  object[:expect_to_pass] ? scheme.process_assert_pass(json,type,caller) : scheme.process_assert_fail(json,type,caller)  
 
       define_method "test_#{string}" do
-        assert output == nil , MediaTypes::MediaTypeValidationError.new(json,type,object[:expect_to_pass],caller).msg
+        assert output == nil , MediaTypes::MediaTypeValidationError.new(json,type,object[:expect_to_pass],caller,scheme.rules).msg
       end
     end
   end

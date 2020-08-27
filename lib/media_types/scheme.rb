@@ -25,8 +25,8 @@ module MediaTypes
 
   class MediaTypeValidationError < StandardError
     attr_reader :msg
-    def initialize(json,media_type_class,expectation,caller)
-      @msg = "Fixture: #{json} expected to #{expectation ? "pass" : "fail"} validation check in #{media_type_class} at #{caller}, but it did not"
+    def initialize(json,media_type_class,expectation,caller,rules)
+      @msg = "Fixture: #{json} expected to #{expectation ? "pass" : "fail"} validation check in #{media_type_class} at #{caller}, but it did not - expected to follow #{rules.inspect}"
     end
   end
 
@@ -72,6 +72,7 @@ module MediaTypes
     end
 
     attr_accessor :type_attributes, :fixtures, :asserted_sane
+    attr_reader :rules
 
     ##
     # Checks if the +output+ is valid
@@ -435,19 +436,19 @@ module MediaTypes
       rescue MediaTypes::Scheme::ValidationError
         expectation_met = true
       end 
-      MediaTypeValidationError.new(json,media_type_class,false,caller) if expectation_met == false
+      MediaTypeValidationError.new(json,media_type_class,false,caller,self.rules) if expectation_met == false
     end
 
     def process_assert_pass(json, media_type_class,caller)
       begin
         validate(json)
       rescue MediaTypes::Scheme::ValidationError
-        error = MediaTypeValidationError.new(json,media_type_class,true,caller)
+        error = MediaTypeValidationError.new(json,media_type_class,true,caller,self.rules)
       end
       error
     end
 
     private
-    attr_accessor :rules
+    attr_writer :rules
   end
 end
