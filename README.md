@@ -405,10 +405,11 @@ Returns a list of all the schemas that are defined.
 
 ## Using Assertions in MediaTypes
 
-When using this library to make your own media types, you can use the methods `assert_pass`, `assert_fail` and `assert_sane!` to run checks that your new Media Type matches your expectations.
+When using this library to make your own media types, you can use the methods `assert_pass` and `assert_fail`  to run checks that your new Media Type matches your expectations.
 
-The first two of these methods take in a fixture (as shown below) & store checks you want to carry out when `assert_sane!` gets called. 
-If an error gets raised, you will get a list of all the fixtures that failed to meet expections returned to you.
+The first two of these methods take in a fixture (as shown below) & store checks you want to carry out when either `assert_sane!` or `assert_media_type` gets called. 
+
+`assert_sane!` can be used as a debugging/development tool (as shown below), giving you a convienient way to check that a MediaType you are building is operating as you intend. If an error gets raised, you will get a list of all the fixtures that failed to meet expections returned to you.
 
 Alternatively, the first time the `validate!` method gets called to check a Media Type fixture, the collection of checks queued up by `assert_pass` and `assert_fail` for the Media Type in question will get carried out as well.
 
@@ -446,19 +447,23 @@ class AnyType
     assert_fail '{"foo": [42]}'
   end
   assert_sane!
+  # place assert_sane! here, after the validations block, if using it as a development tool.
 end
 ```
 Note that while `assert_pass` and `assert_fail` are methods for use inside the validations block, `assert_sane!` is a method that the `AnyType` class itself has access to.
 
 ### Assertions for Media Type Checking in Test Suites
 
-We provide you with the ability to test Media Types you create in the same manner as `assert_sane!` in a Minitest test suite. To do this you must include the `MediaTypes::Assertions` module from the gem, as follows
+In the context of your tests, we provide you with the `assert_media_type` method, which acts as a wrapper for `assert_sane!` and allows you to run the checks you queue up for a particular MediaType within your tests, for any MediaType you have defined.
+
+To do this you must include the `MediaTypes::Assertions` module from the gem, as follows
+
 
 ```Ruby
 class AnyTest < Minitest::Test
   include MediaTypes::Assertions
 
-  class AnyType
+   class AnyType
     include MediaTypes::Dsl
 
     def self.organisation
