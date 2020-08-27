@@ -414,7 +414,7 @@ The first two of these methods take in a fixture (as shown below) & store checks
 Alternatively, the first time the `validate!` method gets called to check a Media Type fixture, the collection of checks queued up by `assert_pass` and `assert_fail` for the Media Type in question will get carried out as well.
 
 ```Ruby
-class AnyType
+class MyMedia
   include MediaTypes::Dsl
 
   def self.organisation
@@ -450,7 +450,7 @@ class AnyType
   # place assert_sane! here, after the validations block, if using it as a development tool.
 end
 ```
-Note that while `assert_pass` and `assert_fail` are methods for use inside the validations block, `assert_sane!` is a method that the `AnyType` class itself has access to.
+Note that while `assert_pass` and `assert_fail` are methods for use inside the validations block, `assert_sane!` is a method that the `MyMedia` class itself has access to.
 
 ### Assertions for Media Type Checking in Test Suites
 
@@ -460,45 +460,46 @@ To do this you must include the `MediaTypes::Assertions` module from the gem, as
 
 
 ```Ruby
-class AnyTest < Minitest::Test
-  include MediaTypes::Assertions
 
-   class AnyType
-    include MediaTypes::Dsl
+  class MyMedia
+  include MediaTypes::Dsl
 
-    def self.organisation
-      'trailervote'
-    end
-
-    use_name 'test'
-
-    validations do
-      any Numeric
-
-      assert_pass <<-FIXTURE
-      { "foo": 42, "bar": 43 }
-      FIXTURE
-
-      assert_pass '{"foo": 42}'
-      # Any also means none, there are no required keys
-      assert_pass '{}'
-
-      # Expects any value to be a Numeric, not a Hash
-      assert_fail <<-FIXTURE
-      { "foo": { "bar": "string" } }
-      FIXTURE
-
-      # Expects any value to be Numeric, not a Hash
-      assert_fail '{"foo": {}}'
-      # Expects any value to be Numeric, not a NilClass
-      assert_fail '{"foo": null}'
-      # Expects any value to be Numeric, not Array
-      assert_fail '{"foo": [42]}'
-    end
+  def self.organisation
+    'trailervote'
   end
 
-  def test_AnyType
-    assert_media_type AnyType
+  use_name 'test'
+
+  validations do
+    any Numeric
+
+    assert_pass <<-FIXTURE
+    { "foo": 42, "bar": 43 }
+    FIXTURE
+
+    assert_pass '{"foo": 42}'
+    # Any also means none, there are no required keys
+    assert_pass '{}'
+
+    # Expects any value to be a Numeric, not a Hash
+    assert_fail <<-FIXTURE
+    { "foo": { "bar": "string" } }
+    FIXTURE
+
+    # Expects any value to be Numeric, not a Hash
+    assert_fail '{"foo": {}}'
+    # Expects any value to be Numeric, not a NilClass
+    assert_fail '{"foo": null}'
+    # Expects any value to be Numeric, not Array
+    assert_fail '{"foo": [42]}'
+  end
+end
+
+class MyMediaTest < Minitest::Test
+  include MediaTypes::Assertions
+
+  def test_MyMedia
+    assert_media_type MyMedia
     # This runs the same checks as assert_sane! for the specified media_type
   end
 end
