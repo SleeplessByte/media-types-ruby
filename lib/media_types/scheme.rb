@@ -415,7 +415,7 @@ module MediaTypes
       @fixtures << object_to_store
     end
 
-    def execute_assertions(media_type_class)
+    def execute_assertions
       errors = []
       @fixtures.each do |object|
         json = JSON.parse(object[:fixture], { symbolize_names: true })
