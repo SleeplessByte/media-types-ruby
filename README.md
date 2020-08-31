@@ -459,8 +459,7 @@ In the context of your tests, we provide you with the `assert_media_type` method
 To do this you must include the `MediaTypes::Assertions` module from the gem, as follows
 
 
-```Ruby
-
+```ruby
   class MyMedia
   include MediaTypes::Dsl
 
