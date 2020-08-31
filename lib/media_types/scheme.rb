@@ -25,8 +25,8 @@ module MediaTypes
 
   class MediaTypeValidationError < StandardError
     attr_reader :msg
-    def initialize(json,media_type_class,expectation,caller,rules)
-      @msg = "Fixture: #{json} expected to #{expectation ? "pass" : "fail"} validation check in #{media_type_class} at #{caller}, but it did not - expected to follow #{rules.inspect}"
+    def initialize(json, caller)
+      @msg = "#{json} was expected to fail validations at #{caller.path + ':' + caller.lineno.to_s}"
     end
   end
 
@@ -403,9 +403,8 @@ module MediaTypes
         caller: caller
         }
       @fixtures << object_to_store
-
     end
-    
+
     def assert_fail(fixture)
       caller = caller_locations[1]
       object_to_store = {
@@ -416,34 +415,33 @@ module MediaTypes
       @fixtures << object_to_store
     end
 
-
     def execute_assertions(media_type_class)
       errors = []
       @fixtures.each do |object|
         json = JSON.parse(object[:fixture], { symbolize_names: true })
         caller = object[:caller]
-        output =  object[:expect_to_pass] ? process_assert_pass(json,media_type_class,caller) : process_assert_fail(json,media_type_class,caller)  
-        errors << output unless output == nil
+        output =  object[:expect_to_pass] ? process_assert_pass(json, caller) : process_assert_fail(json, caller)
+        errors << output unless output.nil?
       end
       raise AssertionError, errors.map { |error| error.msg } unless errors.empty?
       @asserted_sane = true
     end
-    
-    def process_assert_fail(json, media_type_class,caller)
-      expectation_met = false      
-      begin
-        validate(json)           
-      rescue MediaTypes::Scheme::ValidationError
-        expectation_met = true
-      end 
-      MediaTypeValidationError.new(json,media_type_class,false,caller,self.rules) if expectation_met == false
-    end
 
-    def process_assert_pass(json, media_type_class,caller)
+    def process_assert_fail(json, caller)
+      expectation_met = false
       begin
         validate(json)
       rescue MediaTypes::Scheme::ValidationError
-        error = MediaTypeValidationError.new(json,media_type_class,true,caller,self.rules)
+        expectation_met = true
+      end
+      MediaTypeValidationError.new(json, caller) if expectation_met == false
+    end
+
+    def process_assert_pass(json, caller)
+      begin
+        validate(json)
+      rescue => exception
+        error = exception.message + " at #{caller.path + ':' + caller.lineno.to_s}"
       end
       error
     end

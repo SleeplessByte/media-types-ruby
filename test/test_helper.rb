@@ -30,17 +30,4 @@ require_relative './assertions'
 
 class Minitest::Test < Minitest::Runnable
   include MediaTypes::Assertions
-
-  def self.build_fixture_tests(type)
-    scheme = type.media_type_validations.scheme
-    scheme.fixtures.each do |object| 
-      json, caller = [JSON.parse(object[:fixture], { symbolize_names: true }),object[:caller]]
-      string = "#{json} expected to #{object[:expect_to_pass] ? "pass" : "fail"} validations for #{type}"
-      output =  object[:expect_to_pass] ? scheme.process_assert_pass(json,type,caller) : scheme.process_assert_fail(json,type,caller)  
-
-      define_method "test_#{string}" do
-        assert output == nil , MediaTypes::MediaTypeValidationError.new(json,type,object[:expect_to_pass],caller,scheme.rules).msg
-      end
-    end
-  end
 end
