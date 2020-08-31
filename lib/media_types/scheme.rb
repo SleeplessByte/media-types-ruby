@@ -441,9 +441,8 @@ module MediaTypes
       begin
         validate(json)
       rescue => exception
-        error = exception.message + " at #{caller.path + ':' + caller.lineno.to_s}"
+        exception.message + " at #{caller.path + ':' + caller.lineno.to_s}"
       end
-      error
     end
 
     private
