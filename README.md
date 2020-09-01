@@ -446,6 +446,10 @@ class MyMedia
     # Expects any value to be Numeric, not Array
     assert_fail '{"foo": [42]}'
   end
+
+  # Optionally assert that the media type is sane on load. This makes the application crash when this
+  # file is evaluated. Alternatives include using a _test_ (see below), calling this manually or
+  # relying on the program to halt when the media type is used (and invalid).
   assert_sane!
   # place assert_sane! here, after the validations block, if using it as a development tool.
 end
