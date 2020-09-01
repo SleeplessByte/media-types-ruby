@@ -407,7 +407,7 @@ Returns a list of all the schemas that are defined.
 
 When using this library to make your own media types, you can use the methods `assert_pass` and `assert_fail` to define checks that your new Media Type matches your expectations.
 
-These methods take a fixture (as shown below) and store assertions to be carried out when either `assert_sane!` or `assert_media_type` is called. 
+These methods take a fixture (as shown below) and store assertions to be carried out when either `assert_sane!` is called. 
 
 `assert_sane!` can be used as a debugging/development tool (as shown below), giving you a convenient way to check that the MediaType you are building is operating as you intend. It raises with a list of failing fixtures if any of the expectations aren't met. 
 
@@ -454,13 +454,11 @@ class MyMedia
   # place assert_sane! here, after the validations block, if using it as a development tool.
 end
 ```
-Note that while `assert_pass` and `assert_fail` are methods for use inside the validations block, `assert_sane!` is a method that the `MyMedia  ` class itself has access to.
+**Note**: `assert_pass` and `assert_fail` are methods that can _only_ be used inside the `validations` block; `assert_sane!` is a method that the `MyMedia` class itself has access to, and is part of the public API.
 
 ### Assertions for Media Type Checking in Test Suites
 
-In the context of your tests, we provide the `assert_media_type` method, which acts as a wrapper for `assert_sane!` and allows you to run the checks you queue up for a particular `MediaType` within your tests.
-
-Include the `MediaTypes::Assertions` module from the gem to use `assert_media_type`:
+In the context of your tests, we provide the `build_fixture_tests` method,which allows you to run the checks you queue up for a particular `MediaType` within your tests with `assert_pass` and `assert_fail` in a Minitest context. This method is automatically added to the `Minitest::Test`, so If you are already using a Minitest suite, you should gain access to it.
 
 
 ```ruby
@@ -499,13 +497,8 @@ class MyMedia
 end
 
 class MyMediaTest < Minitest::Test
-  include MediaTypes::Assertions
-
-  def test_my_media
-  Minitest.backtrace_filter = Minitest::BacktraceFilter.new
-    assert_media_type MyMedia
-    # This runs the same checks as assert_sane! for the specified media_type
-  end
+  build_fixture_tests MyMedia
+   # This transforms all your calls to `assert_pass` and `assert_fail` into tests
 end
 ```
 
