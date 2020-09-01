@@ -413,7 +413,7 @@ These methods take a fixture (as shown below) and store assertions to be carried
 
 Alternatively, the first time the `validate!` method is called on a Media Type, the collection of assertions stored (defined by `assert_pass` and `assert_fail`) for that Media Type are executed. If any of the assertions fail, subsequent calls to `validate!` re-run the assertions. 
 
-```Ruby
+```ruby
 class MyMedia
   include MediaTypes::Dsl
 
