@@ -17,5 +17,8 @@ module MediaTypes
       end
       true
     end
+    # traceless_assert enables you to write test factories and so one without providing a backtrace to the code where the method was defined, apart from this, it is identical to a normal assert.
+    # this is so that you can create methods such as the ones in ./test_factory.rb which only provide information captured in the error,
+    # and avoid providing an unhelpful backtrace to the file where the template test was written.
   end
 end
