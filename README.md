@@ -409,7 +409,7 @@ When using this library to make your own media types, you can use the methods `a
 
 These methods take a fixture (as shown below) and store assertions to be carried out when either `assert_sane!` or `assert_media_type` is called. 
 
-`assert_sane!` can be used as a debugging/development tool (as shown below), giving you a convienient way to check that a MediaType you are building is operating as you intend. If an error gets raised, you will get a list of all the fixtures that failed to meet expections returned to you.
+`assert_sane!` can be used as a debugging/development tool (as shown below), giving you a convenient way to check that the MediaType you are building is operating as you intend. It raises with a list of failing fixtures if any of the expectations aren't met. 
 
 Alternatively, the first time the `validate!` method gets called to check a Media Type fixture, the collection of checks queued up by `assert_pass` and `assert_fail` for the Media Type in question will get carried out as well.
 
