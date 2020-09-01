@@ -435,13 +435,10 @@ module MediaTypes
     end
 
     def process_assert_pass(json, caller)
-      error = nil
-      begin
-        validate(json)
-      rescue StandardError => e
-        error = e.message + "\n#{caller.path + ':' + caller.lineno.to_s}"
-      end
-      error
+      validate(json)
+      nil
+    rescue StandardError => e
+      e.message + "\n#{caller.path + ':' + caller.lineno.to_s}"
     end
 
     private
