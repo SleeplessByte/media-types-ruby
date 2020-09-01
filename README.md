@@ -501,7 +501,7 @@ end
 class MyMediaTest < Minitest::Test
   include MediaTypes::Assertions
 
-  def test_MyMedia
+  def test_my_media
   Minitest.backtrace_filter = Minitest::BacktraceFilter.new
     assert_media_type MyMedia
     # This runs the same checks as assert_sane! for the specified media_type
