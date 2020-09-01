@@ -414,13 +414,13 @@ module MediaTypes
     end
 
     def execute_assertions
-      errors = []
-      @fixtures.each do |fixture_data|
-        json = JSON.parse(fixture_data.fixture, { symbolize_names: true })
-        output = fixture_data.expect_to_pass ? process_assert_pass(json, fixture_data.caller) : process_assert_fail(json, fixture_data.caller)
-        errors << output unless output.nil?
-      end
-      raise AssertionError, errors.map { |error| error.message } unless errors.empty?
+      errors ||=
+        @fixtures.each_with_object([]) do |fixture_data, error_array|
+          json = JSON.parse(fixture_data.fixture, { symbolize_names: true })
+          output = fixture_data.expect_to_pass ? process_assert_pass(json, fixture_data.caller) : process_assert_fail(json, fixture_data.caller)
+          error_array << output unless output.nil?
+        end
+      raise AssertionError, errors unless errors.empty?
 
       @asserted_sane = true
     end
