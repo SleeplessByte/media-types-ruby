@@ -464,7 +464,7 @@ Include the `MediaTypes::Assertions` module from the gem to use `assert_media_ty
 
 
 ```ruby
-  class MyMedia
+class MyMedia
   include MediaTypes::Dsl
 
   def self.organisation
