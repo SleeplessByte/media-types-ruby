@@ -13,7 +13,7 @@ module MediaTypes
           'example'
         end
 
-        use_name 'test'
+        use_name 'TrivialSchema'
 
         validations do
           version 1 do

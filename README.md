@@ -450,7 +450,7 @@ class MyMedia
   # place assert_sane! here, after the validations block, if using it as a development tool.
 end
 ```
-Note that while `assert_pass` and `assert_fail` are methods for use inside the validations block, `assert_sane!` is a method that the `MyMedia` class itself has access to.
+Note that while `assert_pass` and `assert_fail` are methods for use inside the validations block, `assert_sane!` is a method that the `MyMedia  ` class itself has access to.
 
 ### Assertions for Media Type Checking in Test Suites
 
@@ -498,6 +498,7 @@ class MyMediaTest < Minitest::Test
   include MediaTypes::Assertions
 
   def test_MyMedia
+  Minitest.backtrace_filter = Minitest::BacktraceFilter.new
     assert_media_type MyMedia
     # This runs the same checks as assert_sane! for the specified media_type
   end

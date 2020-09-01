@@ -13,7 +13,7 @@ module MediaTypes
           'trailervote'
         end
 
-        use_name 'test'
+        use_name 'CollectionType'
 
         validations do
           collection :foo, Numeric
@@ -40,7 +40,7 @@ module MediaTypes
           'trailervote'
         end
 
-        use_name 'test'
+        use_name 'CollectionCollectionType'
 
         validations do
           collection :foo do
@@ -70,7 +70,7 @@ module MediaTypes
           'trailervote'
         end
 
-        use_name 'test'
+        use_name 'CollectionSchemeType'
 
         scheme = MediaTypes::Scheme.new do
           attribute :bar, Numeric
@@ -102,7 +102,7 @@ module MediaTypes
           'trailervote'
         end
 
-        use_name 'test'
+        use_name 'CollectionSchemeTypeEmpty'
 
         scheme = MediaTypes::Scheme.new() do
           attribute :bar, Numeric

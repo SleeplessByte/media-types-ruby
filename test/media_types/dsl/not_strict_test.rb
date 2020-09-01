@@ -13,7 +13,7 @@ module MediaTypes
           'trailervote'
         end
 
-        use_name 'test'
+        use_name 'NotStrictType'
 
         validations do
           attribute :foo, Numeric
@@ -39,7 +39,7 @@ module MediaTypes
           'trailervote'
         end
 
-        use_name 'test'
+        use_name 'NotStrictCollectionType'
 
         validations do
           collection :foo do

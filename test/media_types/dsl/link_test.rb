@@ -13,7 +13,7 @@ module MediaTypes
           'trailervote'
         end
 
-        use_name 'test'
+        use_name 'SingleLink'
 
         validations do
           link :self
@@ -41,7 +41,7 @@ module MediaTypes
           'trailervote'
         end
 
-        use_name 'test'
+        use_name 'LinkWithAttribute'
 
         validations do
           link :self do
@@ -75,7 +75,7 @@ module MediaTypes
           'trailervote'
         end
 
-        use_name 'test'
+        use_name 'OptionalLink'
 
         validations do
           link :self, optional: true

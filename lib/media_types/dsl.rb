@@ -90,7 +90,7 @@ module MediaTypes
       end
 
       def assert_sane!
-        self.media_type_validations.execute_assertions(self.class)
+        media_type_validations.execute_assertions
       end
 
       private

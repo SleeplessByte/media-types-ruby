@@ -13,7 +13,7 @@ module MediaTypes
           'trailervote'
         end
 
-        use_name 'test'
+        use_name 'AttributeType'
 
         validations do
           attribute :foo, Numeric
@@ -23,7 +23,6 @@ module MediaTypes
           assert_fail '{"foo": {}}'
           assert_fail '{"foo": null}'
           assert_fail '{"foo": [42]}'
-
         end
       end
 
@@ -35,7 +34,7 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'trailervote'
+          'AttributeCollectionType'
         end
 
         use_name 'test'
@@ -62,7 +61,7 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'trailervote'
+          'AttributeSchemeType'
         end
 
         use_name 'test'
@@ -79,7 +78,6 @@ module MediaTypes
           assert_fail '{"foo": {}}'
           assert_fail '{"foo": null}'
           assert_fail '{"foo": [{"bar": "string"}]}'
-
         end
       end
 
@@ -95,7 +93,7 @@ module MediaTypes
           'trailervote'
         end
 
-        use_name 'test'
+        use_name 'AttributeOptionsType'
 
         validations do
           attribute :foo, Numeric, allow_nil: true
@@ -115,7 +113,7 @@ module MediaTypes
       end
 
       def test_indifferent_access
-        refute AttributeType.valid?({'foo' => nil}), 'Expected input to be invalid'
+        refute AttributeType.valid?({ 'foo' => nil }), 'Expected input to be invalid'
         refute AttributeType.valid?({}), 'Expected input to be invalid'
       end
 

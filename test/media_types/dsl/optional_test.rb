@@ -40,7 +40,7 @@ module MediaTypes
           'trailervote'
         end
 
-        use_name 'test'
+        use_name 'OptionalAttributeInsideAny'
 
         validations do
           any do
@@ -70,7 +70,7 @@ module MediaTypes
           'trailervote'
         end
 
-        use_name 'test'
+        use_name 'OptionalAttributeInsideCollection'
 
         validations do
           collection :foo do
@@ -107,7 +107,7 @@ module MediaTypes
           'trailervote'
         end
 
-        use_name 'test'
+        use_name 'OptionalCollection'
 
         validations do
           collection :foo, optional: true do
@@ -142,7 +142,7 @@ module MediaTypes
           'trailervote'
         end
 
-        use_name 'test'
+        use_name 'OptionalAttributeInsideAttribute'
 
         validations do
           attribute :foo do
@@ -177,7 +177,7 @@ module MediaTypes
           'trailervote'
         end
 
-        use_name 'test'
+        use_name 'OptionalAttributeInsideOptionalAttribute'
 
         validations do
           attribute :foo, optional: true do

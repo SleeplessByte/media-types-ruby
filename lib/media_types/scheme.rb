@@ -24,10 +24,20 @@ module MediaTypes
   end
 
   class MediaTypeValidationError < StandardError
-    attr_reader :msg
     def initialize(json, caller)
-      @msg = "#{json} was expected to fail validations at #{caller.path + ':' + caller.lineno.to_s}"
+      @message = "#{json} was expected to fail validations  \n#{caller.path + ':' + caller.lineno.to_s}"
     end
+
+    attr_reader :message
+  end
+
+  class FixtureData
+    def initialize(caller, fixture, expect_to_pass)
+      @caller = caller
+      @fixture = fixture
+      @expect_to_pass = expect_to_pass
+    end
+    attr_accessor :caller, :fixture, :expect_to_pass
   end
 
   ##
@@ -171,8 +181,8 @@ module MediaTypes
     #
     def attribute(key, type = ::Object, optional: false, **opts, &block)
       raise KeyTypeError, "Unexpected key type #{key.class.name}, please use either a symbol or string." unless key.is_a?(String) || key.is_a?(Symbol)
-      raise DuplicateKeyError, "An attribute with key #{key.to_s} has already been defined. Please remove one of the two." if rules.has_key?(key)
-      raise DuplicateKeyError, "A string attribute with the same string representation as the symbol :#{key.to_s} already exists. Please remove one of the two." if key.is_a?(Symbol)&& rules.has_key?(key.to_s)
+      raise DuplicateKeyError, "An attribute with key #{key} has already been defined. Please remove one of the two." if rules.has_key?(key)
+      raise DuplicateKeyError, "A string attribute with the same string representation as the symbol :#{key} already exists. Please remove one of the two." if key.is_a?(Symbol) && rules.has_key?(key.to_s)
       raise DuplicateKeyError, "A symbol attribute with the same string representation as the string '#{key}' already exists. Please remove one of the two." if key.is_a?(String) && rules.has_key?(key.to_sym)
 
       if block_given?
@@ -396,56 +406,46 @@ module MediaTypes
     end
 
     def assert_pass(fixture)
-      caller = caller_locations[1]
-      object_to_store = {
-        fixture: fixture,
-        expect_to_pass: true,
-        caller: caller
-        }
-      @fixtures << object_to_store
+      @fixtures << FixtureData.new(caller_locations[1], fixture, true)
     end
 
     def assert_fail(fixture)
-      caller = caller_locations[1]
-      object_to_store = {
-        fixture: fixture,
-        expect_to_pass: false,
-        caller: caller
-        }
-      @fixtures << object_to_store
+      @fixtures << FixtureData.new(caller_locations[1], fixture, false)
     end
 
     def execute_assertions
       errors = []
-      @fixtures.each do |object|
-        json = JSON.parse(object[:fixture], { symbolize_names: true })
-        caller = object[:caller]
-        output =  object[:expect_to_pass] ? process_assert_pass(json, caller) : process_assert_fail(json, caller)
+      @fixtures.each do |fixture_data|
+        json = JSON.parse(fixture_data.fixture, { symbolize_names: true })
+        output = fixture_data.expect_to_pass ? process_assert_pass(json, fixture_data.caller) : process_assert_fail(json, fixture_data.caller)
         errors << output unless output.nil?
       end
-      raise AssertionError, errors.map { |error| error.msg } unless errors.empty?
+      raise AssertionError, errors.map { |error| error.message } unless errors.empty?
+
       @asserted_sane = true
     end
 
     def process_assert_fail(json, caller)
-      expectation_met = false
       begin
         validate(json)
       rescue MediaTypes::Scheme::ValidationError
         expectation_met = true
       end
-      MediaTypeValidationError.new(json, caller) if expectation_met == false
+      MediaTypeValidationError.new(json, caller) unless expectation_met
     end
 
     def process_assert_pass(json, caller)
+      error = nil
       begin
         validate(json)
-      rescue => exception
-        exception.message + " at #{caller.path + ':' + caller.lineno.to_s}"
+      rescue StandardError => e
+        error = e.message + "\n#{caller.path + ':' + caller.lineno.to_s}"
       end
+      error
     end
 
     private
+
     attr_writer :rules
   end
 end
