@@ -460,7 +460,7 @@ Note that while `assert_pass` and `assert_fail` are methods for use inside the v
 
 In the context of your tests, we provide the `assert_media_type` method, which acts as a wrapper for `assert_sane!` and allows you to run the checks you queue up for a particular `MediaType` within your tests.
 
-To do this you must include the `MediaTypes::Assertions` module from the gem, as follows
+Include the `MediaTypes::Assertions` module from the gem to use `assert_media_type`:
 
 
 ```ruby
