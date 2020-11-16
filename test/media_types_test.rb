@@ -77,7 +77,10 @@ class MediaTypesTest < Minitest::Test
     validations do
       empty
     end
+
+    expect_string_keys
   end
+  # Supposed to FAIL!!!
 
   # refactor media types to match above
   def test_by_default_the_key_type_expected_is_a_symbol
@@ -236,6 +239,7 @@ class MediaTypesTest < Minitest::Test
     end
   end
 
+  # TODO: Should be in the previous(???)
   def test_symbol_keys_can_set_for_a_media_type
     assert StringKeyModuleToBeOverRidden::OverridingMediaType.symbol_keys?
     refute StringKeyModuleToBeOverRidden::OverridingMediaType.string_keys?
@@ -310,13 +314,11 @@ class MediaTypesTest < Minitest::Test
         empty
       end
     end
+
+    MediaTypes.expect_string_keys
   end
 
   def test_cannot_change_module_expectations_after_default_used
-    parent = self
-    build_module_tree(parent)
-    require 'byebug'
-    byebug
     assert_raises do
       ModuleDefinesExpectationsAfterMediaTypes.module_eval('MediaTypes.expect_string_keys')
     end
@@ -325,7 +327,6 @@ class MediaTypesTest < Minitest::Test
   @@stuff = []
   def build_module_tree(target_module, depth = 1)
     # <----
-
     # This method creates a tree of nested modules, three levels deep, with all combinations of key type inheritance covered.
     if depth >= 4
       return nil
@@ -338,8 +339,6 @@ class MediaTypesTest < Minitest::Test
     [no_key_type_module, string_key_type_module, symbol_key_type_module].each do |module_type|
       @@stuff << module_type
       target_media_type = Class.new
-      # target_media_type = module_type.const_set('TestMediaType', Class.new)
-      # TestMediaType = Class.new
       target_media_type.class_eval do
         include MediaTypes::Dsl
 
@@ -358,38 +357,32 @@ class MediaTypesTest < Minitest::Test
     end
   end
 
+  def expectation_checker(target_module)
+    root_modules = [NoKeyTypeSpecified.name, StringKeyTypeSpecified.name, SymbolKeyTypeSpecified.name]
+    # require 'byebug'; byebug
+    case target_module.name.split('::').last
+    when NoKeyTypeSpecified.name.split('::').last
+      if root_modules.include?(target_module.class.superclass)
+        expectation_checker(target_module.class.superclass)
+      else
+        assert target_module.target_media_type.expect_symbol_keys?
+        refute target_module.target_media_type.expect_string_keys?
+      end
+    when StringKeyTypeSpecified.name.split('::').last
+      assert target_module.target_media_type.expect_string_keys?
+      refute target_module.target_media_type.expect_symbol_keys?
+    when SymbolKeyTypeSpecified.name.split('::').last
+      assert target_module.target_media_type.expect_symbol_keys?
+      refute target_module.target_media_type.expect_string_keys?
+    end
+  end
+
+  module TreeTestRoot; end
+
+  # Write the check/amend the above to check these combinations.
+  def test_module_tree_inheritance_structure_works_as_expected
+    build_module_tree(TreeTestRoot)
+    @@stuff.each { |mod| expectation_checker(mod) }
+  end
+
 end
-
-# def ModuleCreator(target_module = Object, layer = [])
-#   a = target_module.const_set('NoKeyTypeSpecified', Module.new)
-#   b = target_module.const_set('StringKeyTypeSpecified', Module.new)
-#   b.module_eval do
-#     MediaTypes.expect_string_keys
-#   end
-#   c = target_module.const_set('SymbolKeyTypeSpecified', Module.new)
-#   c.module_eval do
-#     MediaTypes.expect_symbol_keys
-#   end
-#   layer.concat [a, b, c]
-# end
-
-# def ModuleCreator(target_module = Object, layer = [])
-#   a = target_module.const_set('NoKeyTypeSpecified', Module.new)
-#   b = target_module.const_set('StringKeyTypeSpecified', Module.new)
-#   b.module_eval do
-#     MediaTypes.expect_string_keys
-#   end
-#   c = target_module.const_set('SymbolKeyTypeSpecified', Module.new)
-#   c.module_eval do
-#     MediaTypes.expect_symbol_keys
-#   end
-#   layer.concat [a, b, c]
-# end
-
-# def FixtureFactory
-#   first_layer = ModuleCreator
-#   second_layer = []
-#   third_layer = []
-#   first_layer.each { |mod| second_layer.concat ModuleCreator(mod) }
-#   second_layer.each { |mod| third_layer.concat ModuleCreator(mod) }
-# end
