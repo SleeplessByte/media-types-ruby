@@ -357,23 +357,22 @@ class MediaTypesTest < Minitest::Test
     end
   end
 
-  def expectation_checker(target_module)
+  def expectation_checker
     root_modules = [NoKeyTypeSpecified.name, StringKeyTypeSpecified.name, SymbolKeyTypeSpecified.name]
-    # require 'byebug'; byebug
-    case target_module.name.split('::').last
-    when NoKeyTypeSpecified.name.split('::').last
-      if root_modules.include?(target_module.class.superclass)
-        expectation_checker(target_module.class.superclass)
-      else
-        assert target_module.target_media_type.expect_symbol_keys?
-        refute target_module.target_media_type.expect_string_keys?
+    @@stuff.each_with_object([]) do |target_module, checks|
+      case target_module.name.split('::').last
+      when NoKeyTypeSpecified.name.split('::').last
+        if root_modules.include?(target_module.class.superclass)
+          expectation_checker(target_module.class.superclass)
+        else
+          check = false unless Kernel.const_get(target_module.name + '::TestMediaType').symbol_keys?
+        end
+      when StringKeyTypeSpecified.name.split('::').last
+        check = false unless  Kernel.const_get(target_module.name + '::TestMediaType').string_keys?
+      when SymbolKeyTypeSpecified.name.split('::').last
+        check = false unless  Kernel.const_get(target_module.name + '::TestMediaType').symbol_keys?
       end
-    when StringKeyTypeSpecified.name.split('::').last
-      assert target_module.target_media_type.expect_string_keys?
-      refute target_module.target_media_type.expect_symbol_keys?
-    when SymbolKeyTypeSpecified.name.split('::').last
-      assert target_module.target_media_type.expect_symbol_keys?
-      refute target_module.target_media_type.expect_string_keys?
+      checks << target_module.name if check == false
     end
   end
 
@@ -382,7 +381,8 @@ class MediaTypesTest < Minitest::Test
   # Write the check/amend the above to check these combinations.
   def test_module_tree_inheritance_structure_works_as_expected
     build_module_tree(TreeTestRoot)
-    @@stuff.each { |mod| expectation_checker(mod) }
+    checks = expectation_checker
+    assert checks.empty?, checks.to_s + '  did not have the expected key types'
   end
 
 end
