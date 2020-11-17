@@ -334,15 +334,6 @@ class MediaTypesTest < Minitest::Test
 
   private
 
-  def demodulize(mod)
-    mod = mod.to_s
-    if (i = mod.rindex('::'))
-      mod[(i + 2)..-1]
-    else
-      mod
-    end
-  end
-
   def validate_inheritance_tree(module_tree)
     module_tree.each_with_object([]) do |target_module, failed|
       validate_module(failed, target_module)
@@ -350,16 +341,7 @@ class MediaTypesTest < Minitest::Test
   end
 
   def validate_module(failed, target_module)
-    case demodulize(target_module)
-    when demodulize(NoKeyTypeSpecified)
-      failed << target_module.name unless validate_module_inheritance(target_module)
-    when demodulize(StringKeyTypeSpecified)
-      failed << target_module.name unless Kernel.const_get(target_module.name + '::TestMediaType').string_keys?
-    when demodulize(SymbolKeyTypeSpecified)
-      failed << target_module.name unless Kernel.const_get(target_module.name + '::TestMediaType').symbol_keys?
-    else
-      failed
-    end
+    failed << target_module.name unless validate_module_inheritance(target_module)
   end
 
   def validate_module_inheritance(target_module)
@@ -402,5 +384,14 @@ class MediaTypesTest < Minitest::Test
       module_type.const_set('TestMediaType', target_media_type)
     end
     module_tree
+  end
+
+  def demodulize(mod)
+    mod = mod.to_s
+    if (i = mod.rindex('::'))
+      mod[(i + 2)..-1]
+    else
+      mod
+    end
   end
 end
