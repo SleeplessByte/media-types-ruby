@@ -18,14 +18,6 @@ module MediaTypes
     @organisation_prefixes[mod.name] = organisation
   end
 
-  def string_keys?
-    true
-  end
-
-  def symbol_keys?
-    true
-  end
-
   def self.expect_string_keys
   end
 
