@@ -356,17 +356,24 @@ class MediaTypesTest < Minitest::Test
     end
   end
 
-  def validate_inheritance_tree(module_tree)
+  def validate_module_inheritance(target_module)
     root_modules = [NoKeyTypeSpecified.name, StringKeyTypeSpecified.name, SymbolKeyTypeSpecified.name]
+    require 'byebug'; byebug
+    expected = target_module.name.split('::').delete(NoKeyTypeSpecified.name).pop
+
+    # if expected =
+
+    if root_modules.include?(target_module.class.superclass)
+    else
+      Kernel.const_get(target_module.name + '::TestMediaType').symbol_keys?
+    end
+  end
+
+  def validate_inheritance_tree(module_tree)
     module_tree.each_with_object([]) do |target_module, failed|
       case target_module.name.split('::').last
       when NoKeyTypeSpecified.name.split('::').last
-        if root_modules.include?(target_module.class.superclass)
-          # This doesn't work, we actually need to see what the closest parent is that actually specifies something and expect that in the current module.
-          # expectation_checker(target_module.class.superclass)
-        else
-          failed << target_module.name unless Kernel.const_get(target_module.name + '::TestMediaType').symbol_keys?
-        end
+        failed << target_module.name unless validate_module_inheritance(target_module)
       when StringKeyTypeSpecified.name.split('::').last
         failed << target_module.name unless  Kernel.const_get(target_module.name + '::TestMediaType').string_keys?
       when SymbolKeyTypeSpecified.name.split('::').last
