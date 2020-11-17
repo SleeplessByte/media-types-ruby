@@ -324,12 +324,11 @@ class MediaTypesTest < Minitest::Test
     end
   end
 
-  @@stuff = []
-  def build_module_tree(target_module, depth = 1)
+  def build_module_tree(target_module, depth = 1, module_tree = [])
     # <----
     # This method creates a tree of nested modules, three levels deep, with all combinations of key type inheritance covered.
     if depth >= 4
-      return nil
+      return module_tree
     end
 
     # Creates three modules, with different key type specifications
@@ -337,7 +336,7 @@ class MediaTypesTest < Minitest::Test
     string_key_type_module = target_module.const_set('StringKeyTypeSpecified', Module.new { MediaTypes.expect_string_keys })
     symbol_key_type_module = target_module.const_set('SymbolKeyTypeSpecified', Module.new { MediaTypes.expect_symbol_keys })
     [no_key_type_module, string_key_type_module, symbol_key_type_module].each do |module_type|
-      @@stuff << module_type
+      module_tree << module_type
       target_media_type = Class.new
       target_media_type.class_eval do
         include MediaTypes::Dsl
@@ -352,27 +351,27 @@ class MediaTypesTest < Minitest::Test
           empty
         end
       end
-      build_module_tree(module_type, depth + 1)
+      build_module_tree(module_type, depth + 1, module_tree)
       module_type.const_set('TestMediaType', target_media_type)
     end
   end
 
-  def expectation_checker
+  def validate_inheritance_tree(module_tree)
     root_modules = [NoKeyTypeSpecified.name, StringKeyTypeSpecified.name, SymbolKeyTypeSpecified.name]
-    @@stuff.each_with_object([]) do |target_module, checks|
+    module_tree.each_with_object([]) do |target_module, failed|
       case target_module.name.split('::').last
       when NoKeyTypeSpecified.name.split('::').last
         if root_modules.include?(target_module.class.superclass)
-          expectation_checker(target_module.class.superclass)
+          # This doesn't work, we actually need to see what the closest parent is that actually specifies something and expect that in the current module.
+          # expectation_checker(target_module.class.superclass)
         else
-          check = false unless Kernel.const_get(target_module.name + '::TestMediaType').symbol_keys?
+          failed << target_module.name unless Kernel.const_get(target_module.name + '::TestMediaType').symbol_keys?
         end
       when StringKeyTypeSpecified.name.split('::').last
-        check = false unless  Kernel.const_get(target_module.name + '::TestMediaType').string_keys?
+        failed << target_module.name unless  Kernel.const_get(target_module.name + '::TestMediaType').string_keys?
       when SymbolKeyTypeSpecified.name.split('::').last
-        check = false unless  Kernel.const_get(target_module.name + '::TestMediaType').symbol_keys?
+        failed << target_module.name unless  Kernel.const_get(target_module.name + '::TestMediaType').symbol_keys?
       end
-      checks << target_module.name if check == false
     end
   end
 
@@ -380,9 +379,9 @@ class MediaTypesTest < Minitest::Test
 
   # Write the check/amend the above to check these combinations.
   def test_module_tree_inheritance_structure_works_as_expected
-    build_module_tree(TreeTestRoot)
-    checks = expectation_checker
-    assert checks.empty?, checks.to_s + '  did not have the expected key types'
+    module_tree = build_module_tree(TreeTestRoot)
+    failed = validate_inheritance_tree(module_tree)
+    assert failed.empty?, failed.to_s + ' did not have the expected key types'
   end
 
 end
