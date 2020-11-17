@@ -324,9 +324,56 @@ class MediaTypesTest < Minitest::Test
     end
   end
 
+  module TreeTestRoot; end
+
+  def test_module_tree_inheritance_structure_works_as_expected
+    module_tree = build_module_tree(TreeTestRoot)
+    failed = validate_inheritance_tree(module_tree)
+    assert failed.empty?, failed.to_s + ' did not have the expected key types'
+  end
+
+  private
+
+  def demodulize(mod)
+    mod = mod.to_s
+    if (i = mod.rindex('::'))
+      mod[(i + 2)..-1]
+    else
+      mod
+    end
+  end
+
+  def validate_inheritance_tree(module_tree)
+    module_tree.each_with_object([]) do |target_module, failed|
+      validate_module(failed, target_module)
+    end
+  end
+
+  def validate_module(failed, target_module)
+    case demodulize(target_module)
+    when demodulize(NoKeyTypeSpecified)
+      failed << target_module.name unless validate_module_inheritance(target_module)
+    when demodulize(StringKeyTypeSpecified)
+      failed << target_module.name unless Kernel.const_get(target_module.name + '::TestMediaType').string_keys?
+    when demodulize(SymbolKeyTypeSpecified)
+      failed << target_module.name unless Kernel.const_get(target_module.name + '::TestMediaType').symbol_keys?
+    else
+      failed
+    end
+  end
+
+  def validate_module_inheritance(target_module)
+    expected = (target_module.name.split('::') - [demodulize(NoKeyTypeSpecified)]).pop
+    if expected == demodulize(StringKeyTypeSpecified)
+      Kernel.const_get(target_module.name + '::TestMediaType').string_keys?
+    else
+      Kernel.const_get(target_module.name + '::TestMediaType').symbol_keys?
+    end
+  end
+
   def build_module_tree(target_module, depth = 1, module_tree = [])
-    # <----
-    # This method creates a tree of nested modules, three levels deep, with all combinations of key type inheritance covered.
+    # This method creates a tree of nested modules, three levels deep,
+    # with all combinations of key type inheritance covered.
     if depth >= 4
       return module_tree
     end
@@ -354,41 +401,6 @@ class MediaTypesTest < Minitest::Test
       build_module_tree(module_type, depth + 1, module_tree)
       module_type.const_set('TestMediaType', target_media_type)
     end
+    module_tree
   end
-
-  def validate_module_inheritance(target_module)
-    root_modules = [NoKeyTypeSpecified.name, StringKeyTypeSpecified.name, SymbolKeyTypeSpecified.name]
-    require 'byebug'; byebug
-    expected = target_module.name.split('::').delete(NoKeyTypeSpecified.name).pop
-
-    # if expected =
-
-    if root_modules.include?(target_module.class.superclass)
-    else
-      Kernel.const_get(target_module.name + '::TestMediaType').symbol_keys?
-    end
-  end
-
-  def validate_inheritance_tree(module_tree)
-    module_tree.each_with_object([]) do |target_module, failed|
-      case target_module.name.split('::').last
-      when NoKeyTypeSpecified.name.split('::').last
-        failed << target_module.name unless validate_module_inheritance(target_module)
-      when StringKeyTypeSpecified.name.split('::').last
-        failed << target_module.name unless  Kernel.const_get(target_module.name + '::TestMediaType').string_keys?
-      when SymbolKeyTypeSpecified.name.split('::').last
-        failed << target_module.name unless  Kernel.const_get(target_module.name + '::TestMediaType').symbol_keys?
-      end
-    end
-  end
-
-  module TreeTestRoot; end
-
-  # Write the check/amend the above to check these combinations.
-  def test_module_tree_inheritance_structure_works_as_expected
-    module_tree = build_module_tree(TreeTestRoot)
-    failed = validate_inheritance_tree(module_tree)
-    assert failed.empty?, failed.to_s + ' did not have the expected key types'
-  end
-
 end
