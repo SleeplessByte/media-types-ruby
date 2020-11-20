@@ -138,70 +138,6 @@ class MediaTypesTest < Minitest::Test
     refute ModuleSpecifiesStringKeys::ShouldInheritKeyType.symbol_keys?
   end
 
-  module ParentMediaTypeModule
-    MediaTypes.expect_string_keys
-    module NestedModuleA
-      MediaTypes.expect_symbol_keys
-      class ShouldExpectSymbolKeys
-        include MediaTypes::Dsl
-
-        def self.organisation
-          'domain.test'
-        end
-
-        use_name 'test'
-
-        validations do
-          empty
-        end
-      end
-
-      module NestedModuleB
-        MediaTypes.expect_string_keys
-        class ShouldExpectStringKeys
-          include MediaTypes::Dsl
-
-          def self.organisation
-            'domain.test'
-          end
-
-          use_name 'test'
-
-          validations do
-            empty
-          end
-        end
-      end
-
-      module NestedModuleC
-        class ShouldExpectStringKeys
-          include MediaTypes::Dsl
-
-          def self.organisation
-            'domain.test'
-          end
-
-          use_name 'test'
-
-          validations do
-            empty
-          end
-        end
-      end
-    end
-  end
-  def test_key_preferences_can_be_inherited_by_a_module
-  end
-
-  def test_that_key_settings_can_be_overridden_in_nested_modules
-    # test_you_can_switch_back_to_symbol_keys_in_a_nested_module
-    assert ParentMediaTypeModule::NestedModuleA::ShouldExpectSymbolKeys.symbol_keys?
-    refute ParentMediaTypeModule::NestedModuleA::ShouldExpectSymbolKeys.string_keys?
-    # test you can switch back to string keys in a nested module
-    assert ParentMediaTypeModule::NestedModuleA::NestedModuleB::ShouldExpectStringKeys.string_keys?
-    refute ParentMediaTypeModule::NestedModuleA::NestedModuleB::ShouldExpectStringKeys.symbol_keys?
-  end
-
   # Check the media type over-rides the module
   module StringKeyModuleToBeOverRidden
     MediaTypes.expect_string_keys
@@ -249,7 +185,7 @@ class MediaTypesTest < Minitest::Test
   end
 
   # Test Clashes
-  module ModuleTriesToSetTwice
+  module ModuleTriesToSetKeyTypeTwice
     MediaTypes.expect_string_keys
   end
   class MediaTypeTriesToSetKeyTypeTwice
@@ -268,7 +204,7 @@ class MediaTypesTest < Minitest::Test
   end
 
   def test_key_settings_cannot_be_altered_on_the_same_level_once_set
-    assert_raises ModuleTriesToSetTwice.module_eval('MediaTypes.expect_symbol_keys')
+    assert_raises ModuleTriesToSetKeyTypeTwice.module_eval('MediaTypes.expect_symbol_keys')
     assert_raises do
       MediaTypeTriesToSetKeyTypeTwice.class_eval do
         expect_string_keys
@@ -325,34 +261,190 @@ class MediaTypesTest < Minitest::Test
   end
 
   module TreeTestRoot; end
+  def setup
+    build_module_tree(TreeTestRoot)
+  end
 
-  def test_module_tree_inheritance_structure_works_as_expected
-    module_tree = build_module_tree(TreeTestRoot)
-    failed = validate_inheritance_tree(module_tree)
-    assert failed.empty?, failed.to_s + ' did not have the expected key types'
+  def test_that_MediaTypesTest_TreeTestRoot_NoKeyTypeSpecified_has_the_expected_key_type_preference
+    assert validate_module_inheritance(MediaTypesTest::TreeTestRoot::NoKeyTypeSpecified), expected
+  end
+
+  def test_that_MediaTypesTest_TreeTestRoot_NoKeyTypeSpecified_NoKeyTypeSpecified_has_the_expected_key_type_preference
+    validate_module_inheritance(MediaTypesTest::TreeTestRoot::NoKeyTypeSpecified::NoKeyTypeSpecified)
+  end
+
+  def test_that_MediaTypesTest_TreeTestRoot_NoKeyTypeSpecified_NoKeyTypeSpecified_NoKeyTypeSpecified_has_the_expected_key_type_preference
+    validate_module_inheritance(MediaTypesTest::TreeTestRoot::NoKeyTypeSpecified::NoKeyTypeSpecified::NoKeyTypeSpecified)
+  end
+
+  def test_that_MediaTypesTest_TreeTestRoot_NoKeyTypeSpecified_NoKeyTypeSpecified_StringKeyTypeSpecified_has_the_expected_key_type_preference
+    validate_module_inheritance(MediaTypesTest::TreeTestRoot::NoKeyTypeSpecified::NoKeyTypeSpecified::StringKeyTypeSpecified)
+  end
+
+  def test_that_MediaTypesTest_TreeTestRoot_NoKeyTypeSpecified_NoKeyTypeSpecified_SymbolKeyTypeSpecified_has_the_expected_key_type_preference
+    validate_module_inheritance(MediaTypesTest::TreeTestRoot::NoKeyTypeSpecified::NoKeyTypeSpecified::SymbolKeyTypeSpecified)
+   end
+
+  def test_that_MediaTypesTest_TreeTestRoot_NoKeyTypeSpecified_StringKeyTypeSpecified_has_the_expected_key_type_preference
+    validate_module_inheritance(MediaTypesTest::TreeTestRoot::NoKeyTypeSpecified::StringKeyTypeSpecified)
+  end
+
+  def test_that_MediaTypesTest_TreeTestRoot_NoKeyTypeSpecified_StringKeyTypeSpecified_NoKeyTypeSpecified_has_the_expected_key_type_preference
+    validate_module_inheritance(MediaTypesTest::TreeTestRoot::NoKeyTypeSpecified::StringKeyTypeSpecified::NoKeyTypeSpecified)
+  end
+
+  def test_that_MediaTypesTest_TreeTestRoot_NoKeyTypeSpecified_StringKeyTypeSpecified_StringKeyTypeSpecified_has_the_expected_key_type_preference
+    validate_module_inheritance(MediaTypesTest::TreeTestRoot::NoKeyTypeSpecified::StringKeyTypeSpecified::StringKeyTypeSpecified)
+   end
+
+  def test_that_MediaTypesTest_TreeTestRoot_NoKeyTypeSpecified_StringKeyTypeSpecified_SymbolKeyTypeSpecified_has_the_expected_key_type_preference
+    validate_module_inheritance(MediaTypesTest::TreeTestRoot::NoKeyTypeSpecified::StringKeyTypeSpecified::SymbolKeyTypeSpecified)
+  end
+
+  def test_that_MediaTypesTest_TreeTestRoot_NoKeyTypeSpecified_SymbolKeyTypeSpecified_has_the_expected_key_type_preference
+    validate_module_inheritance(MediaTypesTest::TreeTestRoot::NoKeyTypeSpecified::SymbolKeyTypeSpecified)
+  end
+
+  def test_that_MediaTypesTest_TreeTestRoot_NoKeyTypeSpecified_SymbolKeyTypeSpecified_NoKeyTypeSpecified_has_the_expected_key_type_preference
+    validate_module_inheritance(MediaTypesTest::TreeTestRoot::NoKeyTypeSpecified::SymbolKeyTypeSpecified::NoKeyTypeSpecified)
+  end
+
+  def test_that_MediaTypesTest_TreeTestRoot_NoKeyTypeSpecified_SymbolKeyTypeSpecified_StringKeyTypeSpecified_has_the_expected_key_type_preference
+    validate_module_inheritance(MediaTypesTest::TreeTestRoot::NoKeyTypeSpecified::SymbolKeyTypeSpecified::StringKeyTypeSpecified)
+  end
+
+  def test_that_MediaTypesTest_TreeTestRoot_NoKeyTypeSpecified_SymbolKeyTypeSpecified_SymbolKeyTypeSpecified_has_the_expected_key_type_preference
+    validate_module_inheritance(MediaTypesTest::TreeTestRoot::NoKeyTypeSpecified::SymbolKeyTypeSpecified::SymbolKeyTypeSpecified)
+  end
+
+  def test_that_MediaTypesTest_TreeTestRoot_StringKeyTypeSpecified_has_the_expected_key_type_preference
+    validate_module_inheritance(MediaTypesTest::TreeTestRoot::StringKeyTypeSpecified)
+  end
+
+  def test_that_MediaTypesTest_TreeTestRoot_StringKeyTypeSpecified_NoKeyTypeSpecified_has_the_expected_key_type_preference
+    validate_module_inheritance(MediaTypesTest::TreeTestRoot::StringKeyTypeSpecified::NoKeyTypeSpecified)
+  end
+
+  def test_that_MediaTypesTest_TreeTestRoot_StringKeyTypeSpecified_NoKeyTypeSpecified_NoKeyTypeSpecified_has_the_expected_key_type_preference
+    validate_module_inheritance(MediaTypesTest::TreeTestRoot::StringKeyTypeSpecified::NoKeyTypeSpecified::NoKeyTypeSpecified)
+  end
+
+  def test_that_MediaTypesTest_TreeTestRoot_StringKeyTypeSpecified_NoKeyTypeSpecified_StringKeyTypeSpecified_has_the_expected_key_type_preference
+    validate_module_inheritance(MediaTypesTest::TreeTestRoot::StringKeyTypeSpecified::NoKeyTypeSpecified::StringKeyTypeSpecified)
+  end
+
+  def test_that_MediaTypesTest_TreeTestRoot_StringKeyTypeSpecified_NoKeyTypeSpecified_SymbolKeyTypeSpecified_has_the_expected_key_type_preference
+    validate_module_inheritance(MediaTypesTest::TreeTestRoot::StringKeyTypeSpecified::NoKeyTypeSpecified::SymbolKeyTypeSpecified)
+  end
+
+  def test_that_MediaTypesTest_TreeTestRoot_StringKeyTypeSpecified_StringKeyTypeSpecified_has_the_expected_key_type_preference
+    validate_module_inheritance(MediaTypesTest::TreeTestRoot::StringKeyTypeSpecified::StringKeyTypeSpecified)
+  end
+
+  def test_that_MediaTypesTest_TreeTestRoot_StringKeyTypeSpecified_StringKeyTypeSpecified_NoKeyTypeSpecified_has_the_expected_key_type_preference
+    validate_module_inheritance(MediaTypesTest::TreeTestRoot::StringKeyTypeSpecified::StringKeyTypeSpecified::NoKeyTypeSpecified)
+  end
+
+  def test_that_MediaTypesTest_TreeTestRoot_StringKeyTypeSpecified_StringKeyTypeSpecified_StringKeyTypeSpecified_has_the_expected_key_type_preference
+    validate_module_inheritance(MediaTypesTest::TreeTestRoot::StringKeyTypeSpecified::StringKeyTypeSpecified::StringKeyTypeSpecified)
+  end
+
+  def test_that_MediaTypesTest_TreeTestRoot_StringKeyTypeSpecified_StringKeyTypeSpecified_SymbolKeyTypeSpecified_has_the_expected_key_type_preference
+    validate_module_inheritance(MediaTypesTest::TreeTestRoot::StringKeyTypeSpecified::StringKeyTypeSpecified::SymbolKeyTypeSpecified)
+  end
+
+  def test_that_MediaTypesTest_TreeTestRoot_StringKeyTypeSpecified_SymbolKeyTypeSpecified_has_the_expected_key_type_preference
+    validate_module_inheritance(MediaTypesTest::TreeTestRoot::StringKeyTypeSpecified::SymbolKeyTypeSpecified)
+  end
+
+  def test_that_MediaTypesTest_TreeTestRoot_StringKeyTypeSpecified_SymbolKeyTypeSpecified_NoKeyTypeSpecified_has_the_expected_key_type_preference
+    validate_module_inheritance(MediaTypesTest::TreeTestRoot::StringKeyTypeSpecified::SymbolKeyTypeSpecified::NoKeyTypeSpecified)
+  end
+
+  def test_that_MediaTypesTest_TreeTestRoot_StringKeyTypeSpecified_SymbolKeyTypeSpecified_StringKeyTypeSpecified_has_the_expected_key_type_preference
+    validate_module_inheritance(MediaTypesTest::TreeTestRoot::StringKeyTypeSpecified::SymbolKeyTypeSpecified::StringKeyTypeSpecified)
+  end
+
+  def test_that_MediaTypesTest_TreeTestRoot_StringKeyTypeSpecified_SymbolKeyTypeSpecified_SymbolKeyTypeSpecified_has_the_expected_key_type_preference
+    validate_module_inheritance(MediaTypesTest::TreeTestRoot::StringKeyTypeSpecified::SymbolKeyTypeSpecified::SymbolKeyTypeSpecified)
+  end
+
+  def test_that_MediaTypesTest_TreeTestRoot_SymbolKeyTypeSpecified_has_the_expected_key_type_preference
+    validate_module_inheritance(MediaTypesTest::TreeTestRoot::SymbolKeyTypeSpecified)
+  end
+
+  def test_that_MediaTypesTest_TreeTestRoot_SymbolKeyTypeSpecified_NoKeyTypeSpecified_has_the_expected_key_type_preference
+    validate_module_inheritance(MediaTypesTest::TreeTestRoot::SymbolKeyTypeSpecified::NoKeyTypeSpecified)
+  end
+
+  def test_that_MediaTypesTest_TreeTestRoot_SymbolKeyTypeSpecified_NoKeyTypeSpecified_NoKeyTypeSpecified_has_the_expected_key_type_preference
+    validate_module_inheritance(MediaTypesTest::TreeTestRoot::SymbolKeyTypeSpecified::NoKeyTypeSpecified::NoKeyTypeSpecified)
+  end
+
+  def test_that_MediaTypesTest_TreeTestRoot_SymbolKeyTypeSpecified_NoKeyTypeSpecified_StringKeyTypeSpecified_has_the_expected_key_type_preference
+    validate_module_inheritance(MediaTypesTest::TreeTestRoot::SymbolKeyTypeSpecified::NoKeyTypeSpecified::StringKeyTypeSpecified)
+  end
+
+  def test_that_MediaTypesTest_TreeTestRoot_SymbolKeyTypeSpecified_NoKeyTypeSpecified_SymbolKeyTypeSpecified_has_the_expected_key_type_preference
+    validate_module_inheritance(MediaTypesTest::TreeTestRoot::SymbolKeyTypeSpecified::NoKeyTypeSpecified::SymbolKeyTypeSpecified)
+  end
+
+  def test_that_MediaTypesTest_TreeTestRoot_SymbolKeyTypeSpecified_StringKeyTypeSpecified_has_the_expected_key_type_preference
+    validate_module_inheritance(MediaTypesTest::TreeTestRoot::SymbolKeyTypeSpecified::StringKeyTypeSpecified)
+  end
+
+  def test_that_MediaTypesTest_TreeTestRoot_SymbolKeyTypeSpecified_StringKeyTypeSpecified_NoKeyTypeSpecified_has_the_expected_key_type_preference
+    validate_module_inheritance(MediaTypesTest::TreeTestRoot::SymbolKeyTypeSpecified::StringKeyTypeSpecified::NoKeyTypeSpecified)
+  end
+
+  def test_that_MediaTypesTest_TreeTestRoot_SymbolKeyTypeSpecified_StringKeyTypeSpecified_StringKeyTypeSpecified_has_the_expected_key_type_preference
+    validate_module_inheritance(MediaTypesTest::TreeTestRoot::SymbolKeyTypeSpecified::StringKeyTypeSpecified::StringKeyTypeSpecified)
+  end
+
+  def test_that_MediaTypesTest_TreeTestRoot_SymbolKeyTypeSpecified_StringKeyTypeSpecified_SymbolKeyTypeSpecified_has_the_expected_key_type_preference
+    validate_module_inheritance(MediaTypesTest::TreeTestRoot::SymbolKeyTypeSpecified::StringKeyTypeSpecified::SymbolKeyTypeSpecified)
+  end
+
+  def test_that_MediaTypesTest_TreeTestRoot_SymbolKeyTypeSpecified_SymbolKeyTypeSpecified_has_the_expected_key_type_preference
+    validate_module_inheritance(MediaTypesTest::TreeTestRoot::SymbolKeyTypeSpecified::SymbolKeyTypeSpecified)
+  end
+
+  def test_that_MediaTypesTest_TreeTestRoot_SymbolKeyTypeSpecified_SymbolKeyTypeSpecified_NoKeyTypeSpecified_has_the_expected_key_type_preference
+    validate_module_inheritance(MediaTypesTest::TreeTestRoot::SymbolKeyTypeSpecified::SymbolKeyTypeSpecified::NoKeyTypeSpecified)
+  end
+
+  def test_that_MediaTypesTest_TreeTestRoot_SymbolKeyTypeSpecified_SymbolKeyTypeSpecified_StringKeyTypeSpecified_has_the_expected_key_type_preference
+    validate_module_inheritance(MediaTypesTest::TreeTestRoot::SymbolKeyTypeSpecified::SymbolKeyTypeSpecified::StringKeyTypeSpecified)
+  end
+
+  def test_that_MediaTypesTest_TreeTestRoot_SymbolKeyTypeSpecified_SymbolKeyTypeSpecified_SymbolKeyTypeSpecified_has_the_expected_key_type_preference
+    validate_module_inheritance(MediaTypesTest::TreeTestRoot::SymbolKeyTypeSpecified::SymbolKeyTypeSpecified::SymbolKeyTypeSpecified)
   end
 
   private
 
-  def validate_inheritance_tree(module_tree)
-    module_tree.each_with_object([]) do |target_module, failed|
-      validate_module(failed, target_module)
-    end
-  end
-
-  def validate_module(failed, target_module)
-    failed << target_module.name unless validate_module_inheritance(target_module)
+  def test
   end
 
   def validate_module_inheritance(target_module)
     expected = (target_module.name.split('::') - [demodulize(NoKeyTypeSpecified)]).pop
-    if expected == demodulize(StringKeyTypeSpecified)
-      Kernel.const_get(target_module.name + '::TestMediaType').string_keys?
-    else
-      Kernel.const_get(target_module.name + '::TestMediaType').symbol_keys?
-    end
+    result = if expected == demodulize(StringKeyTypeSpecified)
+               Kernel.const_get(target_module.name + '::TestMediaType').string_keys?
+             else
+               Kernel.const_get(target_module.name + '::TestMediaType').symbol_keys?
+             end
+    assert result, "expected #{target_module}, to only accept  the same key type as #{expected}"
   end
-
+  
+  # Diagram 
+  #                    ---------->NoKeyTypeSpecified
+  #                   |
+  # parent module()-------------->StringKeyTypeSpecified
+  #                  | 
+  #                  ------------->SymbolKeyTypeSpecified
+  # The method below builds out a tree, where the above depicts a single unit of the overall structure. Each module gets all three possibilities nested in it 
+  # and becomes a parent itself
+  
   def build_module_tree(target_module, depth = 1, module_tree = [])
     # This method creates a tree of nested modules, three levels deep,
     # with all combinations of key type inheritance covered.
