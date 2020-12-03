@@ -10,7 +10,7 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'trailervote'
+          'acme'
         end
 
         use_name 'NotStrictType'
@@ -36,7 +36,7 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'trailervote'
+          'acme'
         end
 
         use_name 'NotStrictCollectionType'

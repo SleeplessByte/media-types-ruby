@@ -10,7 +10,7 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'example'
+          'acme'
         end
 
         use_name 'TrivialSchema'

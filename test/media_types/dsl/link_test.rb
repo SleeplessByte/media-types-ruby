@@ -10,7 +10,7 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'trailervote'
+          'acme'
         end
 
         use_name 'SingleLink'
@@ -38,7 +38,7 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'trailervote'
+          'acme'
         end
 
         use_name 'LinkWithAttribute'
@@ -72,7 +72,7 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'trailervote'
+          'acme'
         end
 
         use_name 'OptionalLink'

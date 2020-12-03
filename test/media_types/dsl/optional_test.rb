@@ -10,7 +10,7 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'trailervote'
+          'acme'
         end
 
         use_name 'test'
@@ -37,7 +37,7 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'trailervote'
+          'acme'
         end
 
         use_name 'OptionalAttributeInsideAny'
@@ -67,7 +67,7 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'trailervote'
+          'acme'
         end
 
         use_name 'OptionalAttributeInsideCollection'
@@ -104,7 +104,7 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'trailervote'
+          'acme'
         end
 
         use_name 'OptionalCollection'
@@ -139,7 +139,7 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'trailervote'
+          'acme'
         end
 
         use_name 'OptionalAttributeInsideAttribute'
@@ -174,7 +174,7 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'trailervote'
+          'acme'
         end
 
         use_name 'OptionalAttributeInsideOptionalAttribute'
