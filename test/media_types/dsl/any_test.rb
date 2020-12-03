@@ -240,7 +240,7 @@ module MediaTypes
       end
 
       [AnyType, AnyOfScheme, AnyWithOptions, AnyWithOptionsOrNil, AnyWithScheme, AnyWithForce].each do |type|
-        build_fixture_tests type
+        assert_mediatype_specification type
       end
     end
   end

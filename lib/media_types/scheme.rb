@@ -38,7 +38,7 @@ module MediaTypes
       @fixture = fixture
       @expect_to_pass = expect_to_pass
     end
- 
+
     attr_accessor :caller, :fixture, :expect_to_pass
   end
 
@@ -78,13 +78,18 @@ module MediaTypes
       self.type_attributes = {}
 
       @fixtures = []
-      @asserted_sane? = false
+      self.asserted_sane = false
 
       instance_exec(&block) if block_given?
     end
 
-    attr_accessor :type_attributes, :fixtures, :asserted_sane
+    attr_accessor :type_attributes, :fixtures
+    attr_writer :asserted_sane
     attr_reader :rules
+
+    def asserted_sane?
+      @asserted_sane
+    end
 
     ##
     # Checks if the +output+ is valid
@@ -424,7 +429,7 @@ module MediaTypes
       end
       raise AssertionError, errors unless errors.empty?
 
-      @asserted_sane? = true
+      self.asserted_sane = true
     end
 
     def process_assert_fail(json, caller)

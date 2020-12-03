@@ -95,8 +95,8 @@ module MediaTypes
         refute OptionalLink.valid?({}), 'Expected input to be invalid'
       end
 
-      [SingleLink,LinkWithAttribute,OptionalLink].each do |type|
-        build_fixture_tests type
+      [SingleLink, LinkWithAttribute, OptionalLink].each do |type|
+        assert_mediatype_specification type
       end
     end
   end

@@ -2,7 +2,7 @@ require 'minitest/autorun'
 
 class Minitest::Test < Minitest::Runnable
   include MediaTypes::Assertions
-  def self.build_fixture_tests(type)
+  def self.assert_mediatype_specification(type)
     scheme = type.media_type_validations.scheme
 
     scheme.fixtures.each_with_index do |fixture_data, counter|
