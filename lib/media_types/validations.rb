@@ -12,6 +12,8 @@ module MediaTypes
   #
   class Validations
 
+    attr_reader :scheme
+
     ##
     # Creates a new stack of validations
     #
@@ -31,7 +33,6 @@ module MediaTypes
       instance_exec(&block) if block_given?
     end
 
-    attr_reader :scheme
     ##
     # Looks up the validations for Constructable
     #
@@ -49,7 +50,7 @@ module MediaTypes
       if scheme.respond_to?(method_name)
         media_type.__getobj__.media_type_combinations ||= Set.new
         media_type.__getobj__.media_type_combinations.add(media_type.as_key)
-      
+
         return scheme.send(method_name, *arguments, &block)
       end
 
