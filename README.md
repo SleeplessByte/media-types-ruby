@@ -462,7 +462,7 @@ In the context of your tests, we provide the `test_specification` method,which a
 
 
 ```ruby
-class ExampleMediaType
+class MyMedia
   include MediaTypes::Dsl
 
   def self.organisation
@@ -496,7 +496,7 @@ class ExampleMediaType
   end
 end
 
-class ExampleMediaTypeTest < Minitest::Test
+class MyMediaTest < Minitest::Test
   test_specification MyMedia
    # This transforms all your calls to `assert_pass` and `assert_fail` into tests
 end
