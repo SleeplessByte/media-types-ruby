@@ -21,12 +21,11 @@ require 'json'
 
 module MediaTypes
   class AssertionError < StandardError
-    attr_accessor :message
   end
 
   class MediaTypeValidationError < StandardError
-    def initialize(json, _caller)
-      @message = "#{json} was expected to fail validations"
+    def initialize(json, caller)
+      @message = "#{json} was expected to fail validations  \n#{caller.path + ':' + caller.lineno.to_s}"
     end
 
     attr_reader :message
@@ -38,11 +37,6 @@ module MediaTypes
       @fixture = fixture
       @expect_to_pass = expect_to_pass
     end
-    # Rename to assertion?
-
-    def run!
-    end
-
     attr_accessor :caller, :fixture, :expect_to_pass
   end
 
@@ -420,12 +414,12 @@ module MediaTypes
     end
 
     def execute_assertions
-      errors = []
-      @fixtures.each_with_object([]) do |fixture_data, _error_array|
-        json = JSON.parse(fixture_data.fixture, { symbolize_names: true })
-        output = fixture_data.expect_to_pass ? process_assert_pass(json, fixture_data.caller) : process_assert_fail(json, fixture_data.caller)
-        errors << output unless output.nil?
-      end
+      errors ||=
+        @fixtures.each_with_object([]) do |fixture_data, error_array|
+          json = JSON.parse(fixture_data.fixture, { symbolize_names: true })
+          output = fixture_data.expect_to_pass ? process_assert_pass(json, fixture_data.caller) : process_assert_fail(json, fixture_data.caller)
+          error_array << output unless output.nil?
+        end
       raise AssertionError, errors unless errors.empty?
 
       @asserted_sane = true
@@ -444,9 +438,7 @@ module MediaTypes
       validate(json)
       nil
     rescue StandardError => e
-      e.message = e.message + " \n#{caller.path + ':' + caller.lineno.to_s}"
-
-      e
+      e.message + "\n#{caller.path + ':' + caller.lineno.to_s}"
     end
 
     private
