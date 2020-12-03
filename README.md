@@ -447,8 +447,8 @@ class MyMedia
     assert_fail '{"foo": [42]}'
   end
 
-  # Optionally assert that the media type is sane on load. This makes the application crash when this
-  # file is evaluated. Alternatives include using a _test_ (see below), calling this manually or
+  # Optionally assert that the media type is sane on load. This makes the application raise an error when the arguments of assert_pass/assert_fail are not in line with your MediaType definition.
+  # Alternatives include using a _test_ (see below), calling this manually or
   # relying on the program to halt when the media type is used (and invalid).
   assert_sane!
   # place assert_sane! here, after the validations block, if using it as a development tool.
@@ -458,11 +458,11 @@ end
 
 ### Assertions for Media Type Checking in Test Suites
 
-In the context of your tests, we provide the `build_fixture_tests` method,which allows you to run the checks you queue up for a particular `MediaType` within your tests with `assert_pass` and `assert_fail` in a Minitest context. This method is automatically added to the `Minitest::Test`, so If you are already using a Minitest suite, you should gain access to it.
+In the context of your tests, we provide the `test_specification` method,which allows you to run the checks you queue up for a particular `MediaType` within your tests with `assert_pass` and `assert_fail` in a Minitest context. This method is automatically added to the `Minitest::Test`, so If you are already using a Minitest suite, you should gain access to it.
 
 
 ```ruby
-class MyMedia
+class ExampleMediaType
   include MediaTypes::Dsl
 
   def self.organisation
@@ -496,8 +496,8 @@ class MyMedia
   end
 end
 
-class MyMediaTest < Minitest::Test
-  build_fixture_tests MyMedia
+class ExampleMediaTypeTest < Minitest::Test
+  test_specification MyMedia
    # This transforms all your calls to `assert_pass` and `assert_fail` into tests
 end
 ```
