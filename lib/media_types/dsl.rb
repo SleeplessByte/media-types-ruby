@@ -5,7 +5,6 @@ require 'media_types/validations'
 
 module MediaTypes
   module Dsl
-
     def self.included(base)
       base.extend ClassMethods
       base.class_eval do
@@ -21,11 +20,16 @@ module MediaTypes
     end
 
     module ClassMethods
-
       def to_constructable
         media_type_constructable.dup.tap do |constructable|
           constructable.__setobj__(self)
         end
+      end
+
+      def symbol_keys?
+      end
+
+      def string_keys?
       end
 
       def valid?(output, **opts)
@@ -35,10 +39,10 @@ module MediaTypes
       def valid_unsafe?(output, media_type = to_constructable, **opts)
         validations.find(media_type).valid?(output, backtrace: ['.'], **opts)
       end
-      
+
       def validate!(output, **opts)
-        target_scheme = self.media_type_validations.scheme
-        assert_sane! unless target_scheme.asserted_sane
+        target_scheme = media_type_validations.scheme
+        assert_sane! unless target_scheme.asserted_sane?
         to_constructable.validate!(output, **opts)
       end
 
@@ -60,16 +64,17 @@ module MediaTypes
           registerable
         end
       end
-      
+
       def view(v)
         to_constructable.view(v)
       end
+
       def version(v)
         to_constructable.version(v)
       end
-      
+
       def identifier_format
-        self.media_type_name_for = Proc.new do |type:, view:, version:, suffix:|
+        self.media_type_name_for = proc do |type:, view:, version:, suffix:|
           yield(type: type, view: view, version: version, suffix: suffix)
         end
       end
@@ -79,7 +84,7 @@ module MediaTypes
       end
 
       def available_validations
-        self.media_type_combinations.map do |a|
+        media_type_combinations.map do |a|
           _, view, version = a
           view(view).version(version)
         end
@@ -96,13 +101,13 @@ module MediaTypes
       private
 
       def use_name(name)
-        if self.media_type_name_for.nil?
-          self.media_type_name_for = Proc.new do |type:, view:, version:, suffix:|
+        if media_type_name_for.nil?
+          self.media_type_name_for = proc do |type:, view:, version:, suffix:|
             resolved_org = nil
             if defined?(organisation)
               resolved_org = organisation
             else
-              resolved_org = MediaTypes::get_organisation(self)
+              resolved_org = MediaTypes.get_organisation(self)
 
               raise format('Implement the class method "organisation" in %<klass>s or specify a global organisation using MediaTypes::set_organisation', klass: self) if resolved_org.nil?
             end
@@ -119,9 +124,16 @@ module MediaTypes
         self.media_type_constructable = Constructable.new(self, type: name)
       end
 
+      def expect_string_keys
+      end
+
+      def expect_symbol_keys
+      end
+
       def validations(&block)
         unless block_given?
-          raise "No validations defined for #{self.name}" if media_type_validations.nil?
+          raise "No validations defined for #{name}" if media_type_validations.nil?
+
           return media_type_validations
         end
         self.media_type_validations = Validations.new(to_constructable, &block)
