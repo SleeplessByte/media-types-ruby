@@ -454,7 +454,7 @@ class MyMedia
   # place assert_sane! here, after the validations block, if using it as a development tool.
 end
 ```
-**Note**: `assert_pass` and `assert_fail` are methods that can _only_ be used inside the `validations` block; `assert_sane!` is a method that the `MyMedia` class itself has access to, and is part of the public API.
+**Note**: `assert_pass` and `assert_fail` are methods that can _only_ be used inside the `validations` block; while `assert_sane!` is part of the public MediaTypes API.
 
 ### Assertions for Media Type Checking in Test Suites
 
