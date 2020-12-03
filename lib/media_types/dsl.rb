@@ -95,7 +95,7 @@ module MediaTypes
       end
 
       def assert_sane!
-        media_type_validations.execute_assertions
+        media_type_validations.run_queued_fixture_checks
       end
 
       private

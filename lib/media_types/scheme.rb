@@ -38,11 +38,7 @@ module MediaTypes
       @fixture = fixture
       @expect_to_pass = expect_to_pass
     end
-    # Rename to assertion?
-
-    def run!
-    end
-
+ 
     attr_accessor :caller, :fixture, :expect_to_pass
   end
 
@@ -82,7 +78,7 @@ module MediaTypes
       self.type_attributes = {}
 
       @fixtures = []
-      @asserted_sane = false
+      @asserted_sane? = false
 
       instance_exec(&block) if block_given?
     end
@@ -419,7 +415,7 @@ module MediaTypes
       @fixtures << FixtureData.new(caller_locations[1], fixture, false)
     end
 
-    def execute_assertions
+    def run_queued_fixture_checks
       errors = []
       @fixtures.each_with_object([]) do |fixture_data, _error_array|
         json = JSON.parse(fixture_data.fixture, { symbolize_names: true })
@@ -428,7 +424,7 @@ module MediaTypes
       end
       raise AssertionError, errors unless errors.empty?
 
-      @asserted_sane = true
+      @asserted_sane? = true
     end
 
     def process_assert_fail(json, caller)
