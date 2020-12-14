@@ -260,6 +260,67 @@ class MediaTypesTest < Minitest::Test
     end
   end
 
+  class NoKeyTypeSpecifiedNotStrict
+    include MediaTypes::Dsl
+
+    def self.organisation
+      'domain.test'
+    end
+
+    use_name 'test'
+
+    validations do
+      not_strict
+    end
+  end
+
+  class StringKeyTypeSpecifiedNotStrict
+    include MediaTypes::Dsl
+    expect_string_keys
+    def self.organisation
+      'domain.test'
+    end
+
+    use_name 'test'
+
+    validations do
+      not_strict
+    end
+  end
+
+  class SymbolKeyTypeSpecifiedNotStrict
+    include MediaTypes::Dsl
+    expect_symbol_keys
+    def self.organisation
+      'domain.test'
+    end
+
+    use_name 'test'
+
+    validations do
+      not_strict
+    end
+  end
+
+  def test_validations_check_key_preference_when_no_key_type_specified
+    assert NoKeyTypeSpecifiedNotStrict.valid? ({:symbol => "stuff"})
+    refute NoKeyTypeSpecifiedNotStrict.valid? ({ "string" => "stuff"})
+  end
+
+  
+  def test_validations_check_key_preference_when_symbol_key_type_specified
+    assert SymbolKeyTypeSpecifiedNotStrict.valid? ({:symbol => "stuff"})
+    refute SymbolKeyTypeSpecifiedNotStrict.valid? ({ "string" => "stuff"})
+  end
+
+  
+  def test_validations_check_key_preference_when_no_key_type_specified
+    refute StringKeyTypeSpecifiedNotStrict.valid? ({:symbol => "stuff"})
+    assert StringKeyTypeSpecifiedNotStrict.valid? ({ "string" => "stuff"})
+  end
+
+
+
   module TreeTestRoot; end
   def setup
     build_module_tree(TreeTestRoot)
@@ -435,16 +496,16 @@ class MediaTypesTest < Minitest::Test
              end
     assert result, "expected #{target_module}, to only accept  the same key type as #{expected}"
   end
-  
-  # Diagram 
+
+  # Diagram
   #                    ---------->NoKeyTypeSpecified
   #                   |
   # parent module()-------------->StringKeyTypeSpecified
-  #                  | 
+  #                  |
   #                  ------------->SymbolKeyTypeSpecified
-  # The method below builds out a tree, where the above depicts a single unit of the overall structure. Each module gets all three possibilities nested in it 
+  # The method below builds out a tree, where the above depicts a single unit of the overall structure. Each module gets all three possibilities nested in it
   # and becomes a parent itself
-  
+
   def build_module_tree(target_module, depth = 1, module_tree = [])
     # This method creates a tree of nested modules, three levels deep,
     # with all combinations of key type inheritance covered.
