@@ -315,7 +315,7 @@ class MediaTypesTest < Minitest::Test
     refute SymbolKeyTypeSpecifiedNotStrict.valid?({ 'string' => 'stuff', :symbol => 'stuff' })
   end
 
-  def test_validations_check_key_preference_when_no_key_type_specified
+  def test_validations_check_key_preference_when_string_key_type_specified
     refute StringKeyTypeSpecifiedNotStrict.valid?({ symbol: 'stuff' })
     assert StringKeyTypeSpecifiedNotStrict.valid?({ 'string' => 'stuff' })
     refute StringKeyTypeSpecifiedNotStrict.valid?({ 'string' => 'stuff', :symbol => 'stuff' })
