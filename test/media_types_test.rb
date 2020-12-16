@@ -189,6 +189,7 @@ class MediaTypesTest < Minitest::Test
   module ModuleTriesToSetKeyTypeTwice
     MediaTypes.expect_string_keys
   end
+
   class MediaTypeTriesToSetKeyTypeTwice
 
     include MediaTypes::Dsl
@@ -205,7 +206,9 @@ class MediaTypesTest < Minitest::Test
   end
 
   def test_key_settings_cannot_be_altered_on_the_same_level_once_set
-    assert_raises ModuleTriesToSetKeyTypeTwice.module_eval('MediaTypes.expect_symbol_keys')
+    assert_raises do
+      endModuleTriesToSetKeyTypeTwice.module_eval('MediaTypes.expect_symbol_keys')
+    end
     assert_raises do
       MediaTypeTriesToSetKeyTypeTwice.class_eval do
         expect_string_keys
@@ -327,7 +330,7 @@ class MediaTypesTest < Minitest::Test
   end
 
   def test_that_MediaTypesTest_TreeTestRoot_NoKeyTypeSpecified_has_the_expected_key_type_preference
-    assert validate_module_inheritance(MediaTypesTest::TreeTestRoot::NoKeyTypeSpecified), expected
+    validate_module_inheritance(MediaTypesTest::TreeTestRoot::NoKeyTypeSpecified)
   end
 
   def test_that_MediaTypesTest_TreeTestRoot_NoKeyTypeSpecified_NoKeyTypeSpecified_has_the_expected_key_type_preference

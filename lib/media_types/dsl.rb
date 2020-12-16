@@ -8,22 +8,8 @@ module MediaTypes
     def self.included(base)
       base.extend ClassMethods
       base.class_eval do
-        class_variable_set(:@@symbol_keys_prefered, true)
-
         class << self
-          attr_accessor :media_type_name_for, :media_type_combinations, :media_type_validations
-
-          def expect_string_keys
-            @@symbol_keys_prefered =  false
-          end
-
-          def expect_symbol_keys
-            @@symbol_keys_prefered =  true
-          end
-
-          def expecting_symbol_keys?
-            @@symbol_keys_prefered
-          end
+          attr_accessor :media_type_name_for, :media_type_combinations, :media_type_validations, :expecting_symbol_keys
 
           private
 
@@ -141,9 +127,25 @@ module MediaTypes
       end
 
       def expect_string_keys
+        raise StandardError, 'Key expectation already set' unless expecting_symbol_keys.nil?
+        raise StandardError, 'Set key expectation before defining validations' unless media_type_validations.nil?
+
+        self.expecting_symbol_keys = false
       end
 
       def expect_symbol_keys
+        raise StandardError, 'Key expectation already set' unless expecting_symbol_keys.nil?
+        raise StandardError, 'Set key expectation before defining validations' unless media_type_validations.nil?
+
+        self.expecting_symbol_keys = true
+      end
+
+      def expecting_symbol_keys?
+        if expecting_symbol_keys.nil?
+          true
+        else
+          expecting_symbol_keys
+        end
       end
 
       def validations(&block)
