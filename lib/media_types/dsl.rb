@@ -21,7 +21,7 @@ module MediaTypes
             @@symbol_keys_prefered =  true
           end
 
-          def read_preference
+          def expecting_symbol_keys?
             @@symbol_keys_prefered
           end
 
@@ -41,11 +41,11 @@ module MediaTypes
       end
 
       def symbol_keys?
-        read_preference
+        expecting_symbol_keys?
       end
 
       def string_keys?
-        !read_preference
+        !expecting_symbol_keys?
       end
 
       def valid?(output, **opts)
