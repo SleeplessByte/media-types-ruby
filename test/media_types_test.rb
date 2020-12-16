@@ -68,6 +68,7 @@ class MediaTypesTest < Minitest::Test
 
   class KeyTypeSpecifiedAfterValidationBlock
     include MediaTypes::Dsl
+
     def self.organisation
       'domain.test'
     end
@@ -303,23 +304,22 @@ class MediaTypesTest < Minitest::Test
   end
 
   def test_validations_check_key_preference_when_no_key_type_specified
-    assert NoKeyTypeSpecifiedNotStrict.valid? ({:symbol => "stuff"})
-    refute NoKeyTypeSpecifiedNotStrict.valid? ({ "string" => "stuff"})
+    assert NoKeyTypeSpecifiedNotStrict.valid?({ symbol: 'stuff' })
+    refute NoKeyTypeSpecifiedNotStrict.valid?({ 'string' => 'stuff' })
+    refute NoKeyTypeSpecifiedNotStrict.valid?({ 'string' => 'stuff', :symbol => 'stuff' })
   end
 
-  
   def test_validations_check_key_preference_when_symbol_key_type_specified
-    assert SymbolKeyTypeSpecifiedNotStrict.valid? ({:symbol => "stuff"})
-    refute SymbolKeyTypeSpecifiedNotStrict.valid? ({ "string" => "stuff"})
+    assert SymbolKeyTypeSpecifiedNotStrict.valid?({ symbol: 'stuff' })
+    refute SymbolKeyTypeSpecifiedNotStrict.valid?({ 'string' => 'stuff' })
+    refute SymbolKeyTypeSpecifiedNotStrict.valid?({ 'string' => 'stuff', :symbol => 'stuff' })
   end
 
-  
   def test_validations_check_key_preference_when_no_key_type_specified
-    refute StringKeyTypeSpecifiedNotStrict.valid? ({:symbol => "stuff"})
-    assert StringKeyTypeSpecifiedNotStrict.valid? ({ "string" => "stuff"})
+    refute StringKeyTypeSpecifiedNotStrict.valid?({ symbol: 'stuff' })
+    assert StringKeyTypeSpecifiedNotStrict.valid?({ 'string' => 'stuff' })
+    refute StringKeyTypeSpecifiedNotStrict.valid?({ 'string' => 'stuff', :symbol => 'stuff' })
   end
-
-
 
   module TreeTestRoot; end
   def setup

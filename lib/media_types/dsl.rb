@@ -8,8 +8,22 @@ module MediaTypes
     def self.included(base)
       base.extend ClassMethods
       base.class_eval do
+        class_variable_set(:@@symbol_keys_prefered, true)
+
         class << self
           attr_accessor :media_type_name_for, :media_type_combinations, :media_type_validations
+
+          def expect_string_keys
+            @@symbol_keys_prefered =  false
+          end
+
+          def expect_symbol_keys
+            @@symbol_keys_prefered =  true
+          end
+
+          def read_preference
+            @@symbol_keys_prefered
+          end
 
           private
 
@@ -27,9 +41,11 @@ module MediaTypes
       end
 
       def symbol_keys?
+        read_preference
       end
 
       def string_keys?
+        !read_preference
       end
 
       def valid?(output, **opts)

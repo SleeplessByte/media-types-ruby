@@ -19,9 +19,11 @@ module MediaTypes
   end
 
   def self.expect_string_keys
+    @@expect_symbol_keys =  false
   end
 
   def self.expect_symbol_keys
+    @@expect_symbol_keys =  true
   end
 
   def self.get_organisation(mod)
