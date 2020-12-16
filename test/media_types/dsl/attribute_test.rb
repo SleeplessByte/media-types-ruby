@@ -10,7 +10,7 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'trailervote'
+          'acme'
         end
 
         use_name 'AttributeType'
@@ -34,7 +34,7 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'AttributeCollectionType'
+          'acme'
         end
 
         use_name 'test'
@@ -61,7 +61,7 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'AttributeSchemeType'
+          'acme'
         end
 
         use_name 'test'
@@ -90,7 +90,7 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'trailervote'
+          'acme'
         end
 
         use_name 'AttributeOptionsType'
