@@ -484,9 +484,6 @@ class MediaTypesTest < Minitest::Test
 
   private
 
-  def test
-  end
-
   def validate_module_inheritance(target_module)
     expected = (target_module.name.split('::') - [demodulize(NoKeyTypeSpecified)]).pop
     result = if expected == demodulize(StringKeyTypeSpecified)
