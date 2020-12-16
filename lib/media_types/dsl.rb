@@ -140,9 +140,14 @@ module MediaTypes
         self.expecting_symbol_keys = true
       end
 
+      def no_expectation_set
+        expecting_symbol_keys.nil?
+      end
+
       def expecting_symbol_keys?
-        if expecting_symbol_keys.nil?
-          true
+        if no_expectation_set
+          inherited_expectation = MediaTypes.get_key_expectation(self)
+          inherited_expectation.nil? ? true : inherited_expectation
         else
           expecting_symbol_keys
         end

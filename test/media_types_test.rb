@@ -66,21 +66,21 @@ class MediaTypesTest < Minitest::Test
     end
   end
 
-  class KeyTypeSpecifiedAfterValidationBlock
-    include MediaTypes::Dsl
+  # class KeyTypeSpecifiedAfterValidationBlock
+  #   include MediaTypes::Dsl
 
-    def self.organisation
-      'domain.test'
-    end
+  #   def self.organisation
+  #     'domain.test'
+  #   end
 
-    use_name 'test'
+  #   use_name 'test'
 
-    validations do
-      empty
-    end
+  #   validations do
+  #     empty
+  #   end
 
-    expect_string_keys
-  end
+  #   expect_string_keys
+  # end
   # Supposed to FAIL!!!
 
   # refactor media types to match above
