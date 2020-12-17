@@ -515,9 +515,16 @@ class MediaTypesTest < Minitest::Test
 
     # Creates three modules, with different key type specifications
     no_key_type_module = target_module.const_set('NoKeyTypeSpecified', Module.new)
-    string_key_type_module = target_module.const_set('StringKeyTypeSpecified', Module.new { MediaTypes.expect_string_keys(self) })
-    symbol_key_type_module = target_module.const_set('SymbolKeyTypeSpecified', Module.new { MediaTypes.expect_symbol_keys(self) })
+    string_key_type_module = target_module.const_set('StringKeyTypeSpecified', Module.new)
+    symbol_key_type_module = target_module.const_set('SymbolKeyTypeSpecified', Module.new)
     [no_key_type_module, string_key_type_module, symbol_key_type_module].each do |module_type|
+      module_type.module_eval do
+        if module_type.name.end_with?('StringKeyTypeSpecified')
+          MediaTypes.expect_string_keys(self)
+        elsif module_type.name.end_with?('SymbolKeyTypeSpecified')
+          MediaTypes.expect_symbol_keys(self)
+        end
+      end
       module_tree << module_type
       target_media_type = Class.new
       target_media_type.class_eval do
