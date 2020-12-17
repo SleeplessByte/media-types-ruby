@@ -9,7 +9,7 @@ module MediaTypes
       base.extend ClassMethods
       base.class_eval do
         class << self
-          attr_accessor :media_type_name_for, :media_type_combinations, :media_type_validations, :expecting_symbol_keys
+          attr_accessor :media_type_name_for, :media_type_combinations, :media_type_validations, :symbol_keys
 
           private
 
@@ -126,30 +126,32 @@ module MediaTypes
         self.media_type_constructable = Constructable.new(self, type: name)
       end
 
+      def no_expectation_set
+        symbol_keys.nil?
+      end
+
       def expect_string_keys
-        raise StandardError, 'Key expectation already set' unless expecting_symbol_keys.nil?
+        raise StandardError, 'Key expectation already set' unless no_expectation_set
         raise StandardError, 'Set key expectation before defining validations' unless media_type_validations.nil?
 
-        self.expecting_symbol_keys = false
+        self.symbol_keys = false
       end
 
       def expect_symbol_keys
-        raise StandardError, 'Key expectation already set' unless expecting_symbol_keys.nil?
+        raise StandardError, 'Key expectation already set' unless no_expectation_set
         raise StandardError, 'Set key expectation before defining validations' unless media_type_validations.nil?
 
-        self.expecting_symbol_keys = true
+        self.symbol_keys = true
       end
 
-      def no_expectation_set
-        expecting_symbol_keys.nil?
-      end
+      SYMBOL_KEYS_DEFAULT = true
 
       def expecting_symbol_keys?
         if no_expectation_set
           inherited_expectation = MediaTypes.get_key_expectation(self)
-          inherited_expectation.nil? ? true : inherited_expectation
+          inherited_expectation.nil? ? SYMBOL_KEYS_DEFAULT : inherited_expectation
         else
-          expecting_symbol_keys
+          symbol_keys
         end
       end
 

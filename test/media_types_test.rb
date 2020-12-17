@@ -117,7 +117,7 @@ class MediaTypesTest < Minitest::Test
 
   # Test that you can over-ride the default for a module
   module ModuleSpecifiesStringKeys
-    MediaTypes.expect_string_keys
+    MediaTypes.expect_string_keys(self)
 
     class ShouldInheritKeyType
       include MediaTypes::Dsl
@@ -141,7 +141,7 @@ class MediaTypesTest < Minitest::Test
 
   # Check the media type over-rides the module
   module StringKeyModuleToBeOverRidden
-    MediaTypes.expect_string_keys
+    MediaTypes.expect_string_keys(self)
 
     class OverridingMediaType
       include MediaTypes::Dsl
@@ -187,7 +187,7 @@ class MediaTypesTest < Minitest::Test
 
   # Test Clashes
   module ModuleTriesToSetKeyTypeTwice
-    MediaTypes.expect_string_keys
+    MediaTypes.expect_string_keys(self)
   end
 
   class MediaTypeTriesToSetKeyTypeTwice
@@ -207,7 +207,7 @@ class MediaTypesTest < Minitest::Test
 
   def test_key_settings_cannot_be_altered_on_the_same_level_once_set
     assert_raises do
-      endModuleTriesToSetKeyTypeTwice.module_eval('MediaTypes.expect_symbol_keys')
+      endModuleTriesToSetKeyTypeTwice.module_eval('MediaTypes.expect_symbol_keys(self)')
     end
     assert_raises do
       MediaTypeTriesToSetKeyTypeTwice.class_eval do
@@ -255,12 +255,12 @@ class MediaTypesTest < Minitest::Test
       end
     end
 
-    MediaTypes.expect_string_keys
+    MediaTypes.expect_string_keys(self)
   end
 
   def test_cannot_change_module_expectations_after_default_used
     assert_raises do
-      ModuleDefinesExpectationsAfterMediaTypes.module_eval('MediaTypes.expect_string_keys')
+      ModuleDefinesExpectationsAfterMediaTypes.module_eval('MediaTypes.expect_string_keys(self)')
     end
   end
 
@@ -515,8 +515,8 @@ class MediaTypesTest < Minitest::Test
 
     # Creates three modules, with different key type specifications
     no_key_type_module = target_module.const_set('NoKeyTypeSpecified', Module.new)
-    string_key_type_module = target_module.const_set('StringKeyTypeSpecified', Module.new { MediaTypes.expect_string_keys })
-    symbol_key_type_module = target_module.const_set('SymbolKeyTypeSpecified', Module.new { MediaTypes.expect_symbol_keys })
+    string_key_type_module = target_module.const_set('StringKeyTypeSpecified', Module.new { MediaTypes.expect_string_keys(self) })
+    symbol_key_type_module = target_module.const_set('SymbolKeyTypeSpecified', Module.new { MediaTypes.expect_symbol_keys(self) })
     [no_key_type_module, string_key_type_module, symbol_key_type_module].each do |module_type|
       module_tree << module_type
       target_media_type = Class.new

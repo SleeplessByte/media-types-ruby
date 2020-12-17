@@ -18,52 +18,39 @@ module MediaTypes
     @organisation_prefixes[mod.name] = organisation
   end
 
-  def self.expect_string_keys
-    @expect_symbol_keys = false
+  def self.expect_string_keys(mod)
+    set_key_expectation(mod, false)
   end
 
-  def self.expect_symbol_keys
-    @expect_symbol_keys = true
+  def self.expect_symbol_keys(mod)
+    set_key_expectation(mod, true)
   end
 
-  def self.expecting_symbol_keys?
-    @expect_symbol_keys
+  def self.expecting_symbol_keys?(mod)
+    get_key_expectation(mod)
   end
 
   # Keep track of modules setting their key expectations
-  def self.set_key_expectation(mod, _expect_symbol_keys)
-    @organisation_key_expectations ||= {}
+  def self.set_key_expectation(mod, expect_symbol_keys)
+    @key_expectations ||= {}
 
-    # Check if this key is already set, if so, we need to throw an error
-    raise 'Module already has a key expectation set' if @organisation_key_expectations[mod.name]
+    raise format('%<mod>s already has a key expectation set', mod: mod.name) if @key_expectations[mod.name]
 
-    # If it's not set already, register it now
-    @organisation_key_expectations[mod.name] = expect_symbol_keysend
-  end
-
-  def demodulize(mod)
-    mod = mod.to_s
-    if (i = mod.rindex('::'))
-      mod[(i + 2)..-1]
-    else
-      mod
-    end
+    @key_expectations[mod.name] = expect_symbol_keys
   end
 
   def self.get_key_expectation(mod)
-    return nil if mod.name == 'MediaTypes' # Need to figure out a proper base case.
+    modules = mod.name.split('::')
+    expect_symbol = nil
 
-    current_module = mod.name
+    while modules.any? && expect_symbol.nil?
+      current_module = modules.join('::')
+      expect_symbol = @key_expectations[current_module]
+      modules = current_module.split('::')
+      modules.pop
+    end
 
-    # Exact match
-    @organisation_key_expectations[current_module]
-    # Return exact match
-
-    # If none is found, we have to get the parent module and do a recursive call
-    module_array = target_module.name.split('::')
-    current_module = module_array.pop
-    parent_module = module_array.join('::')
-    # Recursive call get_key_expectation(parent_module)
+    expect_symbol
   end
 
   def self.get_organisation(mod)
