@@ -162,7 +162,7 @@ class MediaTypesTest < Minitest::Test
   module SymbolKeyModuleToBeOverRidden
     class OverridingMediaType
       include MediaTypes::Dsl
-      expect_symbol_keys
+      expect_string_keys
 
       def self.organisation
         'domain.test'
