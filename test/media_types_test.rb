@@ -207,7 +207,7 @@ class MediaTypesTest < Minitest::Test
 
   def test_key_settings_cannot_be_altered_on_the_same_level_once_set
     assert_raises do
-      endModuleTriesToSetKeyTypeTwice.module_eval('MediaTypes.expect_symbol_keys(self)')
+      ModuleTriesToSetKeyTypeTwice.module_eval('MediaTypes.expect_symbol_keys(self)')
     end
     assert_raises do
       MediaTypeTriesToSetKeyTypeTwice.class_eval do
