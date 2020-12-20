@@ -325,8 +325,9 @@ class MediaTypesTest < Minitest::Test
   end
 
   module TreeTestRoot; end
+  @@tree_already_built = false
   def setup
-    build_module_tree(TreeTestRoot)
+    build_module_tree(TreeTestRoot) unless @@tree_already_built
   end
 
   def test_that_MediaTypesTest_TreeTestRoot_NoKeyTypeSpecified_has_the_expected_key_type_preference
@@ -510,6 +511,7 @@ class MediaTypesTest < Minitest::Test
     # This method creates a tree of nested modules, three levels deep,
     # with all combinations of key type inheritance covered.
     if depth >= 4
+      @@tree_already_built = true
       return module_tree
     end
 
