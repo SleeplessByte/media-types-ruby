@@ -34,7 +34,7 @@ module MediaTypes
   def self.set_key_expectation(mod, expect_symbol_keys)
     @key_expectations ||= {}
 
-    raise format('%<mod>s already has a key expectation set', mod: mod.name) if @key_expectations[mod.name]
+    raise format('%<mod>s already has a key expectation set', mod: mod.name) unless @key_expectations[mod.name].nil?
 
     @key_expectations[mod.name] = expect_symbol_keys
   end
