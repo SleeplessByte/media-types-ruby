@@ -23,7 +23,6 @@ class MediaTypesTest < Minitest::Test
     end
   end
 
-  # Test the default is a string
   class NoKeyTypeSpecified
     include MediaTypes::Dsl
 
@@ -40,7 +39,9 @@ class MediaTypesTest < Minitest::Test
 
   class StringKeyTypeSpecified
     include MediaTypes::Dsl
+
     expect_string_keys
+
     def self.organisation
       'domain.test'
     end
@@ -54,7 +55,9 @@ class MediaTypesTest < Minitest::Test
 
   class SymbolKeyTypeSpecified
     include MediaTypes::Dsl
+
     expect_symbol_keys
+
     def self.organisation
       'domain.test'
     end
@@ -66,22 +69,19 @@ class MediaTypesTest < Minitest::Test
     end
   end
 
-  # class KeyTypeSpecifiedAfterValidationBlock
-  #   include MediaTypes::Dsl
+  class KeyTypeSpecifiedAfterValidationBlock
+    include MediaTypes::Dsl
 
-  #   def self.organisation
-  #     'domain.test'
-  #   end
+    def self.organisation
+      'domain.test'
+    end
 
-  #   use_name 'test'
+    use_name 'test'
 
-  #   validations do
-  #     empty
-  #   end
-
-  #   expect_string_keys
-  # end
-  # Supposed to FAIL!!!
+    validations do
+      empty
+    end
+  end
 
   # refactor media types to match above
   def test_by_default_the_key_type_expected_is_a_symbol
@@ -115,7 +115,6 @@ class MediaTypesTest < Minitest::Test
     end
   end
 
-  # Test that you can over-ride the default for a module
   module ModuleSpecifiesStringKeys
     MediaTypes.expect_string_keys(self)
 
@@ -139,12 +138,12 @@ class MediaTypesTest < Minitest::Test
     refute ModuleSpecifiesStringKeys::ShouldInheritKeyType.symbol_keys?
   end
 
-  # Check the media type over-rides the module
   module StringKeyModuleToBeOverRidden
     MediaTypes.expect_string_keys(self)
 
     class OverridingMediaType
       include MediaTypes::Dsl
+
       expect_symbol_keys
 
       def self.organisation
@@ -162,6 +161,7 @@ class MediaTypesTest < Minitest::Test
   module SymbolKeyModuleToBeOverRidden
     class OverridingMediaType
       include MediaTypes::Dsl
+
       expect_string_keys
 
       def self.organisation
@@ -176,7 +176,6 @@ class MediaTypesTest < Minitest::Test
     end
   end
 
-  # TODO: Should be in the previous(???)
   def test_symbol_keys_can_set_for_a_media_type
     assert StringKeyModuleToBeOverRidden::OverridingMediaType.symbol_keys?
     refute StringKeyModuleToBeOverRidden::OverridingMediaType.string_keys?
@@ -184,8 +183,6 @@ class MediaTypesTest < Minitest::Test
     refute SymbolKeyModuleToBeOverRidden::OverridingMediaType.symbol_keys?
     assert SymbolKeyModuleToBeOverRidden::OverridingMediaType.string_keys?
   end
-
-  # Test Clashes
   module ModuleTriesToSetKeyTypeTwice
     MediaTypes.expect_string_keys(self)
   end
@@ -216,7 +213,7 @@ class MediaTypesTest < Minitest::Test
       end
     end
   end
-  # Test too late
+
   class UnspecifiedKeysMediaType
     include MediaTypes::Dsl
 
@@ -239,7 +236,6 @@ class MediaTypesTest < Minitest::Test
     end
   end
 
-  # Change to you cannot change for  a module once the default is used.
   module ModuleDefinesExpectationsAfterMediaTypes
     class ShouldExpectSymbols
       include MediaTypes::Dsl
@@ -307,21 +303,21 @@ class MediaTypesTest < Minitest::Test
   end
 
   def test_validations_check_key_preference_when_no_key_type_specified
-    assert NoKeyTypeSpecifiedNotStrict.valid?({ symbol: 'stuff' })
-    refute NoKeyTypeSpecifiedNotStrict.valid?({ 'string' => 'stuff' })
-    refute NoKeyTypeSpecifiedNotStrict.valid?({ 'string' => 'stuff', :symbol => 'stuff' })
+    assert NoKeyTypeSpecifiedNotStrict.valid?({ sym: 'test' }), 'Symbol keys should be accepted'
+    refute NoKeyTypeSpecifiedNotStrict.valid?({ 'str' => 'test' }), 'Expecting symbol keys'
+    refute StringKeyTypeSpecifiedNotStrict.valid?({ 'str' => 'test', :sym => 'test' }), 'Expecting string keys only'
   end
 
   def test_validations_check_key_preference_when_symbol_key_type_specified
-    assert SymbolKeyTypeSpecifiedNotStrict.valid?({ symbol: 'stuff' })
-    refute SymbolKeyTypeSpecifiedNotStrict.valid?({ 'string' => 'stuff' })
-    refute SymbolKeyTypeSpecifiedNotStrict.valid?({ 'string' => 'stuff', :symbol => 'stuff' })
+    assert SymbolKeyTypeSpecifiedNotStrict.valid?({ sym: 'test' }), 'Symbol keys should be accepted'
+    refute SymbolKeyTypeSpecifiedNotStrict.valid?({ 'str' => 'test' }), 'Expected string keys to be disallowed'
+    refute StringKeyTypeSpecifiedNotStrict.valid?({ 'str' => 'test', :sym => 'test' }), ''
   end
 
   def test_validations_check_key_preference_when_string_key_type_specified
-    refute StringKeyTypeSpecifiedNotStrict.valid?({ symbol: 'stuff' })
-    assert StringKeyTypeSpecifiedNotStrict.valid?({ 'string' => 'stuff' })
-    refute StringKeyTypeSpecifiedNotStrict.valid?({ 'string' => 'stuff', :symbol => 'stuff' })
+    refute StringKeyTypeSpecifiedNotStrict.valid?({ sym: 'test' }), 'Expected symbol keys to be disallowed'
+    assert StringKeyTypeSpecifiedNotStrict.valid?({ 'str' => 'test' }), 'Expected string key types to be accepted'
+    refute StringKeyTypeSpecifiedNotStrict.valid?({ 'str' => 'test', :sym => 'test' }), 'Expected string keys only'
   end
 
   module TreeTestRoot; end
@@ -348,7 +344,7 @@ class MediaTypesTest < Minitest::Test
 
   def test_that_MediaTypesTest_TreeTestRoot_NoKeyTypeSpecified_NoKeyTypeSpecified_SymbolKeyTypeSpecified_has_the_expected_key_type_preference
     validate_module_inheritance(MediaTypesTest::TreeTestRoot::NoKeyTypeSpecified::NoKeyTypeSpecified::SymbolKeyTypeSpecified)
-   end
+  end
 
   def test_that_MediaTypesTest_TreeTestRoot_NoKeyTypeSpecified_StringKeyTypeSpecified_has_the_expected_key_type_preference
     validate_module_inheritance(MediaTypesTest::TreeTestRoot::NoKeyTypeSpecified::StringKeyTypeSpecified)
@@ -360,7 +356,7 @@ class MediaTypesTest < Minitest::Test
 
   def test_that_MediaTypesTest_TreeTestRoot_NoKeyTypeSpecified_StringKeyTypeSpecified_StringKeyTypeSpecified_has_the_expected_key_type_preference
     validate_module_inheritance(MediaTypesTest::TreeTestRoot::NoKeyTypeSpecified::StringKeyTypeSpecified::StringKeyTypeSpecified)
-   end
+  end
 
   def test_that_MediaTypesTest_TreeTestRoot_NoKeyTypeSpecified_StringKeyTypeSpecified_SymbolKeyTypeSpecified_has_the_expected_key_type_preference
     validate_module_inheritance(MediaTypesTest::TreeTestRoot::NoKeyTypeSpecified::StringKeyTypeSpecified::SymbolKeyTypeSpecified)
@@ -504,8 +500,9 @@ class MediaTypesTest < Minitest::Test
   # parent module()-------------->StringKeyTypeSpecified
   #                  |
   #                  ------------->SymbolKeyTypeSpecified
-  # The method below builds out a tree, where the above depicts a single unit of the overall structure. Each module gets all three possibilities nested in it
-  # and becomes a parent itself
+  #
+  # The method below builds out a tree, where the above depicts a single unit of the overall structure.
+  # Each module gets all three possibilities nested in it and becomes a parent itself.
 
   def build_module_tree(target_module, depth = 1, module_tree = [])
     # This method creates a tree of nested modules, three levels deep,
