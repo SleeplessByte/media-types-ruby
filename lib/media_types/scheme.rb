@@ -421,15 +421,20 @@ module MediaTypes
     end
 
     def run_queued_fixture_checks
-      errors = []
-      @fixtures.each_with_object([]) do |fixture_data, _error_array|
-        json = JSON.parse(fixture_data.fixture, { symbolize_names: true })
-        output = fixture_data.expect_to_pass ? process_assert_pass(json, fixture_data.caller) : process_assert_fail(json, fixture_data.caller)
-        errors << output unless output.nil?
+      @fixtures.each_with_object([]) do |fixture_data, errors|
+        errors << process_fixture_data(fixture_data)
       end
       raise AssertionError, errors unless errors.empty?
 
       self.asserted_sane = true
+    end
+
+    def process_fixture_data(fixture_data)
+      errors = []
+      json = JSON.parse(fixture_data.fixture, { symbolize_names: true })
+      output = fixture_data.expect_to_pass ? process_assert_pass(json, fixture_data.caller) : process_assert_fail(json, fixture_data.caller)
+      errors << output unless output.nil?
+      errors
     end
 
     def process_assert_fail(json, caller)
