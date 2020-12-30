@@ -23,7 +23,7 @@ module MediaTypes
       end
 
       def [](key)
-        __getobj__[normalize_key(key)]
+        __getobj__[key]
       end
 
       def add(key, val, optional: false)
@@ -39,11 +39,11 @@ module MediaTypes
       end
 
       def fetch(key, &block)
-        __getobj__.fetch(normalize_key(key), &block)
+        __getobj__.fetch(key, &block)
       end
 
       def delete(key)
-        __getobj__.delete(normalize_key(key))
+        __getobj__.delete(key)
         self
       end
 
@@ -114,8 +114,7 @@ module MediaTypes
       attr_writer :expected_type
 
       def normalize_key(key)
-        # Because default ruby hashes don't treat symbols and string equal we can't normalize them here.
-        key
+        String(key).to_sym
       end
     end
   end

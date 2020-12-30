@@ -36,6 +36,17 @@ module MediaTypes
 
       def iterate(mark)
         OutputIteratorWithPredicate.call(output, options, rules: rules) do |key, value, options:, context:|
+          weAreUsingStringsAsKeyTypes = true #Placeholder untill there is a know source for this information
+          
+          raise ValidationError,
+              format(
+                'Expected key as %<type>s, got %<actual>s at [%<backtrace>s]',
+                type: weAreUsingStringsAsKeyTypes ? String : Symbol,
+                actual: key.class,
+                backtrace: options.trace(key).backtrace.join('->')
+              ) unless key.class == (weAreUsingStringsAsKeyTypes ? String : Symbol)
+          key = String(key).to_sym if key.class == String
+
           mark.call(key)
 
           rules.get(key).validate!(
