@@ -126,19 +126,19 @@ module MediaTypes
         self.media_type_constructable = Constructable.new(self, type: name)
       end
 
-      def no_expectation_set
+      def no_expectation_set?
         symbol_keys.nil?
       end
 
       def expect_string_keys
-        raise StandardError, 'Key expectation already set' unless no_expectation_set
+        raise StandardError, 'Key expectation already set' unless no_expectation_set?
         raise StandardError, 'Set key expectation before defining validations' unless media_type_validations.nil?
 
         self.symbol_keys = false
       end
 
       def expect_symbol_keys
-        raise StandardError, 'Key expectation already set' unless no_expectation_set
+        raise StandardError, 'Key expectation already set' unless no_expectation_set?
         raise StandardError, 'Set key expectation before defining validations' unless media_type_validations.nil?
 
         self.symbol_keys = true
@@ -147,7 +147,7 @@ module MediaTypes
       SYMBOL_KEYS_DEFAULT = true
 
       def expecting_symbol_keys?
-        if no_expectation_set
+        if no_expectation_set?
           inherited_expectation = MediaTypes.get_key_expectation(self)
           inherited_expectation.nil? ? SYMBOL_KEYS_DEFAULT : inherited_expectation
         else
