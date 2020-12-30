@@ -6,14 +6,14 @@ require 'media_types/scheme/rules_exhausted_guard'
 module MediaTypes
   class Scheme
     class Links
-      def initialize
-        self.links = Rules.new(allow_empty: false, expected_type: ::Hash)
+      def initialize(expected_key_type:)
+        self.links = Rules.new(allow_empty: false, expected_type: ::Hash, expected_key_type: expected_key_type)
       end
 
       def link(key, allow_nil: false, optional: false, &block)
         links.add(
           key,
-          Scheme.new do
+          Scheme.new(expected_key_type: self.links.expected_key_type) do
             attribute :href, String, allow_nil: allow_nil
             instance_exec(&block) if block_given?
           end,
