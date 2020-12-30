@@ -20,7 +20,11 @@ module MediaTypes
     end
 
     module ClassMethods
+      class UninitializedConstructable < RuntimeError; end
+
       def to_constructable
+        raise UninitializedConstructable, 'Constructable has not been initialized' if media_type_constructable.nil?
+
         media_type_constructable.dup.tap do |constructable|
           constructable.__setobj__(self)
         end
@@ -164,6 +168,9 @@ module MediaTypes
         self.media_type_validations = Validations.new(to_constructable, &block)
 
         self
+
+      rescue UninitializedConstructable => e
+        raise e.class, 'Uninitialized constructable, have you called `use_name(name)` before the validations?'
       end
     end
   end
