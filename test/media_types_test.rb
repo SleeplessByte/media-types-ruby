@@ -83,22 +83,6 @@ class MediaTypesTest < Minitest::Test
     end
   end
 
-  # refactor media types to match above
-  def test_by_default_the_key_type_expected_is_a_symbol
-    assert NoKeyTypeSpecified.symbol_keys?
-    refute NoKeyTypeSpecified.string_keys?
-  end
-
-  def test_can_set_a_media_type_to_expect_string_keys_outside_any_module
-    refute StringKeyTypeSpecified.symbol_keys?
-    assert StringKeyTypeSpecified.string_keys?
-  end
-
-  def test_can_set_a_media_type_to_expect_symbol_keys_outside_any_module
-    assert SymbolKeyTypeSpecified.symbol_keys?
-    refute SymbolKeyTypeSpecified.string_keys?
-  end
-
   def test_cannot_specify_key_type_after_validation_block
     assert_raises do
       KeyTypeSpecifiedAfterValidationBlock.class_eval do
