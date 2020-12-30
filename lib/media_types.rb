@@ -40,6 +40,8 @@ module MediaTypes
   end
 
   def self.get_key_expectation(mod)
+    return nil if @key_expectations.nil?
+
     modules = mod.name.split('::')
     expect_symbol = nil
 
