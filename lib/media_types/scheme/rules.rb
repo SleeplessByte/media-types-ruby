@@ -24,11 +24,11 @@ module MediaTypes
       end
 
       def [](key)
-        __getobj__[verify_type_and_normalize_key(key)]
+        __getobj__[normalize_key(verify_key_type(key))]
       end
 
       def add(key, val, optional: false)
-        normalized_key = verify_type_and_normalize_key(key, false)
+        normalized_key = normalize_key(key)
         __getobj__[normalized_key] = val
         optional_keys << normalized_key if optional
 
@@ -40,11 +40,11 @@ module MediaTypes
       end
 
       def fetch(key, &block)
-        __getobj__.fetch(verify_type_and_normalize_key(key, false), &block)
+        __getobj__.fetch(normalize_key(key), &block)
       end
 
       def delete(key)
-        __getobj__.delete(verify_type_and_normalize_key(key))
+        __getobj__.delete(normalize_key(verify_key_type(key)))
         self
       end
 
@@ -114,12 +114,15 @@ module MediaTypes
       attr_accessor :allow_empty, :optional_keys
       attr_writer :expected_type, :expected_key_type
 
-      def verify_type_and_normalize_key(key, doVerify = true)
-        normalized_key = String(key).to_sym
-        if doVerify && !key.instance_of?(expected_key_type)
-          raise KeyTypeError, "Key is of the wrong type. Expected #{expected_key_type} but got #{key.class}" unless __getobj__[normalized_key].instance_of?(NotStrict)
+      def verify_key_type(key)
+        if !key.instance_of?(expected_key_type)
+          raise KeyTypeError, "Key is of the wrong type. Expected #{expected_key_type} but got #{key.class}" unless __getobj__[normalize_key(key)].instance_of?(NotStrict)
         end
-        return normalized_key
+        key
+      end
+
+      def normalize_key(key)
+        String(key).to_sym
       end
     end
   end
