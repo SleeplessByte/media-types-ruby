@@ -500,6 +500,7 @@ class MediaTypesTest < Minitest::Test
       end
       module_tree << module_type
       target_media_type = Class.new
+      module_type.const_set('TestMediaType', target_media_type)
       target_media_type.class_eval do
         include MediaTypes::Dsl
 
@@ -514,7 +515,6 @@ class MediaTypesTest < Minitest::Test
         end
       end
       build_module_tree(module_type, depth + 1, module_tree)
-      module_type.const_set('TestMediaType', target_media_type)
     end
     module_tree
   end
