@@ -242,6 +242,34 @@ class MediaTypesTest < Minitest::Test
     end
   end
 
+  class StringAttributes; end
+
+  def test_string_keys_are_accepted_attributes
+    StringAttributes.class_eval do
+      include MediaTypes::Dsl
+
+      use_name 'test'
+
+      validations do
+        attribute 'name', String
+      end
+    end
+  end
+
+  class SymbolAttributes; end
+
+  def test_symbol_keys_are_accepted_attributes
+    StringAttributes.class_eval do
+      include MediaTypes::Dsl
+
+      use_name 'test'
+
+      validations do
+        attribute :name, String
+      end
+    end
+  end
+
   class NoKeyTypeSpecifiedNotStrict
     include MediaTypes::Dsl
 
