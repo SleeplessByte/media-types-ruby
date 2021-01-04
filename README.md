@@ -418,7 +418,7 @@ class MyMedia
   include MediaTypes::Dsl
 
   def self.organisation
-    'trailervote'
+    'acme'
   end
 
   use_name 'test'
@@ -427,24 +427,24 @@ class MyMedia
     any Numeric
 
     assert_pass <<-FIXTURE
-    { "foo": 42, "bar": 43 }
+    { foo: 42, bar: 43 }
     FIXTURE
 
-    assert_pass '{"foo": 42}'
+    assert_pass '{foo: 42}'
     # Any also means none, there are no required keys
     assert_pass '{}'
 
     # Expects any value to be a Numeric, not a Hash
     assert_fail <<-FIXTURE
-    { "foo": { "bar": "string" } }
+    { foo: { bar: "string" } }
     FIXTURE
   
     # Expects any value to be Numeric, not a Hash
-    assert_fail '{"foo": {}}'
+    assert_fail '{foo: {}}'
     # Expects any value to be Numeric, not a NilClass
-    assert_fail '{"foo": null}'
+    assert_fail '{foo: null}'
     # Expects any value to be Numeric, not Array
-    assert_fail '{"foo": [42]}'
+    assert_fail '{foo: [42]}'
   end
 
   # Optionally assert that the media type is sane on load. This makes the application raise an error when the arguments of assert_pass/assert_fail are not in line with your MediaType definition.
@@ -466,7 +466,7 @@ class MyMedia
   include MediaTypes::Dsl
 
   def self.organisation
-    'trailervote'
+    'acme'
   end
 
   use_name 'test'
@@ -475,30 +475,110 @@ class MyMedia
     any Numeric
 
     assert_pass <<-FIXTURE
-    { "foo": 42, "bar": 43 }
+    { foo: 42, bar: 43 }
     FIXTURE
 
-    assert_pass '{"foo": 42}'
+    assert_pass '{foo: 42}'
     # Any also means none, there are no required keys
     assert_pass '{}'
 
     # Expects any value to be a Numeric, not a Hash
     assert_fail <<-FIXTURE
-    { "foo": { "bar": "string" } }
+    { foo: { bar: "string" } }
     FIXTURE
 
     # Expects any value to be Numeric, not a Hash
-    assert_fail '{"foo": {}}'
+    assert_fail '{foo: {}}'
     # Expects any value to be Numeric, not a NilClass
-    assert_fail '{"foo": null}'
+    assert_fail '{foo: null}'
     # Expects any value to be Numeric, not Array
-    assert_fail '{"foo": [42]}'
+    assert_fail '{foo: [42]}'
   end
 end
 
 class MyMediaTest < Minitest::Test
   test_specification MyMedia
    # This transforms all your calls to `assert_pass` and `assert_fail` into tests
+end
+```
+
+## Key type validation
+
+Users are provided with the ability to specify the expected type of keys in the media type, by default symbol keys are expected.
+This can be set by calling either `expect_symbol_keys` or `expect_string_keys` when defining the MediaType.
+
+```ruby
+class MyMedia
+  include MediaTypes::Dsl
+
+  def self.organisation
+    'acme'
+  end
+
+  use_name 'test'
+  # Expect keys to be strings
+  expect_string_keys
+
+  validations do
+    any Numeric
+
+    # Only pass keys as strings
+    assert_pass <<-FIXTURE
+    { "foo": 42, "bar": 43 }
+    FIXTURE
+
+    assert_pass '{"foo": 42}'
+    assert_pass '{}'
+
+    # Using symbol keys will result in failed validation
+    assert_fail <<-FIXTURE
+    { foo: 42, bar: 43 }
+    FIXTURE
+  end
+
+  assert_sane!
+end
+```
+
+### Inheriting key type expectations
+
+Key type expectations can also be set at the module level, each MediaType within this module will inherit the expectation set by that module.
+
+```ruby
+module Acme
+  expect_string_keys
+
+  # The MyMedia class will be expecting string keys, as inherited from the Acme module.
+  class MyMedia
+    include MediaTypes::Dsl
+
+    def self.organisation
+      'acme'
+    end
+
+    use_name 'test'
+
+    validations do
+      any Numeric
+    end
+  end
+
+  # This behaviour can be overridden inside the MediaType class
+  class MySecondMedia
+    include MediaTypes::Dsl
+
+    def self.organisation
+      'acme'
+    end
+
+    use_name 'test2'
+    # Override parent module key type expectation
+    expect_symbol_keys
+
+    validations do
+      any Numeric
+    end
+  end
 end
 ```
 
