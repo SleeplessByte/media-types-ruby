@@ -138,16 +138,19 @@ module MediaTypes
         symbol_keys.nil?
       end
 
+      # Raised when an error occurs during setting expected key type
+      class KeyTypeExpectationError < StandardError; end
+
       def expect_string_keys
-        raise StandardError, 'Key expectation already set' unless no_expectation_set?
-        raise StandardError, 'Set key expectation before defining validations' unless media_type_validations.nil?
+        raise KeyTypeExpectationError, 'Key expectation already set' unless no_expectation_set?
+        raise KeyTypeExpectationError, 'Set key expectation before defining validations' unless media_type_validations.nil?
 
         self.symbol_keys = false
       end
 
       def expect_symbol_keys
-        raise StandardError, 'Key expectation already set' unless no_expectation_set?
-        raise StandardError, 'Set key expectation before defining validations' unless media_type_validations.nil?
+        raise KeyTypeExpectationError, 'Key expectation already set' unless no_expectation_set?
+        raise KeyTypeExpectationError, 'Set key expectation before defining validations' unless media_type_validations.nil?
 
         self.symbol_keys = true
       end

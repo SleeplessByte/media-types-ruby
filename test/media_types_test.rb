@@ -87,8 +87,6 @@ class MediaTypesTest < Minitest::Test
     assert_raises do
       KeyTypeSpecifiedAfterValidationBlock.class_eval do
         expect_string_keys
-        # Class
-        # Make it assert a specific error class
       end
     end
 
