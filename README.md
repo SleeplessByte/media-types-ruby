@@ -425,9 +425,10 @@ class MyMedia
     any Numeric
 
     assert_pass <<-FIXTURE
-    { "foo": 42, 
-      "bar": 43
-      }
+    {
+      foo: 42,
+      bar: 43
+    }
     FIXTURE
 
     assert_pass '{"foo": 42}'
