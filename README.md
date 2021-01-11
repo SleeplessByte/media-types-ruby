@@ -210,7 +210,7 @@ Expect a collection such as an array or hash. The `&block` defines the Schema fo
 | param          | type                          | description                                                                                                          |
 | -------------- | ----------------------------- | -------------------------------------------------------------------------------------------------------------------- |
 | key            | `Symbol`                      | key of the collection (same as `#attribute`)                                                                         |
-| scheme         | `Scheme`, `NilClass`, `Class` | scheme to use if no `&block` is given or `Class` of each item in the                                                 |
+| scheme         | `Scheme`, `NilClass`, `Class` | scheme to use if no `&block` is given or `Class` of each item in the collection                                      |
 | allow_empty:   | `TrueClass`, `FalseClass`     | if true, empty (no key/value present) is allowed                                                                     |
 | expected_type: | `Class`,                      | forces the validated value to have this type, defaults to `Array`. Use `Object` if either `Array` or `Hash` is fine. |
 | optional:      | `TrueClass`, `FalseClass`     | if true, key may be absent, defaults to `false`                                                                      |
@@ -266,7 +266,7 @@ class MyMedia
   include MediaTypes::Dsl
 
   validations do
-    link :_self
+    link :self
     link :image
   end
 end
