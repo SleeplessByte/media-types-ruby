@@ -168,8 +168,8 @@ module MediaTypes
 
           return media_type_validations
         end
-        self.media_type_validations = Validations.new(to_constructable, symbol_keys? ? Symbol : String, &block)
-        
+        self.media_type_validations = Validations.new(to_constructable, &block)
+
         self
 
       rescue UninitializedConstructable => e
