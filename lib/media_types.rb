@@ -31,6 +31,7 @@ module MediaTypes
     @key_expectations ||= {}
 
     raise format('%<mod>s already has a key expectation set', mod: mod.name) unless @key_expectations[mod.name].nil?
+    raise format('Unable to change key type expectation for %<mod>s since its current expectation is already used', mod: mod.name) if @key_expectations_used[mod.name]
 
     @key_expectations[mod.name] = expect_symbol_keys
   end
@@ -38,8 +39,10 @@ module MediaTypes
   def self.get_key_expectation(mod)
     return nil if @key_expectations.nil?
 
+    @key_expectations_used ||= {}
     modules = mod.name.split('::')
     expect_symbol = nil
+    current_module = nil
 
     while modules.any? && expect_symbol.nil?
       current_module = modules.join('::')
@@ -47,6 +50,8 @@ module MediaTypes
       modules = current_module.split('::')
       modules.pop
     end
+
+    @key_expectations_used[current_module] = true if expect_symbol && current_module
 
     expect_symbol
   end
