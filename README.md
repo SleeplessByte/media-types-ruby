@@ -431,7 +431,7 @@ class MyMedia
     }
     FIXTURE
 
-    assert_pass '{foo: 42}'
+    assert_pass '{ foo: 42 }'
     # Any also means none, there are no required keys
     assert_pass '{}'
 
