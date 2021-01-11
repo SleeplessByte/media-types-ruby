@@ -3,13 +3,14 @@
 module MediaTypes
   class Scheme
     class ValidationOptions
-      attr_accessor :exhaustive, :strict, :backtrace, :context
+      attr_accessor :exhaustive, :strict, :backtrace, :context, :expected_key_type
 
-      def initialize(context = {}, exhaustive: true, strict: true, backtrace: [])
+      def initialize(context = {}, exhaustive: true, strict: true, backtrace: [], expected_key_type: Symbol)
         self.exhaustive = exhaustive
         self.strict = strict
         self.backtrace = backtrace
         self.context = context
+        self.expected_key_type = expected_key_type
       end
 
       def inspect
@@ -27,7 +28,7 @@ module MediaTypes
       end
 
       def with_backtrace(backtrace)
-        ValidationOptions.new(context, exhaustive: exhaustive, strict: strict, backtrace: backtrace)
+        ValidationOptions.new(context, exhaustive: exhaustive, strict: strict, backtrace: backtrace, expected_key_type: expected_key_type)
       end
 
       def trace(*traces)
@@ -35,7 +36,7 @@ module MediaTypes
       end
 
       def exhaustive!
-        ValidationOptions.new(context, exhaustive: true, strict: strict, backtrace: backtrace)
+        ValidationOptions.new(context, exhaustive: true, strict: strict, backtrace: backtrace, expected_key_type: expected_key_type)
       end
     end
   end

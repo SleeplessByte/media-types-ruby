@@ -43,6 +43,7 @@ module MediaTypes
       end
 
       def valid_unsafe?(output, media_type = to_constructable, **opts)
+        opts[:expected_key_type] = string_keys? ? String : Symbol
         validations.find(media_type).valid?(output, backtrace: ['.'], **opts)
       end
 
@@ -53,6 +54,7 @@ module MediaTypes
       end
 
       def validate_unsafe!(output, media_type = to_constructable, **opts)
+        opts[:expected_key_type] = string_keys? ? String : Symbol
         validations.find(media_type).validate(output, backtrace: ['.'], **opts)
       end
 

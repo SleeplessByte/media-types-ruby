@@ -14,6 +14,7 @@ module MediaTypes
         self.allow_empty = allow_empty
         self.expected_type = expected_type
         self.optional_keys = []
+        self.original_key_type = {}
 
         self.default = MissingValidation.new
       end
@@ -23,13 +24,14 @@ module MediaTypes
       end
 
       def [](key)
-        __getobj__[key]
+        __getobj__[normalize_key(key)]
       end
 
       def add(key, val, optional: false)
         normalized_key = normalize_key(key)
         __getobj__[normalized_key] = val
         optional_keys << normalized_key if optional
+        original_key_type[normalized_key] = key.class
 
         self
       end
@@ -39,11 +41,11 @@ module MediaTypes
       end
 
       def fetch(key, &block)
-        __getobj__.fetch(key, &block)
+        __getobj__.fetch(normalize_key(key), &block)
       end
 
       def delete(key)
-        __getobj__.delete(key)
+        __getobj__.delete(normalize_key(key))
         self
       end
 
@@ -105,12 +107,21 @@ module MediaTypes
         ].join(': ')
       end
 
+      def has_key?(key)
+        normalized_key = normalize_key(key)
+        if __getobj__.key?(normalized_key)
+          return original_key_type[normalized_key]
+        else
+          return false
+        end
+      end
+
       alias get []
       alias remove delete
 
       private
 
-      attr_accessor :allow_empty, :optional_keys
+      attr_accessor :allow_empty, :optional_keys, :original_key_type
       attr_writer :expected_type
 
       def normalize_key(key)
