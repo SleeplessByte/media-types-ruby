@@ -10,7 +10,7 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'trailervote'
+          'acme'
         end
 
         use_name 'CollectionType'
@@ -99,7 +99,7 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'trailervote'
+          'acme'
         end
 
         use_name 'CollectionSchemeTypeEmpty'
@@ -123,7 +123,7 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'trailervote'
+          'acme'
         end
 
         use_name 'test'
@@ -150,7 +150,7 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'trailervote'
+          'acme'
         end
 
         use_name 'test'
@@ -176,8 +176,8 @@ module MediaTypes
         refute CollectionForceHashType.valid?(foo: nil), 'Expected input to be invalid'
       end
 
-      [CollectionType, CollectionCollectionType,CollectionSchemeType,CollectionSchemeTypeEmpty,CollectionOptionsType,CollectionForceHashType].each do |type|
-        build_fixture_tests type
+      [CollectionType, CollectionCollectionType, CollectionSchemeType, CollectionSchemeTypeEmpty, CollectionOptionsType, CollectionForceHashType].each do |type|
+        assert_mediatype_specification type
       end
     end
   end

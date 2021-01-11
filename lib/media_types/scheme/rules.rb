@@ -6,13 +6,14 @@ module MediaTypes
   class Scheme
     class Rules < DelegateClass(::Hash)
 
-      attr_reader :expected_type
+      attr_reader :expected_type, :expected_key_type
 
-      def initialize(allow_empty:, expected_type:)
+      def initialize(allow_empty:, expected_type:, expected_key_type:)
         super({})
 
         self.allow_empty = allow_empty
         self.expected_type = expected_type
+        self.expected_key_type = expected_key_type
         self.optional_keys = []
 
         self.default = MissingValidation.new
@@ -23,7 +24,7 @@ module MediaTypes
       end
 
       def [](key)
-        __getobj__[normalize_key(key)]
+        __getobj__[normalize_key(verify_key_type(key))]
       end
 
       def add(key, val, optional: false)
@@ -43,7 +44,7 @@ module MediaTypes
       end
 
       def delete(key)
-        __getobj__.delete(normalize_key(key))
+        __getobj__.delete(normalize_key(verify_key_type(key)))
         self
       end
 
@@ -111,11 +112,17 @@ module MediaTypes
       private
 
       attr_accessor :allow_empty, :optional_keys
-      attr_writer :expected_type
+      attr_writer :expected_type, :expected_key_type
+
+      def verify_key_type(key)
+        if !key.instance_of?(expected_key_type)
+          raise KeyTypeError, "Key is of the wrong type. Expected #{expected_key_type} but got #{key.class}" unless __getobj__[normalize_key(key)].instance_of?(NotStrict)
+        end
+        key
+      end
 
       def normalize_key(key)
-        # Because default ruby hashes don't treat symbols and string equal we can't normalize them here.
-        key
+        String(key).to_sym
       end
     end
   end

@@ -10,7 +10,7 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'trailervote'
+          'acme'
         end
 
         use_name 'SingleLink'
@@ -38,7 +38,7 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'trailervote'
+          'acme'
         end
 
         use_name 'LinkWithAttribute'
@@ -72,7 +72,7 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'trailervote'
+          'acme'
         end
 
         use_name 'OptionalLink'
@@ -95,8 +95,8 @@ module MediaTypes
         refute OptionalLink.valid?({}), 'Expected input to be invalid'
       end
 
-      [SingleLink,LinkWithAttribute,OptionalLink].each do |type|
-        build_fixture_tests type
+      [SingleLink, LinkWithAttribute, OptionalLink].each do |type|
+        assert_mediatype_specification type
       end
     end
   end

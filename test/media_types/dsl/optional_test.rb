@@ -10,7 +10,7 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'trailervote'
+          'acme'
         end
 
         use_name 'test'
@@ -37,7 +37,7 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'trailervote'
+          'acme'
         end
 
         use_name 'OptionalAttributeInsideAny'
@@ -67,7 +67,7 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'trailervote'
+          'acme'
         end
 
         use_name 'OptionalAttributeInsideCollection'
@@ -104,7 +104,7 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'trailervote'
+          'acme'
         end
 
         use_name 'OptionalCollection'
@@ -139,7 +139,7 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'trailervote'
+          'acme'
         end
 
         use_name 'OptionalAttributeInsideAttribute'
@@ -174,7 +174,7 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'trailervote'
+          'acme'
         end
 
         use_name 'OptionalAttributeInsideOptionalAttribute'
@@ -207,8 +207,8 @@ module MediaTypes
         refute OptionalAttributeInsideOptionalAttribute.valid?(foo: nil), 'Expected input to be invalid'
       end
 
-      [OptionalAttribute,OptionalAttributeInsideAny,OptionalAttributeInsideCollection,OptionalCollection,OptionalAttributeInsideAttribute,OptionalAttributeInsideOptionalAttribute].each do |type|
-       build_fixture_tests type  
+      [OptionalAttribute, OptionalAttributeInsideAny, OptionalAttributeInsideCollection, OptionalCollection, OptionalAttributeInsideAttribute, OptionalAttributeInsideOptionalAttribute].each do |type|
+        assert_mediatype_specification type
       end
     end
   end

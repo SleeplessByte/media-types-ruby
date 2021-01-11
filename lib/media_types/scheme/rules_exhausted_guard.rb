@@ -43,6 +43,15 @@ module MediaTypes
             options.trace(key),
             context: context
           )
+          
+        rescue KeyTypeError => error
+          raise ValidationError,
+            format(
+              'Expected key type as %<type>s, but got %<actual>s at [%<backtrace>s]',
+              type: rules.expected_key_type,
+              actual: key.class,
+              backtrace: options.trace(key).backtrace.join('->')
+            )
         end
       end
 

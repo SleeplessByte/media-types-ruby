@@ -10,7 +10,7 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'trailervote'
+          'acme'
         end
 
         use_name 'NotStrictType'
@@ -36,7 +36,7 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'trailervote'
+          'acme'
         end
 
         use_name 'NotStrictCollectionType'
@@ -63,8 +63,8 @@ module MediaTypes
         refute NotStrictCollectionType.valid?(foo: nil), 'Expected input to be invalid'
       end
 
-      [NotStrictType,NotStrictCollectionType].each do |type|
-        build_fixture_tests type
+      [NotStrictType, NotStrictCollectionType].each do |type|
+        assert_mediatype_specification type
       end
     end
   end

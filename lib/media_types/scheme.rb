@@ -38,10 +38,6 @@ module MediaTypes
       @fixture = fixture
       @expect_to_pass = expect_to_pass
     end
-    # Rename to assertion?
-
-    def run!
-    end
 
     attr_accessor :caller, :fixture, :expect_to_pass
   end
@@ -74,21 +70,27 @@ module MediaTypes
     #
     # @param [TrueClass, FalseClass] allow_empty if true allows to be empty, if false raises EmptyOutputError if empty
     # @param [NilClass, Class] expected_type forces the type to be this type, if given
+    # @param [Symbol, String] expected_key_type Sets the expected key type for the Rules
     #
     # @see MissingValidation
     #
-    def initialize(allow_empty: false, expected_type: ::Object, &block)
-      self.rules = Rules.new(allow_empty: allow_empty, expected_type: expected_type)
+    def initialize(allow_empty: false, expected_type: ::Object, expected_key_type: Symbol, &block)
+      self.rules = Rules.new(allow_empty: allow_empty, expected_type: expected_type, expected_key_type: expected_key_type)
       self.type_attributes = {}
 
       @fixtures = []
-      @asserted_sane = false
+      self.asserted_sane = false
 
       instance_exec(&block) if block_given?
     end
 
-    attr_accessor :type_attributes, :fixtures, :asserted_sane
+    attr_accessor :type_attributes, :fixtures
+    attr_writer :asserted_sane
     attr_reader :rules
+
+    def asserted_sane?
+      @asserted_sane
+    end
 
     ##
     # Checks if the +output+ is valid
@@ -187,9 +189,7 @@ module MediaTypes
     #
     def attribute(key, type = ::Object, optional: false, **opts, &block)
       raise KeyTypeError, "Unexpected key type #{key.class.name}, please use either a symbol or string." unless key.is_a?(String) || key.is_a?(Symbol)
-      raise DuplicateKeyError, "An attribute with key #{key} has already been defined. Please remove one of the two." if rules.has_key?(key)
-      raise DuplicateKeyError, "A string attribute with the same string representation as the symbol :#{key} already exists. Please remove one of the two." if key.is_a?(Symbol) && rules.has_key?(key.to_s)
-      raise DuplicateKeyError, "A symbol attribute with the same string representation as the string '#{key}' already exists. Please remove one of the two." if key.is_a?(String) && rules.has_key?(key.to_sym)
+      raise DuplicateKeyError, "An attribute with the same string representation as the string '#{key}' already exists. Please remove one of the two." if rules.has_key?(String(key).to_sym)
 
       if block_given?
         return collection(key, expected_type: ::Hash, optional: optional, **opts, &block)
@@ -251,7 +251,7 @@ module MediaTypes
         return rules.default = Attribute.new(scheme)
       end
 
-      rules.default = Scheme.new(allow_empty: allow_empty, expected_type: expected_type, &block)
+      rules.default = Scheme.new(allow_empty: allow_empty, expected_type: expected_type, expected_key_type: rules.expected_key_type, &block)
     end
 
     ##
@@ -330,6 +330,9 @@ module MediaTypes
     #   # => true
     #
     def collection(key, scheme = nil, allow_empty: false, expected_type: ::Array, optional: false, &block)
+      raise KeyTypeError, "Unexpected key type #{key.class.name}, please use either a symbol or string." unless key.is_a?(String) || key.is_a?(Symbol)
+      raise DuplicateKeyError, "A collection with the same string representation as the string '#{key}' already exists. Please remove one of the two." if rules.has_key?(String(key).to_sym)
+
       unless block_given?
         return rules.add(
           key,
@@ -342,7 +345,7 @@ module MediaTypes
         )
       end
 
-      rules.add(key, Scheme.new(allow_empty: allow_empty, expected_type: expected_type, &block), optional: optional)
+      rules.add(key, Scheme.new(allow_empty: allow_empty, expected_type: expected_type, expected_key_type: rules.expected_key_type, &block), optional: optional)
     end
 
     ##
@@ -381,7 +384,7 @@ module MediaTypes
     #
     def link(*args, **opts, &block)
       rules.fetch(:_links) do
-        Links.new.tap do |links|
+        Links.new(expected_key_type: rules.expected_key_type).tap do |links|
           rules.add(:_links, links)
         end
       end.link(*args, **opts, &block)
@@ -419,16 +422,21 @@ module MediaTypes
       @fixtures << FixtureData.new(caller_locations[1], fixture, false)
     end
 
-    def execute_assertions
-      errors = []
-      @fixtures.each_with_object([]) do |fixture_data, _error_array|
-        json = JSON.parse(fixture_data.fixture, { symbolize_names: true })
-        output = fixture_data.expect_to_pass ? process_assert_pass(json, fixture_data.caller) : process_assert_fail(json, fixture_data.caller)
-        errors << output unless output.nil?
+    def run_queued_fixture_checks
+      errors = @fixtures.each_with_object([]) do |fixture_data, array|
+        array << process_fixture_data(fixture_data)
       end
       raise AssertionError, errors unless errors.empty?
 
-      @asserted_sane = true
+      self.asserted_sane = true
+    end
+
+    def process_fixture_data(fixture_data)
+      errors = []
+      json = JSON.parse(fixture_data.fixture, { symbolize_names: true })
+      output = fixture_data.expect_to_pass ? process_assert_pass(json, fixture_data.caller) : process_assert_fail(json, fixture_data.caller)
+      errors << output unless output.nil?
+      errors
     end
 
     def process_assert_fail(json, caller)

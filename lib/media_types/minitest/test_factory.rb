@@ -2,17 +2,42 @@ require 'minitest/autorun'
 
 class Minitest::Test < Minitest::Runnable
   include MediaTypes::Assertions
-  def self.build_fixture_tests(type)
-    scheme = type.media_type_validations.scheme
+  def self.assert_mediatype_specification(mediatype)
+    fixtures = mediatype.media_type_validations.scheme.fixtures
 
-    scheme.fixtures.each_with_index do |fixture_data, counter|
-      json = JSON.parse(fixture_data.fixture, { symbolize_names: true })
-      test_name = "test_fixture#{counter}_#{fixture_data.expect_to_pass ? 'assert_pass' : 'assert_fail'}_for_#{type.to_constructable})"
+    fixtures.each_with_index do |fixture_data, counter|
+      config = if fixture_data.expect_to_pass
+                 passing_config(mediatype, fixture_data, counter)
+               else
+                 failing_config(mediatype, fixture_data, counter)
+               end
+      generate_test(config)
+    end
+  end
 
-      define_method test_name do
-        processed = fixture_data.expect_to_pass ? scheme.process_assert_pass(json, fixture_data.caller) : scheme.process_assert_fail(json, fixture_data.caller)
-        traceless_assert processed.nil?,  fixture_data.expect_to_pass ? processed : MediaTypes::MediaTypeValidationError.new(json, fixture_data.caller).message
-      end
+  def self.passing_config(mediatype, fixture_data, counter)
+    json = JSON.parse(fixture_data.fixture, { symbolize_names: true })
+    processed = mediatype.media_type_validations.scheme.process_assert_pass(json, fixture_data.caller)
+    {
+      test_name: "test_fixture#{counter}_assert_pass_for_#{mediatype.to_constructable})",
+      processed: processed,
+      message: processed
+    }
+  end
+
+  def self.failing_config(mediatype, fixture_data, counter)
+    json = JSON.parse(fixture_data.fixture, { symbolize_names: true })
+    {
+      test_name: "test_fixture#{counter}_assert_fail_for_#{mediatype.to_constructable})",
+      processed: mediatype.media_type_validations.scheme.process_assert_fail(json, fixture_data.caller),
+      message: MediaTypes::MediaTypeValidationError.new(json, fixture_data.caller).message
+    }
+  end
+
+  def self.generate_test(config)
+    define_method config[:test_name] do
+      assert true
+      raise Minitest::Assertion, config[:message], '' unless config[:processed].nil?
     end
   end
 end

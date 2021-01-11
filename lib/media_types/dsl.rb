@@ -9,7 +9,7 @@ module MediaTypes
       base.extend ClassMethods
       base.class_eval do
         class << self
-          attr_accessor :media_type_name_for, :media_type_combinations, :media_type_validations
+          attr_accessor :media_type_name_for, :media_type_combinations, :media_type_validations, :symbol_keys
 
           private
 
@@ -20,16 +20,26 @@ module MediaTypes
     end
 
     module ClassMethods
+      class UninitializedConstructable < RuntimeError; end
+
       def to_constructable
+        raise UninitializedConstructable, 'Constructable has not been initialized' if media_type_constructable.nil?
+
         media_type_constructable.dup.tap do |constructable|
           constructable.__setobj__(self)
         end
       end
 
       def symbol_keys?
+        expecting_symbol_keys?
       end
 
       def string_keys?
+        !expecting_symbol_keys?
+      end
+
+      def key_type
+        symbol_keys? ? Symbol : String
       end
 
       def valid?(output, **opts)
@@ -42,7 +52,7 @@ module MediaTypes
 
       def validate!(output, **opts)
         target_scheme = media_type_validations.scheme
-        assert_sane! unless target_scheme.asserted_sane
+        assert_sane! unless target_scheme.asserted_sane?
         to_constructable.validate!(output, **opts)
       end
 
@@ -95,7 +105,7 @@ module MediaTypes
       end
 
       def assert_sane!
-        media_type_validations.execute_assertions
+        media_type_validations.run_queued_fixture_checks
       end
 
       private
@@ -124,10 +134,36 @@ module MediaTypes
         self.media_type_constructable = Constructable.new(self, type: name)
       end
 
+      def no_expectation_set?
+        symbol_keys.nil?
+      end
+
+      # Raised when an error occurs during setting expected key type
+      class KeyTypeExpectationError < StandardError; end
+
       def expect_string_keys
+        raise KeyTypeExpectationError, 'Key expectation already set' unless no_expectation_set?
+        raise KeyTypeExpectationError, 'Set key expectation before defining validations' unless media_type_validations.nil?
+
+        self.symbol_keys = false
       end
 
       def expect_symbol_keys
+        raise KeyTypeExpectationError, 'Key expectation already set' unless no_expectation_set?
+        raise KeyTypeExpectationError, 'Set key expectation before defining validations' unless media_type_validations.nil?
+
+        self.symbol_keys = true
+      end
+
+      SYMBOL_KEYS_DEFAULT = true
+
+      def expecting_symbol_keys?
+        if no_expectation_set?
+          inherited_expectation = MediaTypes.get_key_expectation(self)
+          inherited_expectation.nil? ? SYMBOL_KEYS_DEFAULT : inherited_expectation
+        else
+          symbol_keys
+        end
       end
 
       def validations(&block)
@@ -136,9 +172,12 @@ module MediaTypes
 
           return media_type_validations
         end
-        self.media_type_validations = Validations.new(to_constructable, &block)
-
+        self.media_type_validations = Validations.new(to_constructable, {}, Scheme.new(expected_key_type: key_type), &block)
+        
         self
+
+      rescue UninitializedConstructable => e
+        raise e.class, 'Uninitialized constructable, have you called `use_name(name)` before the validations?'
       end
     end
   end

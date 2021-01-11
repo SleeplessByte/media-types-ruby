@@ -18,10 +18,41 @@ module MediaTypes
     @organisation_prefixes[mod.name] = organisation
   end
 
-  def self.expect_string_keys
+  def self.expect_string_keys(mod)
+    set_key_expectation(mod, false)
   end
 
-  def self.expect_symbol_keys
+  def self.expect_symbol_keys(mod)
+    set_key_expectation(mod, true)
+  end
+
+  def self.expecting_symbol_keys?(mod)
+    get_key_expectation(mod)
+  end
+
+  # Keep track of modules setting their key expectations
+  def self.set_key_expectation(mod, expect_symbol_keys)
+    @key_expectations ||= {}
+
+    raise format('%<mod>s already has a key expectation set', mod: mod.name) unless @key_expectations[mod.name].nil?
+
+    @key_expectations[mod.name] = expect_symbol_keys
+  end
+
+  def self.get_key_expectation(mod)
+    return nil if @key_expectations.nil?
+
+    modules = mod.name.split('::')
+    expect_symbol = nil
+
+    while modules.any? && expect_symbol.nil?
+      current_module = modules.join('::')
+      expect_symbol = @key_expectations[current_module]
+      modules = current_module.split('::')
+      modules.pop
+    end
+
+    expect_symbol
   end
 
   def self.get_organisation(mod)
