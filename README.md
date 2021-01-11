@@ -452,9 +452,10 @@ class MyMedia
   # Alternatives include using a _test_ (see below), calling this manually or
   # relying on the program to halt when the media type is used (and invalid).
 end
-  # Once the MediaType is defined, you can call assert_sane! to run the checks you expect 
-  MyMedia.assert_sane! 
 
+# Once the MediaType is defined, you can call assert_sane! to run the checks you expect
+MyMedia.assert_sane!
+```
 
 ### Assertions for Media Type Checking in Test Suites
 
