@@ -331,6 +331,11 @@ module MediaTypes
     #   # => true
     #
     def collection(key, scheme = nil, allow_empty: false, expected_type: ::Array, optional: false, &block)
+      raise KeyTypeError, "Unexpected key type #{key.class.name}, please use either a symbol or string." unless key.is_a?(String) || key.is_a?(Symbol)
+      raise DuplicateKeyError, "A collection with key #{key} has already been defined. Please remove one of the two." if rules.has_key?(key)
+      raise DuplicateKeyError, "A collection with a String name and with the same string representation as the symbol :#{key} already exists. Please remove one of the two." if key.is_a?(Symbol) && rules.has_key?(key.to_s)
+      raise DuplicateKeyError, "A collection with a Symbol name and with the same string representation as the string '#{key}' already exists. Please remove one of the two." if key.is_a?(String) && rules.has_key?(key.to_sym)
+
       unless block_given?
         return rules.add(
           key,

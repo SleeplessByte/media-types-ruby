@@ -11,6 +11,10 @@ module MediaTypes
       end
 
       def link(key, allow_nil: false, optional: false, &block)
+        raise KeyTypeError, "Unexpected key type #{key.class.name}, please use either a symbol or string." unless key.is_a?(String) || key.is_a?(Symbol)
+        raise DuplicateKeyError, "A link with key #{key} has already been defined. Please remove one of the two." if links.has_key?(key)
+        raise DuplicateKeyError, "A link with a String name and with the same string representation as the symbol :#{key} already exists. Please remove one of the two." if key.is_a?(Symbol) && links.has_key?(key.to_s)
+        raise DuplicateKeyError, "A link with a Symbol name and with the same string representation as the string '#{key}' already exists. Please remove one of the two." if key.is_a?(String) && link.has_key?(key.to_sym)
         links.add(
           key,
           Scheme.new do
