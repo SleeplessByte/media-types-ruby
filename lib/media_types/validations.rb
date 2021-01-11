@@ -25,7 +25,7 @@ module MediaTypes
     # @see Constructable
     # @see Scheme
     #
-    def initialize(media_type, registry = {}, scheme = Scheme.new(), &block)
+    def initialize(media_type, expected_key_type, registry = {}, scheme = Scheme.new(expected_key_type: expected_key_type), &block)
       self.media_type = media_type
       self.registry = registry.merge!(media_type.as_key => scheme)
       self.scheme = scheme

@@ -38,10 +38,6 @@ module MediaTypes
         !expecting_symbol_keys?
       end
 
-      def key_type
-        symbol_keys? ? Symbol : String
-      end
-
       def valid?(output, **opts)
         to_constructable.valid?(output, **opts)
       end
@@ -172,7 +168,7 @@ module MediaTypes
 
           return media_type_validations
         end
-        self.media_type_validations = Validations.new(to_constructable, {}, Scheme.new(expected_key_type: key_type), &block)
+        self.media_type_validations = Validations.new(to_constructable, symbol_keys? ? Symbol : String, &block)
         
         self
 

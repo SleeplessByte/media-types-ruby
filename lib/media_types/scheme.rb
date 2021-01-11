@@ -74,7 +74,7 @@ module MediaTypes
     #
     # @see MissingValidation
     #
-    def initialize(allow_empty: false, expected_type: ::Object, expected_key_type: Symbol, &block)
+    def initialize(allow_empty: false, expected_type: ::Object, expected_key_type:, &block)
       self.rules = Rules.new(allow_empty: allow_empty, expected_type: expected_type, expected_key_type: expected_key_type)
       self.type_attributes = {}
 
@@ -189,7 +189,7 @@ module MediaTypes
     #
     def attribute(key, type = ::Object, optional: false, **opts, &block)
       raise KeyTypeError, "Unexpected key type #{key.class.name}, please use either a symbol or string." unless key.is_a?(String) || key.is_a?(Symbol)
-      raise DuplicateKeyError, "An attribute with the same string representation as the string '#{key}' already exists. Please remove one of the two." if rules.has_key?(String(key).to_sym)
+      raise DuplicateKeyError, "An attribute with the same string representation as the string '#{key}' already exists. Please remove one of the two." if (key.is_a?(String) && rules.has_key?(String(key).to_sym)) || rules.has_key?(key)
 
       if block_given?
         return collection(key, expected_type: ::Hash, optional: optional, **opts, &block)
@@ -330,8 +330,7 @@ module MediaTypes
     #   # => true
     #
     def collection(key, scheme = nil, allow_empty: false, expected_type: ::Array, optional: false, &block)
-      raise KeyTypeError, "Unexpected key type #{key.class.name}, please use either a symbol or string." unless key.is_a?(String) || key.is_a?(Symbol)
-      raise DuplicateKeyError, "A collection with the same string representation as the string '#{key}' already exists. Please remove one of the two." if rules.has_key?(String(key).to_sym)
+      raise DuplicateKeyError, "A collection with the same string representation as the string '#{key}' already exists. Please remove one of the two." if (key.is_a?(String) && rules.has_key?(String(key).to_sym)) || rules.has_key?(key)
 
       unless block_given?
         return rules.add(

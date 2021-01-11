@@ -54,7 +54,7 @@ module MediaTypes
       end
 
       def iterate(&block)
-        hash_rule = Rules.new(allow_empty: false, expected_type: ::Hash, expected_key_type: rules.expected_key_type)
+        hash_rule = Rules.new(allow_empty: false, expected_type: ::Hash)
 
         enumerable.each_with_index.all? do |array_like_element, i|
           OutputTypeGuard.call(array_like_element, options.trace(1), rules: hash_rule)
