@@ -470,6 +470,45 @@ class MyMediaTest < Minitest::Test
    # This transforms all your calls to `assert_pass` and `assert_fail` into tests
 end
 ```
+
+## Key type validation for particular MediaTypes
+
+Users are provided with the ability to specify the expected type of keys in a specific media type, by default symbol keys are expected.
+This can be set by calling either `expect_symbol_keys` or `expect_string_keys` when defining the MediaType.
+
+```ruby
+class MyMedia
+  include MediaTypes::Dsl
+
+  def self.organisation
+    'acme'
+  end
+
+  use_name 'test'
+  # Expect keys to be strings
+  expect_string_keys
+
+  validations do
+    any Numeric
+
+    # Only pass keys as strings
+    assert_pass <<-FIXTURE
+    { "foo": 42, "bar": 43 }
+    FIXTURE
+
+    assert_pass '{"foo": 42}'
+    assert_pass '{}'
+
+    # Using symbol keys will result in failed validation
+    assert_fail <<-FIXTURE
+    { foo: 42, bar: 43 }
+    FIXTURE
+  end
+
+  assert_sane!
+end
+```
+
 ### Inheriting key type expectations
 
 Key type expectations can  be set at the module level, each MediaType within this module will inherit the expectation set by that module. This can help ensure consistancy within a code base.
@@ -509,43 +548,6 @@ module Acme
       any Numeric
     end
   end
-end
-```
-## Key type validation for particular MediaTypes
-
-Users are provided with the ability to specify the expected type of keys in a specific media type, by default symbol keys are expected.
-This can be set by calling either `expect_symbol_keys` or `expect_string_keys` when defining the MediaType.
-
-```ruby
-class MyMedia
-  include MediaTypes::Dsl
-
-  def self.organisation
-    'acme'
-  end
-
-  use_name 'test'
-  # Expect keys to be strings
-  expect_string_keys
-
-  validations do
-    any Numeric
-
-    # Only pass keys as strings
-    assert_pass <<-FIXTURE
-    { "foo": 42, "bar": 43 }
-    FIXTURE
-
-    assert_pass '{"foo": 42}'
-    assert_pass '{}'
-
-    # Using symbol keys will result in failed validation
-    assert_fail <<-FIXTURE
-    { foo: 42, bar: 43 }
-    FIXTURE
-  end
-
-  assert_sane!
 end
 ```
 
