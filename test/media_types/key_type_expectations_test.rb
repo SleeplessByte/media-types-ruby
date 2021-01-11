@@ -4,52 +4,6 @@ require_relative '../test_helper'
 
 module MediaTypes
   class KeyTypeExpectationsTest < Minitest::Test
-    class NoKeyTypeSpecified
-      include MediaTypes::Dsl
-
-      def self.organisation
-        'domain.test'
-      end
-
-      use_name 'test'
-
-      validations do
-        empty
-      end
-    end
-
-    class StringKeyTypeSpecified
-      include MediaTypes::Dsl
-
-      expect_string_keys
-
-      def self.organisation
-        'domain.test'
-      end
-
-      use_name 'test'
-
-      validations do
-        empty
-      end
-    end
-
-    class SymbolKeyTypeSpecified
-      include MediaTypes::Dsl
-
-      expect_symbol_keys
-
-      def self.organisation
-        'domain.test'
-      end
-
-      use_name 'test'
-
-      validations do
-        empty
-      end
-    end
-
     module TreeTestRoot; end
     @@tree_already_built = false
     def setup
