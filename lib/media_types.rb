@@ -31,7 +31,7 @@ module MediaTypes
     @key_expectations ||= {}
 
     raise format('%<mod>s already has a key expectation set', mod: mod.name) unless @key_expectations[mod.name].nil?
-    raise format('Unable to change key type expectation for %<mod>s since its current expectation is already used', mod: mod.name) if @key_expectations_used[mod.name]
+    raise format('Unable to change key type expectation for %<mod>s since its current expectation is already used', mod: mod.name) if @key_expectations_used && @key_expectations_used[mod.name]
 
     @key_expectations[mod.name] = expect_symbol_keys
   end
