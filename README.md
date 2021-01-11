@@ -126,7 +126,7 @@ Adds an attribute to the schema, if a +block+ is given, uses that to test agains
 ```Ruby
 require 'media_types'
 
-class MyMedia
+class ExampleMediaType
   include MediaTypes::Dsl
 
   validations do
@@ -141,7 +141,7 @@ MyMedia.valid?({ foo: 'my-string' })
 ####  Add an attribute named foo, expecting nested scheme
 
 ```Ruby
-class MyMedia
+class ExampleMediaType
  include MediaTypes::Dsl
 
  validations do
@@ -405,13 +405,11 @@ Returns a list of all the schemas that are defined.
 
 ## Using Assertions in MediaTypes
 
-When using this library to make your own media types, you can use the methods `assert_pass` and `assert_fail` to define checks that your new Media Type matches your expectations.
+When using this library to make your own media types, you can use the methods `assert_pass` and `assert_fail` to define checks that your new Media Type matches your expectations. These methods take a json string (as shown below) and store assertions to be carried out when `assert_sane!` is called. This will help you ensure that the MediaType definitions you write will actually have the requirements you expect them to.
 
-These methods take a fixture (as shown below) and store assertions to be carried out when either `assert_sane!` is called. 
+`assert_sane!` can be used as a testing tool (as shown below), giving you a convenient way to check that the MediaType you are building is operating as you intend. It raises with a list of failing fixtures if any of the expectations aren't met. These checks will help you ensure MediaType definitions do not get introduced into your codebase if they do not showcase the behaviour you expect of them.
 
-`assert_sane!` can be used as a debugging/development tool (as shown below), giving you a convenient way to check that the MediaType you are building is operating as you intend. It raises with a list of failing fixtures if any of the expectations aren't met. 
-
-Alternatively, the first time the `validate!` method is called on a Media Type, the collection of assertions stored (defined by `assert_pass` and `assert_fail`) for that Media Type are executed. If any of the assertions fail, subsequent calls to `validate!` re-run the assertions. 
+Alternatively, when `validate!` method is called on a Media Type for the first time, the collection of assertions stored (defined by `assert_pass` and `assert_fail`) for that Media Type are executed. 
 
 ```ruby
 class MyMedia
@@ -427,7 +425,9 @@ class MyMedia
     any Numeric
 
     assert_pass <<-FIXTURE
-    { "foo": 42, "bar": 43 }
+    { "foo": 42, 
+      "bar": 43
+      }
     FIXTURE
 
     assert_pass '{"foo": 42}'
@@ -447,58 +447,103 @@ class MyMedia
     assert_fail '{"foo": [42]}'
   end
 
-  # Optionally assert that the media type is sane on load. This makes the application crash when this
-  # file is evaluated. Alternatives include using a _test_ (see below), calling this manually or
+  # Optionally assert that the media type is sane on load. This raises an error when the object being checked doesn't match the specified MediaType scheme.
+  # Alternatives include using a _test_ (see below), calling this manually or
   # relying on the program to halt when the media type is used (and invalid).
-  assert_sane!
-  # place assert_sane! here, after the validations block, if using it as a development tool.
 end
-```
-**Note**: `assert_pass` and `assert_fail` are methods that can _only_ be used inside the `validations` block; `assert_sane!` is a method that the `MyMedia` class itself has access to, and is part of the public API.
+  # Once the MediaType is defined, you can call assert_sane! to run the checks you expect 
+  MyMedia.assert_sane! 
+
 
 ### Assertions for Media Type Checking in Test Suites
 
-In the context of your tests, we provide the `build_fixture_tests` method,which allows you to run the checks you queue up for a particular `MediaType` within your tests with `assert_pass` and `assert_fail` in a Minitest context. This method is automatically added to the `Minitest::Test`, so If you are already using a Minitest suite, you should gain access to it.
+For your test-suites, the `generate_specification_tests` method  allows you to run the `assert_pass` and `assert_fail` checks for a particular `MediaType` as tests in a Minitest context. This is shown in the example below.
 
+This method is automatically added to the `Minitest::Test`, so if you are already using a Minitest suite, you should gain access to it. 
+
+```ruby
+
+class MyMediaTest < Minitest::Test
+  build_fixture_tests MyMedia
+   # This transforms all your calls to `assert_pass` and `assert_fail` into tests
+end
+```
+### Inheriting key type expectations
+
+Key type expectations can  be set at the module level, each MediaType within this module will inherit the expectation set by that module. This can help ensure consistancy within a code base.
+
+```ruby
+module Acme
+  MediaTypes.expect_string_keys
+
+  # The MyMedia class will be expecting string keys, as inherited from the Acme module.
+  class MyMedia
+    include MediaTypes::Dsl
+
+    def self.organisation
+      'acme'
+    end
+
+    use_name 'test'
+
+    validations do
+      any Numeric
+    end
+  end
+
+  # This behaviour can be overridden inside the MediaType class
+  class MySecondMedia
+    include MediaTypes::Dsl
+
+    def self.organisation
+      'acme'
+    end
+
+    use_name 'test2'
+    # Override parent module key type expectation
+    expect_symbol_keys
+
+    validations do
+      any Numeric
+    end
+  end
+end
+```
+## Key type validation for particular MediaTypes
+
+Users are provided with the ability to specify the expected type of keys in a specific media type, by default symbol keys are expected.
+This can be set by calling either `expect_symbol_keys` or `expect_string_keys` when defining the MediaType.
 
 ```ruby
 class MyMedia
   include MediaTypes::Dsl
 
   def self.organisation
-    'trailervote'
+    'acme'
   end
 
   use_name 'test'
+  # Expect keys to be strings
+  expect_string_keys
 
   validations do
     any Numeric
 
+    # Only pass keys as strings
     assert_pass <<-FIXTURE
     { "foo": 42, "bar": 43 }
     FIXTURE
 
     assert_pass '{"foo": 42}'
-    # Any also means none, there are no required keys
     assert_pass '{}'
 
-    # Expects any value to be a Numeric, not a Hash
+    # Using symbol keys will result in failed validation
     assert_fail <<-FIXTURE
-    { "foo": { "bar": "string" } }
+    { foo: 42, bar: 43 }
     FIXTURE
-
-    # Expects any value to be Numeric, not a Hash
-    assert_fail '{"foo": {}}'
-    # Expects any value to be Numeric, not a NilClass
-    assert_fail '{"foo": null}'
-    # Expects any value to be Numeric, not Array
-    assert_fail '{"foo": [42]}'
   end
-end
 
-class MyMediaTest < Minitest::Test
-  build_fixture_tests MyMedia
-   # This transforms all your calls to `assert_pass` and `assert_fail` into tests
+  assert_sane!
 end
 ```
 
