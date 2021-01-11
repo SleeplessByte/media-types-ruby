@@ -22,6 +22,8 @@ module MediaTypes
     module ClassMethods
       class UninitializedConstructable < RuntimeError; end
 
+      SYMBOL_KEYS_DEFAULT = true
+
       def to_constructable
         raise UninitializedConstructable, 'Constructable has not been initialized' if media_type_constructable.nil?
 
@@ -31,11 +33,16 @@ module MediaTypes
       end
 
       def symbol_keys?
-        expecting_symbol_keys?
+        if no_expectation_set?
+          inherited_expectation = MediaTypes.get_key_expectation(self)
+          inherited_expectation.nil? ? SYMBOL_KEYS_DEFAULT : inherited_expectation
+        else
+          symbol_keys
+        end
       end
 
       def string_keys?
-        !expecting_symbol_keys?
+        !symbol_keys?
       end
 
       def valid?(output, **opts)
@@ -151,17 +158,6 @@ module MediaTypes
         raise KeyTypeExpectationError, 'Set key expectation before defining validations' unless media_type_validations.nil?
 
         self.symbol_keys = true
-      end
-
-      SYMBOL_KEYS_DEFAULT = true
-
-      def expecting_symbol_keys?
-        if no_expectation_set?
-          inherited_expectation = MediaTypes.get_key_expectation(self)
-          inherited_expectation.nil? ? SYMBOL_KEYS_DEFAULT : inherited_expectation
-        else
-          symbol_keys
-        end
       end
 
       def validations(&block)
