@@ -431,21 +431,21 @@ class MyMedia
     }
     FIXTURE
 
-    assert_pass '{"foo": 42}'
+    assert_pass '{foo: 42}'
     # Any also means none, there are no required keys
     assert_pass '{}'
 
     # Expects any value to be a Numeric, not a Hash
     assert_fail <<-FIXTURE
-    { "foo": { "bar": "string" } }
+    { foo: { bar: "string" } }
     FIXTURE
   
     # Expects any value to be Numeric, not a Hash
-    assert_fail '{"foo": {}}'
+    assert_fail '{ foo: {} }'
     # Expects any value to be Numeric, not a NilClass
-    assert_fail '{"foo": null}'
+    assert_fail '{ foo: null }'
     # Expects any value to be Numeric, not Array
-    assert_fail '{"foo": [42]}'
+    assert_fail '{ foo: [42] }'
   end
 
   # Optionally assert that the media type is sane on load. This raises an error when the object being checked doesn't match the specified MediaType scheme.
