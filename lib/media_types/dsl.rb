@@ -175,7 +175,7 @@ module MediaTypes
         self
 
       rescue UninitializedConstructable => e
-        raise e.class, 'Uninitialized constructable, have you called `use_name(name)` before the validations?'
+        raise e.class, 'Have you called `use_name(name)` before the validations?'
       end
     end
   end
