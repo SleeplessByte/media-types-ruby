@@ -416,7 +416,7 @@ class MyMedia
   include MediaTypes::Dsl
 
   def self.organisation
-    'trailervote'
+    'acme'
   end
 
   use_name 'test'
@@ -425,35 +425,37 @@ class MyMedia
     any Numeric
 
     assert_pass <<-FIXTURE
-    { "foo": 42, 
-      "bar": 43
-      }
+    {
+      foo: 42,
+      bar: 43
+    }
     FIXTURE
 
-    assert_pass '{"foo": 42}'
+    assert_pass '{foo: 42}'
     # Any also means none, there are no required keys
     assert_pass '{}'
 
     # Expects any value to be a Numeric, not a Hash
     assert_fail <<-FIXTURE
-    { "foo": { "bar": "string" } }
+    { foo: { bar: "string" } }
     FIXTURE
   
     # Expects any value to be Numeric, not a Hash
-    assert_fail '{"foo": {}}'
+    assert_fail '{ foo: {} }'
     # Expects any value to be Numeric, not a NilClass
-    assert_fail '{"foo": null}'
+    assert_fail '{ foo: null }'
     # Expects any value to be Numeric, not Array
-    assert_fail '{"foo": [42]}'
+    assert_fail '{ foo: [42] }'
   end
 
   # Optionally assert that the media type is sane on load. This raises an error when the object being checked doesn't match the specified MediaType scheme.
   # Alternatives include using a _test_ (see below), calling this manually or
   # relying on the program to halt when the media type is used (and invalid).
 end
-  # Once the MediaType is defined, you can call assert_sane! to run the checks you expect 
-  MyMedia.assert_sane! 
 
+# Once the MediaType is defined, you can call assert_sane! to run the checks you expect
+MyMedia.assert_sane!
+```
 
 ### Assertions for Media Type Checking in Test Suites
 
