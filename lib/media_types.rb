@@ -26,10 +26,6 @@ module MediaTypes
     set_key_expectation(mod, true)
   end
 
-  def self.expecting_symbol_keys?(mod)
-    get_key_expectation(mod)
-  end
-
   # Keep track of modules setting their key expectations
   def self.set_key_expectation(mod, expect_symbol_keys)
     @key_expectations ||= {}
