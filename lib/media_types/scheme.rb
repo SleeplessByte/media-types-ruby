@@ -458,9 +458,7 @@ module MediaTypes
       validate(json, expected_key_type: expected_key_type)
       nil
     rescue StandardError => e
-      e.message = e.message + " \n#{caller.path + ':' + caller.lineno.to_s}"
-
-      e
+      raise e.class, e.message + " \n#{caller.path + ':' + caller.lineno.to_s}"
     end
 
     private
