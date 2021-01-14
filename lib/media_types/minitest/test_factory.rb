@@ -16,7 +16,7 @@ class Minitest::Test < Minitest::Runnable
   end
 
   def self.passing_config(mediatype, fixture_data, counter)
-    json = JSON.parse(fixture_data.fixture, { symbolize_names: true })
+    json = JSON.parse(fixture_data.fixture, { symbolize_names: mediatype.symbol_keys? })
     processed = mediatype.media_type_validations.scheme.process_assert_pass(json, fixture_data.caller)
     {
       test_name: "test_fixture#{counter}_assert_pass_for_#{mediatype.to_constructable})",
@@ -26,7 +26,7 @@ class Minitest::Test < Minitest::Runnable
   end
 
   def self.failing_config(mediatype, fixture_data, counter)
-    json = JSON.parse(fixture_data.fixture, { symbolize_names: true })
+    json = JSON.parse(fixture_data.fixture, { symbolize_names: mediatype.symbol_keys? })
     {
       test_name: "test_fixture#{counter}_assert_fail_for_#{mediatype.to_constructable})",
       processed: mediatype.media_type_validations.scheme.process_assert_fail(json, fixture_data.caller),
