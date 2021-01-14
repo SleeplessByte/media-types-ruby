@@ -110,7 +110,7 @@ module MediaTypes
       end
 
       def assert_sane!
-        media_type_validations.run_queued_fixture_checks
+        media_type_validations.run_queued_fixture_checks(symbol_keys?)
       end
 
       private

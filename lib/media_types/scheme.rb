@@ -427,34 +427,35 @@ module MediaTypes
       @fixtures << FixtureData.new(caller_locations[1], fixture, false)
     end
 
-    def run_queued_fixture_checks
+    def run_queued_fixture_checks(expect_symbol_keys)
       errors = @fixtures.each_with_object([]) do |fixture_data, array|
-        array << process_fixture_data(fixture_data)
+        array << process_fixture_data(fixture_data, expect_symbol_keys)
       end
       raise AssertionError, errors unless errors.empty?
 
       self.asserted_sane = true
     end
 
-    def process_fixture_data(fixture_data)
+    def process_fixture_data(fixture_data, expect_symbol_keys)
       errors = []
-      json = JSON.parse(fixture_data.fixture, { symbolize_names: true })
-      output = fixture_data.expect_to_pass ? process_assert_pass(json, fixture_data.caller) : process_assert_fail(json, fixture_data.caller)
+      json = JSON.parse(fixture_data.fixture, { symbolize_names: expect_symbol_keys })
+      expected_key_type = expect_symbol_keys ? Symbol : String
+      output = fixture_data.expect_to_pass ? process_assert_pass(json, fixture_data.caller, expected_key_type) : process_assert_fail(json, fixture_data.caller, expected_key_type)
       errors << output unless output.nil?
       errors
     end
 
-    def process_assert_fail(json, caller)
+    def process_assert_fail(json, caller, expected_key_type)
       begin
-        validate(json)
+        validate(json, expected_key_type: expected_key_type)
       rescue MediaTypes::Scheme::ValidationError
         expectation_met = true
       end
       MediaTypeValidationError.new(json, caller) unless expectation_met
     end
 
-    def process_assert_pass(json, caller)
-      validate(json)
+    def process_assert_pass(json, caller, expected_key_type)
+      validate(json, expected_key_type: expected_key_type)
       nil
     rescue StandardError => e
       e.message = e.message + " \n#{caller.path + ':' + caller.lineno.to_s}"

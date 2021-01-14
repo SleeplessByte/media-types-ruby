@@ -5,7 +5,7 @@ module MediaTypes
     class ValidationOptions
       attr_accessor :exhaustive, :strict, :backtrace, :context, :expected_key_type
 
-      def initialize(context = {}, exhaustive: true, strict: true, backtrace: [], expected_key_type: Symbol)
+      def initialize(context = {}, exhaustive: true, strict: true, backtrace: [], expected_key_type:)
         self.exhaustive = exhaustive
         self.strict = strict
         self.backtrace = backtrace
