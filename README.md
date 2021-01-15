@@ -439,24 +439,24 @@ class MyMedia
     any Numeric
 
     assert_pass <<-FIXTURE
-    { foo: 42, bar: 43 }
+    { "foo": 42, "bar": 43 }
     FIXTURE
 
-    assert_pass '{foo: 42}'
+    assert_pass '{"foo": 42}'
     # Any also means none, there are no required keys
     assert_pass '{}'
 
     # Expects any value to be a Numeric, not a Hash
     assert_fail <<-FIXTURE
-    { foo: { bar: "string" } }
+    { "foo": { "bar": "string" } }
     FIXTURE
 
     # Expects any value to be Numeric, not a Hash
-    assert_fail '{foo: {}}'
+    assert_fail '{"foo": {}}'
     # Expects any value to be Numeric, not a NilClass
-    assert_fail '{foo: null}'
+    assert_fail '{"foo": null}'
     # Expects any value to be Numeric, not Array
-    assert_fail '{foo: [42]}'
+    assert_fail '{"foo": [42]}'
   end
 end
 
@@ -506,7 +506,7 @@ class MyMedia
 
     # Using symbol keys will result in failed validation
     assert_fail <<-FIXTURE
-    { foo: 42, bar: 43 }
+    { "foo": 42, "bar": 43 }
     FIXTURE
   end
 
