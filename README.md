@@ -469,7 +469,12 @@ end
 
 The  `assert_pass` and `assert_fail` methods take a JSON string (as shown below) and store assertions to be carried out later. The first time the `validate!` method is called on a Media Type, the collection of assertions stored (defined by `assert_pass` and `assert_fail`) for that Media Type are executed.
 
-This is done as a last line of defence against introducing faulty MediaTypes into your software. Ideally, you want to carry out these checks on load rather than when your server/project is already up and running, this functionality is provided by the `assert_sane!` method.
+This is done as a last line of defence against introducing faulty MediaTypes into your software. Ideally, you want to carry out these checks on load rather than when your server/project is already up and running, this functionality is provided by the `assert_sane!` method. Which can be called on a particular class
+
+```ruby
+  MyMedia.assert_sane!
+  # true
+```
 
 ## Key type validation
 
