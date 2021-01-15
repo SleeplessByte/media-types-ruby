@@ -429,7 +429,8 @@ module MediaTypes
 
     def run_queued_fixture_checks(expect_symbol_keys)
       errors = @fixtures.each_with_object([]) do |fixture_data, array|
-        array << process_fixture_data(fixture_data, expect_symbol_keys)
+        output = process_fixture_data(fixture_data, expect_symbol_keys)
+        array += output
       end
       raise AssertionError, errors unless errors.empty?
 
