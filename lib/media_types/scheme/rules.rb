@@ -106,14 +106,14 @@ module MediaTypes
           value.is_a?(Scheme) || value.is_a?(Rules) ? "\n#{value.inspect(indent + 2)}" : value.inspect
         ].join(': ')
       end
-
+      
       def has_key?(key)
-        normalized_key = normalize_key(key)
-        if __getobj__.key?(normalized_key)
-          return original_key_type[normalized_key]
-        else
-          return false
-        end
+        __getobj__.key?(normalize_key(key))
+      end
+
+      def get_original_key_type(key)
+        raise format('Key %<key>s does not exist', key: key) unless has_key?(key)
+        original_key_type[normalize_key(key)]
       end
 
       alias get []
@@ -125,6 +125,7 @@ module MediaTypes
       attr_writer :expected_type
 
       def normalize_key(key)
+
         String(key).to_sym
       end
     end

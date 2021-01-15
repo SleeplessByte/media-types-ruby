@@ -188,10 +188,11 @@ module MediaTypes
     #
     def attribute(key, type = ::Object, optional: false, **opts, &block)
       raise KeyTypeError, "Unexpected key type #{key.class.name}, please use either a symbol or string." unless key.is_a?(String) || key.is_a?(Symbol)
-      raise DuplicateKeyError, "An attribute with key :#{key} has already been defined. Please remove one of the two." if (key.is_a?(Symbol) && rules.has_key?(key) == Symbol)
-      raise DuplicateKeyError, "An attribute with key #{key} has already been defined. Please remove one of the two." if (key.is_a?(String) && rules.has_key?(key) == String)
-      raise DuplicateKeyError, "A string keyed attribute with the same string representation as the symbol :#{key} already exists. Please remove one of the two." if key.is_a?(Symbol) && rules.has_key?(key) == String
-      raise DuplicateKeyError, "A symbol keyed attribute with the same string representation as the string '#{key}' already exists. Please remove one of the two." if key.is_a?(String) && rules.has_key?(key) == Symbol
+      raise DuplicateKeyError, "An attribute with key :#{key} has already been defined. Please remove one of the two." if key.is_a?(Symbol) && rules.has_key?(key) && rules.get_original_key_type(key) == Symbol
+      raise DuplicateKeyError, "An attribute with key '#{key}' has already been defined. Please remove one of the two." if key.is_a?(String) && rules.has_key?(key) && rules.get_original_key_type(key) == String
+      raise DuplicateKeyError, "A string keyed attribute '#{key}' with the same string representation as the symbol :#{key} already exists. Please remove one of the two." if key.is_a?(Symbol) && rules.has_key?(key) && rules.get_original_key_type(key) == String
+      raise DuplicateKeyError, "A symbol keyed attribute :#{key} with the same string representation as the string '#{key}' already exists. Please remove one of the two." if key.is_a?(String) && rules.has_key?(key) && rules.get_original_key_type(key) == Symbol
+
 
       if block_given?
         return collection(key, expected_type: ::Hash, optional: optional, **opts, &block)
@@ -332,11 +333,11 @@ module MediaTypes
     #   # => true
     #
     def collection(key, scheme = nil, allow_empty: false, expected_type: ::Array, optional: false, &block)
-      raise KeyTypeError, "Unexpected key type #{key.class.name}, please use either a symbol or string." unless key.is_a?(String) || key.is_a?(Symbol)      
-      raise DuplicateKeyError, "A collection with key :#{key} has already been defined. Please remove one of the two." if (key.is_a?(Symbol) && rules.has_key?(key) == Symbol)
-      raise DuplicateKeyError, "A collection with key #{key} has already been defined. Please remove one of the two." if (key.is_a?(String) && rules.has_key?(key) == String)
-      raise DuplicateKeyError, "A collection with a String type name and with the same string representation as the symbol :#{key} already exists. Please remove one of the two." if key.is_a?(Symbol) && rules.has_key?(key) == String
-      raise DuplicateKeyError, "A collection with a Symbol type name and with the same string representation as the string '#{key}' already exists. Please remove one of the two." if key.is_a?(String) && rules.has_key?(key) == Symbol
+      raise KeyTypeError, "Unexpected key type #{key.class.name}, please use either a symbol or string." unless key.is_a?(String) || key.is_a?(Symbol)
+      raise DuplicateKeyError, "A collection with key :#{key} has already been defined. Please remove one of the two." if key.is_a?(Symbol) && rules.has_key?(key) && rules.get_original_key_type(key) == Symbol
+      raise DuplicateKeyError, "A collection with key '#{key}' has already been defined. Please remove one of the two." if key.is_a?(String) && rules.has_key?(key) && rules.get_original_key_type(key) == String
+      raise DuplicateKeyError, "A collection with a String key '#{key}' with the same string representation as the symbol :#{key} already exists. Please remove one of the two." if key.is_a?(Symbol) && rules.has_key?(key) && rules.get_original_key_type(key) == String
+      raise DuplicateKeyError, "A collection with a Symbol key :#{key} with the same string representation as the string '#{key}' already exists. Please remove one of the two." if key.is_a?(String) && rules.has_key?(key) && rules.get_original_key_type(key) == Symbol
 
       unless block_given?
         return rules.add(
