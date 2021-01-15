@@ -484,7 +484,7 @@ This can be set by calling either `expect_symbol_keys` or `expect_string_keys` w
 ```ruby
 class MyMedia
   include MediaTypes::Dsl
-U
+
   def self.organisation
     'acme'
   end
