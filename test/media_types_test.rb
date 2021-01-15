@@ -298,7 +298,7 @@ class MediaTypesTest < Minitest::Test
       attribute :foo, Numeric
     end
   end
-  
+
   class SymbolKeyTypeSpecifiedWithAttribute
     include MediaTypes::Dsl
     expect_symbol_keys
@@ -452,39 +452,39 @@ class MediaTypesTest < Minitest::Test
   end
 
   def test_validations_check_key_preference_when_no_key_type_specified_link
-    refute NoKeyTypeSpecifiedWithLink.valid?({ '_links' =>  { 'foo' =>  { 'href' => 'https://example.org/s' }} }), 'Expected string keys to be disallowed'
-    refute NoKeyTypeSpecifiedWithLink.valid?({ :_links  =>  { 'foo' =>  { 'href' => 'https://example.org/s' }} }), 'Expected string keys to be disallowed'
-    refute NoKeyTypeSpecifiedWithLink.valid?({ '_links' =>  { :foo  =>  { 'href' => 'https://example.org/s' }} }), 'Expected string keys to be disallowed'
-    refute NoKeyTypeSpecifiedWithLink.valid?({ :_links  =>  { :foo  =>  { 'href' => 'https://example.org/s' }} }), 'Expected string keys to be disallowed'
-    refute NoKeyTypeSpecifiedWithLink.valid?({ '_links' =>  { 'foo' =>  { :href  => 'https://example.org/s' }} }), 'Expected string keys to be disallowed'
-    refute NoKeyTypeSpecifiedWithLink.valid?({ :_links  =>  { 'foo' =>  { :href  => 'https://example.org/s' }} }), 'Expected string keys to be disallowed'
-    refute NoKeyTypeSpecifiedWithLink.valid?({ '_links' =>  { :foo  =>  { :href  => 'https://example.org/s' }} }), 'Expected string keys to be disallowed'
-    assert NoKeyTypeSpecifiedWithLink.valid?({ _links:      { foo:      { href:     'https://example.org/s' }} }), 'Symbol keys should be accepted'
-    refute NoKeyTypeSpecifiedWithLink.valid?({ _links: { foo: { href: 'https://example.org/s' }, 'foo' => { href: 'https://image.org/i' }} }), 'Expecting symbol keys only'
+    refute NoKeyTypeSpecifiedWithLink.valid?({ '_links' => { 'foo' => { 'href' => 'https://example.org/s' } } }), 'Expected string keys to be disallowed'
+    refute NoKeyTypeSpecifiedWithLink.valid?({ _links: { 'foo' => { 'href' => 'https://example.org/s' } } }), 'Expected string keys to be disallowed'
+    refute NoKeyTypeSpecifiedWithLink.valid?({ '_links' => { foo: { 'href' => 'https://example.org/s' } } }), 'Expected string keys to be disallowed'
+    refute NoKeyTypeSpecifiedWithLink.valid?({ _links: { foo: { 'href' => 'https://example.org/s' } } }), 'Expected string keys to be disallowed'
+    refute NoKeyTypeSpecifiedWithLink.valid?({ '_links' => { 'foo' => { href: 'https://example.org/s' } } }), 'Expected string keys to be disallowed'
+    refute NoKeyTypeSpecifiedWithLink.valid?({ _links: { 'foo' => { href: 'https://example.org/s' } } }), 'Expected string keys to be disallowed'
+    refute NoKeyTypeSpecifiedWithLink.valid?({ '_links' =>  { foo: { href: 'https://example.org/s' } } }), 'Expected string keys to be disallowed'
+    assert NoKeyTypeSpecifiedWithLink.valid?({ _links:      { foo: { href: 'https://example.org/s' } } }), 'Symbol keys should be accepted'
+    refute NoKeyTypeSpecifiedWithLink.valid?({ _links: { foo: { href: 'https://example.org/s' }, 'foo' => { href: 'https://image.org/i' } } }), 'Expecting symbol keys only'
   end
 
   def test_validations_check_key_preference_when_symbol_key_type_specified_link
-    refute SymbolKeyTypeSpecifiedWithLink.valid?({ '_links' =>  { 'foo' =>  { 'href' => 'https://example.org/s' }} }), 'Expected string keys to be disallowed'
-    refute SymbolKeyTypeSpecifiedWithLink.valid?({ :_links  =>  { 'foo' =>  { 'href' => 'https://example.org/s' }} }), 'Expected string keys to be disallowed'
-    refute SymbolKeyTypeSpecifiedWithLink.valid?({ '_links' =>  { :foo  =>  { 'href' => 'https://example.org/s' }} }), 'Expected string keys to be disallowed'
-    refute SymbolKeyTypeSpecifiedWithLink.valid?({ :_links  =>  { :foo  =>  { 'href' => 'https://example.org/s' }} }), 'Expected string keys to be disallowed'
-    refute SymbolKeyTypeSpecifiedWithLink.valid?({ '_links' =>  { 'foo' =>  { :href  => 'https://example.org/s' }} }), 'Expected string keys to be disallowed'
-    refute SymbolKeyTypeSpecifiedWithLink.valid?({ :_links  =>  { 'foo' =>  { :href  => 'https://example.org/s' }} }), 'Expected string keys to be disallowed'
-    refute SymbolKeyTypeSpecifiedWithLink.valid?({ '_links' =>  { :foo  =>  { :href  => 'https://example.org/s' }} }), 'Expected string keys to be disallowed'
-    assert SymbolKeyTypeSpecifiedWithLink.valid?({ _links:      { foo:      { href:     'https://example.org/s' }} }), 'Symbol keys should be accepted'
-    refute SymbolKeyTypeSpecifiedWithLink.valid?({ _links: { foo: { href: 'https://example.org/s' }, 'foo' => { href: 'https://image.org/i' }} }), 'Expecting symbol keys only'
+    refute SymbolKeyTypeSpecifiedWithLink.valid?({ '_links' =>  { 'foo' => { 'href' => 'https://example.org/s' } } }), 'Expected string keys to be disallowed'
+    refute SymbolKeyTypeSpecifiedWithLink.valid?({ _links: { 'foo' => { 'href' => 'https://example.org/s' } } }), 'Expected string keys to be disallowed'
+    refute SymbolKeyTypeSpecifiedWithLink.valid?({ '_links' => { foo: { 'href' => 'https://example.org/s' } } }), 'Expected string keys to be disallowed'
+    refute SymbolKeyTypeSpecifiedWithLink.valid?({ _links: { foo: { 'href' => 'https://example.org/s' } } }), 'Expected string keys to be disallowed'
+    refute SymbolKeyTypeSpecifiedWithLink.valid?({ '_links' => { 'foo' => { href: 'https://example.org/s' } } }), 'Expected string keys to be disallowed'
+    refute SymbolKeyTypeSpecifiedWithLink.valid?({ _links: { 'foo' => { href: 'https://example.org/s' } } }), 'Expected string keys to be disallowed'
+    refute SymbolKeyTypeSpecifiedWithLink.valid?({ '_links' =>  { foo: { href: 'https://example.org/s' } } }), 'Expected string keys to be disallowed'
+    assert SymbolKeyTypeSpecifiedWithLink.valid?({ _links:      { foo: { href: 'https://example.org/s' } } }), 'Symbol keys should be accepted'
+    refute SymbolKeyTypeSpecifiedWithLink.valid?({ _links: { foo: { href: 'https://example.org/s' }, 'foo' => { href: 'https://image.org/i' } } }), 'Expecting symbol keys only'
   end
 
   def test_validations_check_key_preference_when_string_key_type_specified_linkrefute
-    assert StringKeyTypeSpecifiedWithLink.valid?({ '_links' =>  { 'foo' =>  { 'href' => 'https://example.org/s' }} }), 'Expected string keys to be accepted'
-    refute StringKeyTypeSpecifiedWithLink.valid?({ :_links  =>  { 'foo' =>  { 'href' => 'https://example.org/s' }} }), 'Expected symbol keys to be disallowed'
-    refute StringKeyTypeSpecifiedWithLink.valid?({ '_links' =>  { :foo  =>  { 'href' => 'https://example.org/s' }} }), 'Expected symbol keys to be disallowed'
-    refute StringKeyTypeSpecifiedWithLink.valid?({ :_links  =>  { :foo  =>  { 'href' => 'https://example.org/s' }} }), 'Expected symbol keys to be disallowed'
-    refute StringKeyTypeSpecifiedWithLink.valid?({ '_links' =>  { 'foo' =>  { :href  => 'https://example.org/s' }} }), 'Expected symbol keys to be disallowed'
-    refute StringKeyTypeSpecifiedWithLink.valid?({ :_links  =>  { 'foo' =>  { :href  => 'https://example.org/s' }} }), 'Expected symbol keys to be disallowed'
-    refute StringKeyTypeSpecifiedWithLink.valid?({ '_links' =>  { :foo  =>  { :href  => 'https://example.org/s' }} }), 'Expected symbol keys to be disallowed'
-    refute StringKeyTypeSpecifiedWithLink.valid?({ _links:      { foo:      { href:     'https://example.org/s' }} }), 'Expected symbol keys to be disallowed'
-    refute StringKeyTypeSpecifiedWithLink.valid?({ '_links' => { :foo => { 'href' => 'https://example.org/s' }, 'foo' => { 'href' => 'https://image.org/i' }} }), 'Expected string keys only'    
+    assert StringKeyTypeSpecifiedWithLink.valid?({ '_links' => { 'foo' => { 'href' => 'https://example.org/s' } } }), 'Expected string keys to be accepted'
+    refute StringKeyTypeSpecifiedWithLink.valid?({ _links: { 'foo' => { 'href' => 'https://example.org/s' } } }), 'Expected symbol keys to be disallowed'
+    refute StringKeyTypeSpecifiedWithLink.valid?({ '_links' => { foo: { 'href' => 'https://example.org/s' } } }), 'Expected symbol keys to be disallowed'
+    refute StringKeyTypeSpecifiedWithLink.valid?({ _links: { foo: { 'href' => 'https://example.org/s' } } }), 'Expected symbol keys to be disallowed'
+    refute StringKeyTypeSpecifiedWithLink.valid?({ '_links' => { 'foo' => { href: 'https://example.org/s' } } }), 'Expected symbol keys to be disallowed'
+    refute StringKeyTypeSpecifiedWithLink.valid?({ _links: { 'foo' => { href: 'https://example.org/s' } } }), 'Expected symbol keys to be disallowed'
+    refute StringKeyTypeSpecifiedWithLink.valid?({ '_links' =>  { foo: { href: 'https://example.org/s' } } }), 'Expected symbol keys to be disallowed'
+    refute StringKeyTypeSpecifiedWithLink.valid?({ _links:      { foo: { href: 'https://example.org/s' } } }), 'Expected symbol keys to be disallowed'
+    refute StringKeyTypeSpecifiedWithLink.valid?({ '_links' => { :foo => { 'href' => 'https://example.org/s' }, 'foo' => { 'href' => 'https://image.org/i' } } }), 'Expected string keys only'
   end
 
   #### Testing Any ####
@@ -553,7 +553,7 @@ class MediaTypesTest < Minitest::Test
   end
 
   #### Testing not_strict ####
-  
+
   class NoKeyTypeSpecifiedWithNotStrict
     include MediaTypes::Dsl
 
@@ -667,13 +667,13 @@ class MediaTypesTest < Minitest::Test
   def test_validations_check_key_preference_when_no_key_type_nested_collection
     assert NoKeyTypeSpecifiedWithNestedCollection.valid?({ foo: [{ bar: 9 }] }), 'Symbol keys should be accepted'
     refute NoKeyTypeSpecifiedWithNestedCollection.valid?({ foo: [{ 'bar' => 9 }] }), 'Expected string keys to be disallowed'
-    refute NoKeyTypeSpecifiedWithNestedCollection.valid?({ foo: [{ bar: 9 }, { 'bar' => 42}] }), 'Expecting symbol keys only'
+    refute NoKeyTypeSpecifiedWithNestedCollection.valid?({ foo: [{ bar: 9 }, { 'bar' => 42 }] }), 'Expecting symbol keys only'
   end
 
   def test_validations_check_key_preference_when_symbol_key_type_nested_collection
     assert SymbolKeyTypeSpecifiedWithNestedCollection.valid?({ foo: [{ bar: 9 }] }), 'Symbol keys should be accepted'
     refute SymbolKeyTypeSpecifiedWithNestedCollection.valid?({ foo: [{ 'bar' => 9 }] }), 'Expected string keys to be disallowed'
-    refute SymbolKeyTypeSpecifiedWithNestedCollection.valid?({ foo: [{ bar: 9 }, { 'bar' => 42}] }), 'Expecting symbol keys only'
+    refute SymbolKeyTypeSpecifiedWithNestedCollection.valid?({ foo: [{ bar: 9 }, { 'bar' => 42 }] }), 'Expecting symbol keys only'
   end
 
   def test_validations_check_key_preference_when_string_key_type_nested_collection
@@ -727,20 +727,20 @@ class MediaTypesTest < Minitest::Test
   end
 
   def test_validations_check_key_preference_when_no_key_type_specified_keyed_data
-    assert NoKeyTypeSpecifiedWithKeyedData.valid?({ foo: {bar: 9} }), 'Any key should be accepted'
-    assert NoKeyTypeSpecifiedWithKeyedData.valid?({ foo: {'bar'=> 9} }), 'Any key should be accepted'
-    assert NoKeyTypeSpecifiedWithKeyedData.valid?({ foo: {'bar' => 9, :bar => 42} }), 'Any key should be accepted'
+    assert NoKeyTypeSpecifiedWithKeyedData.valid?({ foo: { bar: 9 } }), 'Any key should be accepted'
+    assert NoKeyTypeSpecifiedWithKeyedData.valid?({ foo: { 'bar' => 9 } }), 'Any key should be accepted'
+    assert NoKeyTypeSpecifiedWithKeyedData.valid?({ foo: { 'bar' => 9, :bar => 42 } }), 'Any key should be accepted'
   end
 
   def test_validations_check_key_preference_when_symbol_key_type_specified_keyed_data
-    assert SymbolKeyTypeSpecifiedWithKeyedData.valid?({ foo: {bar: 9} }), 'Any key should be accepted'
-    assert SymbolKeyTypeSpecifiedWithKeyedData.valid?({ foo: {'bar'=> 9} }), 'Any key should be accepted'
-    assert SymbolKeyTypeSpecifiedWithKeyedData.valid?({ foo: {'bar' => 9, :bar => 42} }), 'Any key should be accepted'
+    assert SymbolKeyTypeSpecifiedWithKeyedData.valid?({ foo: { bar: 9 } }), 'Any key should be accepted'
+    assert SymbolKeyTypeSpecifiedWithKeyedData.valid?({ foo: { 'bar' => 9 } }), 'Any key should be accepted'
+    assert SymbolKeyTypeSpecifiedWithKeyedData.valid?({ foo: { 'bar' => 9, :bar => 42 } }), 'Any key should be accepted'
   end
 
   def test_validations_check_key_preference_when_string_key_type_specified_keyed_data
-    assert StringKeyTypeSpecifiedWithKeyedData.valid?({ 'foo' => {bar: 9} }), 'Any key should be accepted'
-    assert StringKeyTypeSpecifiedWithKeyedData.valid?({ 'foo' => {'bar'=> 9} }), 'Any key should be accepted'
-    assert StringKeyTypeSpecifiedWithKeyedData.valid?({ 'foo' => {'bar' => 9, :bar => 42} }), 'Any key should be accepted'
+    assert StringKeyTypeSpecifiedWithKeyedData.valid?({ 'foo' => { bar: 9 } }), 'Any key should be accepted'
+    assert StringKeyTypeSpecifiedWithKeyedData.valid?({ 'foo' => { 'bar' => 9 } }), 'Any key should be accepted'
+    assert StringKeyTypeSpecifiedWithKeyedData.valid?({ 'foo' => { 'bar' => 9, :bar => 42 } }), 'Any key should be accepted'
   end
 end
