@@ -17,7 +17,8 @@ class Minitest::Test < Minitest::Runnable
 
   def self.passing_config(mediatype, fixture_data, counter)
     json = JSON.parse(fixture_data.fixture, { symbolize_names: mediatype.symbol_keys? })
-    processed = mediatype.media_type_validations.scheme.process_assert_pass(json, fixture_data.caller)
+    expected_key_type = mediatype.symbol_keys? ? Symbol : String
+    processed = mediatype.media_type_validations.scheme.process_assert_pass(json, fixture_data.caller, expected_key_type)
     {
       test_name: "test_fixture#{counter}_assert_pass_for_#{mediatype.to_constructable})",
       processed: processed,
@@ -27,9 +28,10 @@ class Minitest::Test < Minitest::Runnable
 
   def self.failing_config(mediatype, fixture_data, counter)
     json = JSON.parse(fixture_data.fixture, { symbolize_names: mediatype.symbol_keys? })
+    expected_key_type = mediatype.symbol_keys? ? Symbol : String
     {
       test_name: "test_fixture#{counter}_assert_fail_for_#{mediatype.to_constructable})",
-      processed: mediatype.media_type_validations.scheme.process_assert_fail(json, fixture_data.caller),
+      processed: mediatype.media_type_validations.scheme.process_assert_fail(json, fixture_data.caller, expected_key_type),
       message: MediaTypes::MediaTypeValidationError.new(json, fixture_data.caller).message
     }
   end
