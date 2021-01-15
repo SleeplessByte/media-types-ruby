@@ -126,7 +126,7 @@ Adds an attribute to the schema, if a +block+ is given, uses that to test agains
 ```Ruby
 require 'media_types'
 
-class ExampleMediaType
+class MyMedia
   include MediaTypes::Dsl
 
   validations do
@@ -141,7 +141,7 @@ MyMedia.valid?({ foo: 'my-string' })
 ####  Add an attribute named foo, expecting nested scheme
 
 ```Ruby
-class ExampleMediaType
+class MyMedia
  include MediaTypes::Dsl
 
  validations do
@@ -403,13 +403,27 @@ Example: `Venue.available_validations`
 
 Returns a list of all the schemas that are defined.
 
-## Using Assertions in MediaTypes
+## Ensuring Your MediaTypes Work
 
-When using this library to make your own media types, you can use the methods `assert_pass` and `assert_fail` to define checks that your new Media Type matches your expectations. These methods take a json string (as shown below) and store assertions to be carried out when `assert_sane!` is called. This will help you ensure that the MediaType definitions you write will actually have the requirements you expect them to.
+### Overview & Rational
 
-`assert_sane!` can be used as a testing tool (as shown below), giving you a convenient way to check that the MediaType you are building is operating as you intend. It raises with a list of failing fixtures if any of the expectations aren't met. These checks will help you ensure MediaType definitions do not get introduced into your codebase if they do not showcase the behaviour you expect of them.
+It is vital that when using this library, your MediaTypes enforce the specification you actually intend them to, as the rules they _do_ enforce will significantly impact code elsewhere in your codebase. To this end, we provide you with a few avenues to check whether MediaTypes enforce the specifications you actually intend by checking examples of JSON you expect to be complient/non-complient with the specifications you design. These are as follows:
 
-Alternatively, when `validate!` method is called on a Media Type for the first time, the collection of assertions stored (defined by `assert_pass` and `assert_fail`) for that Media Type are executed. 
+1. We provide you with two methods (`assert_pass` and `assert fail`), which enable you to specify JSON fixtures you expect to be complient/non-complient
+
+2. We provide methods to turn those fixtures into tests with the `test_specification` method.
+
+3. We automatically check a MediaType's checks defined by (1) the first time it is validated, and throw an error if any fail.
+
+4. We provide you with a way to run the checks carried out by (3) on load, using the method `assert_sane` so that they can be caught then.
+
+These four options are examined in more detail below:
+
+### Media Type Checking in Test Suites
+
+In the context of your tests, we provide the `test_specification` method,which allows you to run the checks you queue up for a particular `MediaType` within your tests with `assert_pass` and `assert_fail` in a Minitest context. This method is automatically added to the `Minitest::Test`, so If you are already using a Minitest suite, you should gain access to it.
+
+The example below demonstrates how to use `assert_pass` and `assert_fail` within a MediaType, and how to use the `test_specification` method to generate MiniTest tests from them.
 
 ```ruby
 class MyMedia
@@ -425,13 +439,10 @@ class MyMedia
     any Numeric
 
     assert_pass <<-FIXTURE
-    {
-      foo: 42,
-      bar: 43
-    }
+    { foo: 42, bar: 43 }
     FIXTURE
 
-    assert_pass '{ foo: 42 }'
+    assert_pass '{foo: 42}'
     # Any also means none, there are no required keys
     assert_pass '{}'
 
@@ -439,47 +450,36 @@ class MyMedia
     assert_fail <<-FIXTURE
     { foo: { bar: "string" } }
     FIXTURE
-  
-    # Expects any value to be Numeric, not a Hash
-    assert_fail '{ foo: {} }'
-    # Expects any value to be Numeric, not a NilClass
-    assert_fail '{ foo: null }'
-    # Expects any value to be Numeric, not Array
-    assert_fail '{ foo: [42] }'
-  end
 
-  # Optionally assert that the media type is sane on load. This raises an error when the object being checked doesn't match the specified MediaType scheme.
-  # Alternatives include using a _test_ (see below), calling this manually or
-  # relying on the program to halt when the media type is used (and invalid).
+    # Expects any value to be Numeric, not a Hash
+    assert_fail '{foo: {}}'
+    # Expects any value to be Numeric, not a NilClass
+    assert_fail '{foo: null}'
+    # Expects any value to be Numeric, not Array
+    assert_fail '{foo: [42]}'
+  end
 end
 
-# Once the MediaType is defined, you can call assert_sane! to run the checks you expect
-MyMedia.assert_sane!
-```
-
-### Assertions for Media Type Checking in Test Suites
-
-For your test-suites, the `generate_specification_tests` method  allows you to run the `assert_pass` and `assert_fail` checks for a particular `MediaType` as tests in a Minitest context. This is shown in the example below.
-
-This method is automatically added to the `Minitest::Test`, so if you are already using a Minitest suite, you should gain access to it. 
-
-```ruby
-
 class MyMediaTest < Minitest::Test
-  build_fixture_tests MyMedia
+  test_specification MyMedia
    # This transforms all your calls to `assert_pass` and `assert_fail` into tests
 end
 ```
+### Validation Checks
 
-## Key type validation for particular MediaTypes
+The  `assert_pass` and `assert_fail` methods take a JSON string (as shown below) and store assertions to be carried out later. The first time the `validate!` method is called on a Media Type, the collection of assertions stored (defined by `assert_pass` and `assert_fail`) for that Media Type are executed.
 
-Users are provided with the ability to specify the expected type of keys in a specific media type, by default symbol keys are expected.
+This is done as a last line of defence against introducing faulty MediaTypes into your software. Ideally, you want to carry out these checks on load rather than when your server/project is already up and running, this functionality is provided by the `assert_sane!` method.
+
+## Key type validation
+
+Users are provided with the ability to specify the expected type of keys in the media type, by default symbol keys are expected.
 This can be set by calling either `expect_symbol_keys` or `expect_string_keys` when defining the MediaType.
 
 ```ruby
 class MyMedia
   include MediaTypes::Dsl
-
+U
   def self.organisation
     'acme'
   end
@@ -511,11 +511,11 @@ end
 
 ### Inheriting key type expectations
 
-Key type expectations can  be set at the module level, each MediaType within this module will inherit the expectation set by that module. This can help ensure consistancy within a code base.
+Key type expectations can also be set at the module level, each MediaType within this module will inherit the expectation set by that module.
 
 ```ruby
 module Acme
-  MediaTypes.expect_string_keys
+  expect_string_keys
 
   # The MyMedia class will be expecting string keys, as inherited from the Acme module.
   class MyMedia
