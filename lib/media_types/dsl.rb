@@ -22,8 +22,6 @@ module MediaTypes
     end
 
     module ClassMethods
-      SYMBOL_KEYS_DEFAULT = true
-
       def to_constructable
         raise UninitializedConstructable if media_type_constructable.nil?
 
@@ -34,8 +32,7 @@ module MediaTypes
 
       def symbol_keys?
         if symbol_keys.nil?
-          inherited_expectation = MediaTypes.get_key_expectation(self)
-          inherited_expectation.nil? ? SYMBOL_KEYS_DEFAULT : inherited_expectation
+          MediaTypes.get_key_expectation(self)
         else
           symbol_keys
         end
