@@ -17,11 +17,11 @@ module MediaTypes
 
         validations do
           version 1 do
-              attribute :foo_1, Numeric
+            attribute :foo_1, Numeric
           end
 
           version 2 do
-              attribute :foo_2, Numeric
+            attribute :foo_2, Numeric
           end
 
           view 'raw' do
@@ -33,7 +33,7 @@ module MediaTypes
       end
 
       def test_configued_schema
-        assert TrivialSchema.view('raw').version(2).valid?({foo_raw: 42})
+        assert TrivialSchema.view('raw').version(2).valid?({ foo_raw: 42 })
         TrivialSchema.view('raw').version(2).to_s
 
         assert_raises do
@@ -43,7 +43,7 @@ module MediaTypes
         assert TrivialSchema.available_validations.length == 3
         assert TrivialSchema.available_validations.first == TrivialSchema.version(1)
         assert TrivialSchema.version(1).available_validations.length == 1
-        assert TrivialSchema.version(1).view('raw').available_validations.length == 0
+        assert TrivialSchema.version(1).view('raw').available_validations.length.zero?
       end
 
     end
