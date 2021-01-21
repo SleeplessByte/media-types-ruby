@@ -3,6 +3,8 @@
 require 'media_types/constructable'
 require 'media_types/validations'
 
+require 'media_types/dsl/errors'
+
 module MediaTypes
   module Dsl
     def self.included(base)
@@ -20,12 +22,10 @@ module MediaTypes
     end
 
     module ClassMethods
-      class UninitializedConstructable < RuntimeError; end
-
       SYMBOL_KEYS_DEFAULT = true
 
       def to_constructable
-        raise UninitializedConstructable, 'Constructable has not been initialized' if media_type_constructable.nil?
+        raise UninitializedConstructable if media_type_constructable.nil?
 
         media_type_constructable.dup.tap do |constructable|
           constructable.__setobj__(self)
@@ -138,9 +138,6 @@ module MediaTypes
         end
         self.media_type_constructable = Constructable.new(self, type: name)
       end
-
-      # Raised when an error occurs during setting expected key type
-      class KeyTypeExpectationError < StandardError; end
 
       def expect_string_keys
         raise KeyTypeExpectationError, 'Key expectation already set' unless symbol_keys.nil?
