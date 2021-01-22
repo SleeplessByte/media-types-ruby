@@ -23,12 +23,13 @@ module MediaTypes
   class AssertionError < StandardError
   end
 
-  class MediaTypeValidationError < StandardError
-    def initialize(json, _caller)
-      @message = "#{json} was expected to fail validations"
+  class UnexpectedValidationSuccessError < StandardError
+    def initialize(fixture, caller)
+      super("#{fixture} passed validations, but was marked as expected to fail")
+      @caller = caller
     end
 
-    attr_reader :message
+    attr_reader :caller
   end
 
   class FixtureData
@@ -451,7 +452,7 @@ module MediaTypes
       rescue MediaTypes::Scheme::ValidationError
         expectation_met = true
       end
-      MediaTypeValidationError.new(json, caller) unless expectation_met
+      UnexpectedValidationSuccessError.new(json, caller) unless expectation_met
     end
 
     def process_assert_pass(json, caller, expected_key_type)
