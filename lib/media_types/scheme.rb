@@ -21,7 +21,6 @@ require 'json'
 
 module MediaTypes
   class AssertionError < StandardError
-    attr_accessor :message
   end
 
   class MediaTypeValidationError < StandardError
