@@ -39,9 +39,13 @@ module MediaTypes
   SYMBOL_KEYS_DEFAULT = true
 
   def self.get_key_expectation(mod)
-    return nil if @key_expectations.nil?
-
     @key_expectations_used ||= {}
+
+    if @key_expectations.nil?
+      @key_expectations_used[mod] = true
+      return SYMBOL_KEYS_DEFAULT
+    end
+
     modules = mod.name.split('::')
     expect_symbol = nil
     current_module = nil
