@@ -35,7 +35,7 @@ module Minitest
       {
         test_name: "test_fixture#{counter}_assert_fail_for_#{mediatype.to_constructable})",
         processed: mediatype.media_type_validations.scheme.process_assert_fail(json, fixture_data.caller, expected_key_type),
-        message: MediaTypes::MediaTypeValidationError.new(json, fixture_data.caller).message
+        message: MediaTypes::UnexpectedValidationSuccessError.new(json, fixture_data.caller).message
       }
     end
 

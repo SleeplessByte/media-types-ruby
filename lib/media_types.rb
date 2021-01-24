@@ -36,10 +36,16 @@ module MediaTypes
     @key_expectations[mod.name] = expect_symbol_keys
   end
 
-  def self.get_key_expectation(mod)
-    return nil if @key_expectations.nil?
+  SYMBOL_KEYS_DEFAULT = true
 
+  def self.get_key_expectation(mod)
     @key_expectations_used ||= {}
+
+    if @key_expectations.nil?
+      @key_expectations_used[mod] = true
+      return SYMBOL_KEYS_DEFAULT
+    end
+
     modules = mod.name.split('::')
     expect_symbol = nil
     current_module = nil
@@ -51,9 +57,9 @@ module MediaTypes
       modules.pop
     end
 
-    @key_expectations_used[current_module] = true if expect_symbol && current_module
+    @key_expectations_used[current_module] = true if current_module
 
-    expect_symbol
+    expect_symbol.nil? ? SYMBOL_KEYS_DEFAULT : expect_symbol
   end
 
   def self.get_organisation(mod)

@@ -104,7 +104,7 @@ module MediaTypes
 
         use_name 'CollectionSchemeTypeEmpty'
 
-        scheme = MediaTypes::Scheme.new() do
+        scheme = MediaTypes::Scheme.new do
           attribute :bar, Numeric
         end
 

@@ -214,28 +214,6 @@ class MediaTypesTest < Minitest::Test
     end
   end
 
-  class UnspecifiedKeysMediaType
-    include MediaTypes::Dsl
-
-    def self.organisation
-      'domain.test'
-    end
-
-    use_name 'test'
-
-    validations do
-      empty
-    end
-  end
-
-  def test_key_settings_for_a_media_type_have_to_precede_validations_being_called
-    assert_raises do
-      UnspecifiedKeysMediaType.class_eval do
-        expect_string_keys
-      end
-    end
-  end
-
   module ModuleDefinesExpectationsAfterMediaTypes
     class ShouldExpectSymbols
       include MediaTypes::Dsl

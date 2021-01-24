@@ -3,6 +3,8 @@
 require 'media_types/constructable'
 require 'media_types/validations'
 
+require 'media_types/dsl/errors'
+
 module MediaTypes
   module Dsl
     def self.included(base)
@@ -20,12 +22,8 @@ module MediaTypes
     end
 
     module ClassMethods
-      class UninitializedConstructable < RuntimeError; end
-
-      SYMBOL_KEYS_DEFAULT = true
-
       def to_constructable
-        raise UninitializedConstructable, 'Constructable has not been initialized' if media_type_constructable.nil?
+        raise UninitializedConstructable if media_type_constructable.nil?
 
         media_type_constructable.dup.tap do |constructable|
           constructable.__setobj__(self)
@@ -34,8 +32,7 @@ module MediaTypes
 
       def symbol_keys?
         if symbol_keys.nil?
-          inherited_expectation = MediaTypes.get_key_expectation(self)
-          inherited_expectation.nil? ? SYMBOL_KEYS_DEFAULT : inherited_expectation
+          MediaTypes.get_key_expectation(self)
         else
           symbol_keys
         end
@@ -139,19 +136,14 @@ module MediaTypes
         self.media_type_constructable = Constructable.new(self, type: name)
       end
 
-      # Raised when an error occurs during setting expected key type
-      class KeyTypeExpectationError < StandardError; end
-
       def expect_string_keys
         raise KeyTypeExpectationError, 'Key expectation already set' unless symbol_keys.nil?
-        raise KeyTypeExpectationError, 'Set key expectation before defining validations' unless media_type_validations.nil?
 
         self.symbol_keys = false
       end
 
       def expect_symbol_keys
         raise KeyTypeExpectationError, 'Key expectation already set' unless symbol_keys.nil?
-        raise KeyTypeExpectationError, 'Set key expectation before defining validations' unless media_type_validations.nil?
 
         self.symbol_keys = true
       end
@@ -165,7 +157,6 @@ module MediaTypes
         self.media_type_validations = Validations.new(to_constructable, &block)
 
         self
-
       rescue UninitializedConstructable => e
         raise e.class, 'Have you called `use_name(name)` before the validations?'
       end

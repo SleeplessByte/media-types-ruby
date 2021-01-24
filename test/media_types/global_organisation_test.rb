@@ -12,7 +12,6 @@ module MediaTypes
       class AnyType
         include MediaTypes::Dsl
 
-
         use_name 'test'
 
         validations do
@@ -21,12 +20,12 @@ module MediaTypes
       end
 
       def test_module_organisations
-        MediaTypes::set_organisation MediaTypes::OrganisationScope.itself, 'universal.exports'
+        MediaTypes.set_organisation MediaTypes::OrganisationScope.itself, 'universal.exports'
         assert_equal 'application/vnd.universal.exports.test+json', AnyType.identifier
       end
 
       module Acme
-        MediaTypes::set_organisation Acme, 'acme'
+        MediaTypes.set_organisation Acme, 'acme'
 
         class FooValidator
           include MediaTypes::Dsl
@@ -38,7 +37,7 @@ module MediaTypes
           end
         end
       end
-      
+
       def test_readme_example
         assert_equal Acme::FooValidator.identifier, 'application/vnd.acme.foo+json'
       end
