@@ -138,14 +138,12 @@ module MediaTypes
 
       def expect_string_keys
         raise KeyTypeExpectationError, 'Key expectation already set' unless symbol_keys.nil?
-        raise KeyTypeExpectationError, 'Set key expectation before defining validations' unless media_type_validations.nil?
 
         self.symbol_keys = false
       end
 
       def expect_symbol_keys
         raise KeyTypeExpectationError, 'Key expectation already set' unless symbol_keys.nil?
-        raise KeyTypeExpectationError, 'Set key expectation before defining validations' unless media_type_validations.nil?
 
         self.symbol_keys = true
       end
@@ -159,7 +157,6 @@ module MediaTypes
         self.media_type_validations = Validations.new(to_constructable, &block)
 
         self
-
       rescue UninitializedConstructable => e
         raise e.class, 'Have you called `use_name(name)` before the validations?'
       end
