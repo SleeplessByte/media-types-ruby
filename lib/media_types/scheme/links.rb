@@ -11,17 +11,6 @@ module MediaTypes
       end
 
       def link(key, allow_nil: false, optional: false, &block)
-        raise KeyTypeError, "Unexpected key type #{key.class.name}, please use either a symbol or string." unless key.is_a?(String) || key.is_a?(Symbol)
-        raise DuplicateKeyError, "A link with key :#{key} has already been defined. Please remove one of the two." if key.is_a?(Symbol) && rules.has_key?(key) && rules.get_original_key_type(key) == Symbol
-        raise DuplicateKeyError, "A link with key '#{key}' has already been defined. Please remove one of the two." if key.is_a?(String) && rules.has_key?(key) && rules.get_original_key_type(key) == String
-        raise DuplicateKeyError, "A string keyed link '#{key}' with the same string representation as the symbol :#{key} already exists. Please remove one of the two." if key.is_a?(Symbol) && rules.has_key?(key) && rules.get_original_key_type(key) == String
-        raise DuplicateKeyError, "A symbol keyed link :#{key} with the same string representation as the string '#{key}' already exists. Please remove one of the two." if key.is_a?(String) && rules.has_key?(key) && rules.get_original_key_type(key) == Symbol
-
-        raise DuplicateKeyError, "A link with key :#{key} has already been defined. Please remove one of the two." if (key.is_a?(Symbol) && links.has_key?(key) == Symbol)
-        raise DuplicateKeyError, "A link with key #{key} has already been defined. Please remove one of the two." if (key.is_a?(String) && links.has_key?(key) == String)
-        raise DuplicateKeyError, "A link with a String type name and with the same string representation as the symbol :#{key} already exists. Please remove one of the two." if key.is_a?(Symbol) && links.has_key?(key) == String
-        raise DuplicateKeyError, "A link with a Symbol type name and with the same string representation as the string '#{key}' already exists. Please remove one of the two." if key.is_a?(String) && links.has_key?(key) == Symbol
-
         links.add(
           key,
           Scheme.new do

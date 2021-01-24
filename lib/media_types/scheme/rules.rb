@@ -28,6 +28,12 @@ module MediaTypes
       end
 
       def add(key, val, optional: false)
+      raise KeyTypeError, "Unexpected key type #{key.class.name}, please use either a symbol or string." unless key.is_a?(String) || key.is_a?(Symbol)
+      raise DuplicateKeyError.new "#{val.class.name.split('::').last} rule with key :#{key} has already been defined. Please remove one of the two.", DuplicateKeyError::SYMBOL_SYMBOL_CASE if key.is_a?(Symbol) && has_key?(key) && get_original_key_type(key) == Symbol
+      raise DuplicateKeyError.new "#{val.class.name.split('::').last} rule with key '#{key}' has already been defined. Please remove one of the two.", DuplicateKeyError::STRING_STRING_CASE if key.is_a?(String) && has_key?(key) && get_original_key_type(key) == String
+      raise DuplicateKeyError.new "#{val.class.name.split('::').last} rule with a String key '#{key}' with the same string representation as the Symbol :#{key} already exists. Please remove one of the two.", DuplicateKeyError::STRING_SYMBOL_CASE if key.is_a?(Symbol) && has_key?(key) && get_original_key_type(key) == String
+      raise DuplicateKeyError.new "#{val.class.name.split('::').last} rule with a Symbol key :#{key} with the same string representation as the String '#{key}' already exists. Please remove one of the two.", DuplicateKeyError::SYMBOL_STRING_CASE if key.is_a?(String) && has_key?(key) && get_original_key_type(key) == Symbol
+
         normalized_key = normalize_key(key)
         __getobj__[normalized_key] = val
         optional_keys << normalized_key if optional
@@ -128,6 +134,7 @@ module MediaTypes
 
         String(key).to_sym
       end
+
     end
   end
 end
