@@ -124,85 +124,85 @@ module MediaTypes
       class DuplicateSymbolSymbol; end
 
       def test_duplicate_attribute_raises_error_for_case_symbol_symbol
-        DuplicateSymbolSymbol.class_eval do
-          include MediaTypes::Dsl
+        assert_raises Scheme::DuplicateSymbolKeyError do
+          DuplicateSymbolSymbol.class_eval do
+            include MediaTypes::Dsl
 
-          def self.organisation
-            'domain.test'
-          end
+            def self.organisation
+              'domain.test'
+            end
 
-          use_name 'test'
+            use_name 'test'
 
-          validations do
-            attribute :foo, Numeric
-            attribute :foo, Numeric
+            validations do
+              attribute :foo, Numeric
+              attribute :foo, Numeric
+            end
           end
         end
-      rescue Scheme::DuplicateKeyError => e
-        assert e.duplicate_case == Scheme::DuplicateKeyError::SYMBOL_SYMBOL_CASE
       end
 
       class DuplicateteSymbolString; end
 
       def test_duplicate_attribute_raises_error_for_case_symbol_string
-        DuplicateteSymbolString.class_eval do
-          include MediaTypes::Dsl
+        assert_raises Scheme::StringOverSymbolError do
+          DuplicateteSymbolString.class_eval do
+            include MediaTypes::Dsl
 
-          def self.organisation
-            'domain.test'
-          end
+            def self.organisation
+              'domain.test'
+            end
 
-          use_name 'test'
+            use_name 'test'
 
-          validations do
-            attribute :foo, Numeric
-            attribute 'foo', Numeric
+            validations do
+              attribute :foo, Numeric
+              attribute 'foo', Numeric
+            end
           end
         end
-      rescue Scheme::DuplicateKeyError => e
-        assert e.duplicate_case == Scheme::DuplicateKeyError::SYMBOL_STRING_CASE
       end
 
       class DuplicateStringSymbol; end
 
       def test_duplicate_attribute_raises_error_for_case_string_symbol
-        DuplicateStringSymbol.class_eval do
-          include MediaTypes::Dsl
+        assert_raises Scheme::SymbolOverStringError do
+          DuplicateStringSymbol.class_eval do
+            include MediaTypes::Dsl
 
-          def self.organisation
-            'domain.test'
-          end
+            def self.organisation
+              'domain.test'
+            end
 
-          use_name 'test'
+            use_name 'test'
 
-          validations do
-            attribute 'foo', Numeric
-            attribute :foo, Numeric
+            validations do
+              attribute 'foo', Numeric
+              attribute :foo, Numeric
+            end
           end
         end
-      rescue Scheme::DuplicateKeyError => e
-        assert e.duplicate_case == Scheme::DuplicateKeyError::STRING_SYMBOL_CASE
       end
 
       class DuplicateStringString; end
 
       def test_duplicate_attribute_raises_error_for_case_string_string
-        DuplicateStringString.class_eval do
-          include MediaTypes::Dsl
+        assert_raises Scheme::DuplicateStringKeyError do
+          DuplicateStringString.class_eval do
+            include MediaTypes::Dsl
 
-          def self.organisation
-            'domain.test'
-          end
+            def self.organisation
+              'domain.test'
+            end
 
-          use_name 'test'
+            use_name 'test'
 
-          validations do
-            attribute 'foo', Numeric
-            attribute 'foo', Numeric
+            validations do
+              attribute 'foo', Numeric
+              attribute 'foo', Numeric
+            end
           end
         end
-      rescue Scheme::DuplicateKeyError => e
-        assert e.duplicate_case == Scheme::DuplicateKeyError::STRING_STRING_CASE
       end
 
       class NonStringOrSymbolKeytype; end

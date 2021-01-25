@@ -10,15 +10,37 @@ module MediaTypes
     class KeyTypeError < ArgumentError; end
 
     # Raised when trying to register a key twice
-    class DuplicateKeyError < ArgumentError;
-      SYMBOL_SYMBOL_CASE = 'SYMBOL_SYMBOL'
-      STRING_STRING_CASE = 'STRING_STRING'
-      SYMBOL_STRING_CASE = 'SYMBOL_STRING'
-      STRING_SYMBOL_CASE = 'STRING_SYMBOL'
-      attr_reader :duplicate_case
-      def initialize(msg, dup_case)
-        @duplicate_case = dup_case
-        super(msg)
+    class DuplicateKeyError < ArgumentError; end
+
+    class DuplicateSymbolKeyError < DuplicateKeyError
+      MESSAGE_TEMPLATE = '%<rule_type>s rule with key :%<key>s has already been defined. Please remove one of the two.'
+
+      def initialize(rule_type, key)
+        super(format(MESSAGE_TEMPLATE, rule_type: rule_type, key: key))
+      end
+    end
+
+    class DuplicateStringKeyError < DuplicateKeyError
+      MESSAGE_TEMPLATE = '%<rule_type>s rule with key %<key>s has already been defined. Please remove one of the two.'
+
+      def initialize(rule_type, key)
+        super(format(MESSAGE_TEMPLATE, { rule_type: rule_type, key: key }))
+      end
+    end
+
+    class StringOverSymbolError < DuplicateKeyError
+      MESSAGE_TEMPLATE = 'Trying to add %<rule_type>s rule String key %<key>s while a Symbol with the same name already exists. Please remove one of the two.'
+
+      def initialize(rule_type, key)
+        super(format(MESSAGE_TEMPLATE, { rule_type: rule_type, key: key }))
+      end
+    end
+
+    class SymbolOverStringError < DuplicateKeyError
+      MESSAGE_TEMPLATE = 'Trying to add %<rule_type>s rule with Symbol key :%<key>s while a String key with the same name already exists. Please remove one of the two.'
+
+      def initialize(rule_type, key)
+        super(format(MESSAGE_TEMPLATE, { rule_type: rule_type, key: key }))
       end
     end
 
@@ -35,7 +57,7 @@ module MediaTypes
     class ExhaustedOutputError < ValidationError; end
 
     # Raised when trying to override a non default rule scheme in the Rules Hash's default object method
-    class OverwritingUnspecifiedKeyExpectionsError < ArgumentError;
+    class OverwritingUnspecifiedKeyExpectionsError < ArgumentError
       NOT_STRICT_TO_NOT_STRICT_CASE = 'NOT_STRICT_TO_NOT_STRICT'
       NOT_STRICT_TO_ANY_CASE = 'NOT_STRICT_TO_ANY'
       ANY_TO_NOT_STRICT_CASE = 'ANY_TO_NOT_STRICT'

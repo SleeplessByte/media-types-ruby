@@ -28,11 +28,7 @@ module MediaTypes
       end
 
       def add(key, val, optional: false)
-      raise KeyTypeError, "Unexpected key type #{key.class.name}, please use either a symbol or string." unless key.is_a?(String) || key.is_a?(Symbol)
-      raise DuplicateKeyError.new "#{val.class.name.split('::').last} rule with key :#{key} has already been defined. Please remove one of the two.", DuplicateKeyError::SYMBOL_SYMBOL_CASE if key.is_a?(Symbol) && has_key?(key) && get_original_key_type(key) == Symbol
-      raise DuplicateKeyError.new "#{val.class.name.split('::').last} rule with key '#{key}' has already been defined. Please remove one of the two.", DuplicateKeyError::STRING_STRING_CASE if key.is_a?(String) && has_key?(key) && get_original_key_type(key) == String
-      raise DuplicateKeyError.new "#{val.class.name.split('::').last} rule with a String key '#{key}' with the same string representation as the Symbol :#{key} already exists. Please remove one of the two.", DuplicateKeyError::STRING_SYMBOL_CASE if key.is_a?(Symbol) && has_key?(key) && get_original_key_type(key) == String
-      raise DuplicateKeyError.new "#{val.class.name.split('::').last} rule with a Symbol key :#{key} with the same string representation as the String '#{key}' already exists. Please remove one of the two.", DuplicateKeyError::SYMBOL_STRING_CASE if key.is_a?(String) && has_key?(key) && get_original_key_type(key) == Symbol
+        validate_input(key, val)
 
         normalized_key = normalize_key(key)
         __getobj__[normalized_key] = val
@@ -40,6 +36,26 @@ module MediaTypes
         original_key_type[normalized_key] = key.class
 
         self
+      end
+
+      def validate_input(key, val)
+        raise KeyTypeError, "Unexpected key type #{key.class.name}, please use either a symbol or string." unless key.is_a?(String) || key.is_a?(Symbol)
+
+        validate_key_name(key, val)
+      end
+
+      def validate_key_name(key, val)
+        return unless has_key?(key)
+
+        if key.is_a?(Symbol)
+          raise DuplicateSymbolKeyError.new(val.class.name.split('::').last, key) if get_original_key_type(key) == Symbol
+
+          raise SymbolOverStringError.new(val.class.name.split('::').last, key)
+        else
+          raise DuplicateStringKeyError.new(val.class.name.split('::').last, key) if get_original_key_type(key) == String
+
+          raise StringOverSymbolError.new(val.class.name.split('::').last, key)
+        end
       end
 
       def []=(key, val)
@@ -112,18 +128,19 @@ module MediaTypes
           value.is_a?(Scheme) || value.is_a?(Rules) ? "\n#{value.inspect(indent + 2)}" : value.inspect
         ].join(': ')
       end
-      
+
       def has_key?(key)
         __getobj__.key?(normalize_key(key))
       end
 
       def get_original_key_type(key)
         raise format('Key %<key>s does not exist', key: key) unless has_key?(key)
+
         original_key_type[normalize_key(key)]
       end
 
       def default=(input_default)
-        if (!default.nil?)
+        unless default.nil?
           raise OverwritingUnspecifiedKeyExpectionsError.new "An 'any' rule has already been defined. Please remove one of the two.", OverwritingUnspecifiedKeyExpectionsError::ANY_TO_ANY_CASE if !(default.is_a?(MissingValidation) || default.is_a?(NotStrict)) && !(input_default.is_a?(MissingValidation) || input_default.is_a?(NotStrict))
           raise OverwritingUnspecifiedKeyExpectionsError.new "The 'not_strict' rule has already been defined. Please remove one of the two.", OverwritingUnspecifiedKeyExpectionsError::NOT_STRICT_TO_NOT_STRICT_CASE if default.is_a?(NotStrict) && input_default.is_a?(NotStrict)
           raise OverwritingUnspecifiedKeyExpectionsError.new "An 'any' rule has already been defined. Setting 'not_strict' will override that rule. Please remove one of the two.", OverwritingUnspecifiedKeyExpectionsError::ANY_TO_NOT_STRICT_CASE if !(default.is_a?(MissingValidation) || default.is_a?(NotStrict)) && input_default.is_a?(NotStrict)
@@ -141,10 +158,8 @@ module MediaTypes
       attr_writer :expected_type
 
       def normalize_key(key)
-
         String(key).to_sym
       end
-
     end
   end
 end
