@@ -242,6 +242,48 @@ module MediaTypes
       [AnyType, AnyOfScheme, AnyWithOptions, AnyWithOptionsOrNil, AnyWithScheme, AnyWithForce].each do |type|
         assert_mediatype_specification type
       end
+
+      class OverwritingAnyWithAny; end
+
+      def test_overwriting_any_with_any_raises_error
+        OverwritingAnyWithAny.class_eval do
+          include MediaTypes::Dsl
+
+          def self.organisation
+            'domain.test'
+          end
+
+          use_name 'test'
+          
+          validations do
+            any Numeric
+            any Numeric
+          end
+        end
+      rescue Scheme::OverwritingUnspecifiedKeyExpectionsError => e
+        assert e.duplicate_case == Scheme::OverwritingUnspecifiedKeyExpectionsError::ANY_TO_ANY
+      end
+
+      class OverwritingNotStrictWithAny; end
+
+      def test_overwriting_any_with_any_raises_error
+        OverwritingAnyWithAny.class_eval do
+          include MediaTypes::Dsl
+
+          def self.organisation
+            'domain.test'
+          end
+
+          use_name 'test'
+
+          validations do
+            not_strict
+            any Numeric
+          end
+        end
+      rescue Scheme::OverwritingUnspecifiedKeyExpectionsError => e
+        assert e.duplicate_case == Scheme::OverwritingUnspecifiedKeyExpectionsError::NOT_STRICT_TO_ANY_CASE
+      end
     end
   end
 end

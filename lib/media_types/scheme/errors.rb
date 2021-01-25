@@ -33,5 +33,18 @@ module MediaTypes
 
     # Raised when it expected more data but there wasn't any left
     class ExhaustedOutputError < ValidationError; end
+
+    # Raised when trying to override a non default rule scheme in the Rules Hash's default object method
+    class OverwritingUnspecifiedKeyExpectionsError < ArgumentError;
+      NOT_STRICT_TO_NOT_STRICT_CASE = 'NOT_STRICT_TO_NOT_STRICT'
+      NOT_STRICT_TO_ANY_CASE = 'NOT_STRICT_TO_ANY'
+      ANY_TO_NOT_STRICT_CASE = 'ANY_TO_NOT_STRICT'
+      ANY_TO_ANY_CASE = 'ANY_TO_ANY'
+      attr_reader :duplicate_case
+      def initialize(msg, dup_case)
+        @duplicate_case = dup_case
+        super(msg)
+      end
+    end
   end
 end
