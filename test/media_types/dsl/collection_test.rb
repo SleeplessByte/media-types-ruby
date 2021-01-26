@@ -36,8 +36,8 @@ module MediaTypes
       class CollectionCollectionType
         include MediaTypes::Dsl
 
-        def self.trailervote
-          'trailervote'
+        def self.organisation
+          'domain.test'
         end
 
         use_name 'CollectionCollectionType'
@@ -66,8 +66,8 @@ module MediaTypes
       class CollectionSchemeType
         include MediaTypes::Dsl
 
-        def self.trailervote
-          'trailervote'
+        def self.organisation
+          'domain.test'
         end
 
         use_name 'CollectionSchemeType'
