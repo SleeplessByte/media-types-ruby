@@ -145,7 +145,7 @@ module MediaTypes
       class DuplicateteSymbolString; end
 
       def test_duplicate_attribute_raises_error_for_case_symbol_string
-        assert_raises Scheme::StringOverSymbolError do
+        assert_raises Scheme::StringOverwritingSymbolError do
           DuplicateteSymbolString.class_eval do
             include MediaTypes::Dsl
 
@@ -166,7 +166,7 @@ module MediaTypes
       class DuplicateStringSymbol; end
 
       def test_duplicate_attribute_raises_error_for_case_string_symbol
-        assert_raises Scheme::SymbolOverStringError do
+        assert_raises Scheme::SymbolOverwritingStringError do
           DuplicateStringSymbol.class_eval do
             include MediaTypes::Dsl
 

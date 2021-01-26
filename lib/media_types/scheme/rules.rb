@@ -50,11 +50,11 @@ module MediaTypes
         if key.is_a?(Symbol)
           raise DuplicateSymbolKeyError.new(val.class.name.split('::').last, key) if get_original_key_type(key) == Symbol
 
-          raise SymbolOverStringError.new(val.class.name.split('::').last, key)
+          raise SymbolOverwritingStringError.new(val.class.name.split('::').last, key)
         else
           raise DuplicateStringKeyError.new(val.class.name.split('::').last, key) if get_original_key_type(key) == String
 
-          raise StringOverSymbolError.new(val.class.name.split('::').last, key)
+          raise StringOverwritingSymbolError.new(val.class.name.split('::').last, key)
         end
       end
 

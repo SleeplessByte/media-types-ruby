@@ -28,7 +28,7 @@ module MediaTypes
       end
     end
 
-    class StringOverSymbolError < DuplicateKeyError
+    class StringOverwritingSymbolError < DuplicateKeyError
       MESSAGE_TEMPLATE = 'Trying to add %<rule_type>s rule String key %<key>s while a Symbol with the same name already exists. Please remove one of the two.'
 
       def initialize(rule_type, key)
@@ -36,7 +36,7 @@ module MediaTypes
       end
     end
 
-    class SymbolOverStringError < DuplicateKeyError
+    class SymbolOverwritingStringError < DuplicateKeyError
       MESSAGE_TEMPLATE = 'Trying to add %<rule_type>s rule with Symbol key :%<key>s while a String key with the same name already exists. Please remove one of the two.'
 
       def initialize(rule_type, key)
