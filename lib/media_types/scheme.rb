@@ -23,10 +23,10 @@ module MediaTypes
   class AssertionError < StandardError
   end
 
-  class UnexpectedValidationSuccessError < StandardError
-    def initialize(fixture, caller)
-      super("#{fixture} passed validations, but was marked as expected to fail")
+  class UnexpectedValidationResultError < StandardError
+    def initialize(caller)
       @caller = caller
+      super
     end
 
     attr_reader :caller
@@ -416,11 +416,18 @@ module MediaTypes
     end
 
     def run_queued_fixture_checks(expect_symbol_keys)
-      errors = @fixtures.each_with_object([]) do |fixture_data, array|
-        output = process_fixture_data(fixture_data, expect_symbol_keys)
-        array += output
+      @failed_fixtures = []
+
+      @fixtures.each do |fixture_data|
+        begin
+          process_fixture_data(fixture_data, expect_symbol_keys)
+        rescue UnexpectedValidationResultError => e
+          @failed_fixtures << (e.caller.path + ':' + e.caller.lineno.to_s).to_s
+          next
+        end
       end
-      raise AssertionError, errors unless errors.empty?
+
+      raise AssertionError, @failed_fixtures unless @failed_fixtures.empty?
 
       self.asserted_sane = true
     end
@@ -440,14 +447,14 @@ module MediaTypes
       rescue MediaTypes::Scheme::ValidationError
         expectation_met = true
       end
-      UnexpectedValidationSuccessError.new(json, caller) unless expectation_met
+      raise UnexpectedValidationResultError.new(caller) unless expectation_met
     end
 
     def process_assert_pass(json, caller, expected_key_type)
       validate(json, expected_key_type: expected_key_type)
       nil
-    rescue StandardError => e
-      raise e.class, e.message + " \n#{caller.path + ':' + caller.lineno.to_s}"
+    rescue MediaTypes::Scheme::ValidationError
+      raise UnexpectedValidationResultError.new(caller)
     end
 
     private
