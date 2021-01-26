@@ -141,10 +141,10 @@ module MediaTypes
 
       def default=(input_default)
         unless default.nil?
-          raise OverwritingUnspecifiedKeyExpectionsError.new "An 'any' rule has already been defined. Please remove one of the two.", OverwritingUnspecifiedKeyExpectionsError::ANY_TO_ANY_CASE if !(default.is_a?(MissingValidation) || default.is_a?(NotStrict)) && !(input_default.is_a?(MissingValidation) || input_default.is_a?(NotStrict))
-          raise OverwritingUnspecifiedKeyExpectionsError.new "The 'not_strict' rule has already been defined. Please remove one of the two.", OverwritingUnspecifiedKeyExpectionsError::NOT_STRICT_TO_NOT_STRICT_CASE if default.is_a?(NotStrict) && input_default.is_a?(NotStrict)
-          raise OverwritingUnspecifiedKeyExpectionsError.new "An 'any' rule has already been defined. Setting 'not_strict' will override that rule. Please remove one of the two.", OverwritingUnspecifiedKeyExpectionsError::ANY_TO_NOT_STRICT_CASE if !(default.is_a?(MissingValidation) || default.is_a?(NotStrict)) && input_default.is_a?(NotStrict)
-          raise OverwritingUnspecifiedKeyExpectionsError.new "The 'not_strict' rule has already been defined. Setting 'any' will override that rule. Please remove one of the two.", OverwritingUnspecifiedKeyExpectionsError::NOT_STRICT_TO_ANY_CASE if default.is_a?(NotStrict) && !(input_default.is_a?(MissingValidation) || input_default.is_a?(NotStrict))
+          raise DuplicateAnyRuleError if !(default.is_a?(MissingValidation) || default.is_a?(NotStrict)) && !(input_default.is_a?(MissingValidation) || input_default.is_a?(NotStrict))
+          raise DuplicateNotStrictRuleError if default.is_a?(NotStrict) && input_default.is_a?(NotStrict)
+          raise NotStrictOverwritingAnyError if !(default.is_a?(MissingValidation) || default.is_a?(NotStrict)) && input_default.is_a?(NotStrict)
+          raise AnyOverwritingNotStrictError if default.is_a?(NotStrict) && !(input_default.is_a?(MissingValidation) || input_default.is_a?(NotStrict))
         end
         super(input_default)
       end

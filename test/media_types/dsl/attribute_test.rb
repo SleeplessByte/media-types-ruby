@@ -120,7 +120,7 @@ module MediaTypes
       [AttributeType, AttributeCollectionType, AttributeSchemeType, AttributeOptionsType].each do |type|
         assert_mediatype_specification type
       end
-    
+
       class DuplicateSymbolSymbol; end
 
       def test_duplicate_attribute_raises_error_for_case_symbol_symbol

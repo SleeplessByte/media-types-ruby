@@ -246,43 +246,43 @@ module MediaTypes
       class OverwritingAnyWithAny; end
 
       def test_overwriting_any_with_any_raises_error
-        OverwritingAnyWithAny.class_eval do
-          include MediaTypes::Dsl
+        assert_raises Scheme::DuplicateAnyRuleError do
+          OverwritingAnyWithAny.class_eval do
+            include MediaTypes::Dsl
 
-          def self.organisation
-            'domain.test'
-          end
+            def self.organisation
+              'domain.test'
+            end
 
-          use_name 'test'
-          
-          validations do
-            any Numeric
-            any Numeric
+            use_name 'test'
+
+            validations do
+              any Numeric
+              any Numeric
+            end
           end
         end
-      rescue Scheme::OverwritingUnspecifiedKeyExpectionsError => e
-        assert e.duplicate_case == Scheme::OverwritingUnspecifiedKeyExpectionsError::ANY_TO_ANY
       end
 
       class OverwritingNotStrictWithAny; end
 
-      def test_overwriting_any_with_any_raises_error
-        OverwritingAnyWithAny.class_eval do
-          include MediaTypes::Dsl
+      def test_overwriting_noy_strict_with_any_raises_error
+        assert_raises Scheme::AnyOverwritingNotStrictError do
+          OverwritingAnyWithAny.class_eval do
+            include MediaTypes::Dsl
 
-          def self.organisation
-            'domain.test'
-          end
+            def self.organisation
+              'domain.test'
+            end
 
-          use_name 'test'
+            use_name 'test'
 
-          validations do
-            not_strict
-            any Numeric
+            validations do
+              not_strict
+              any Numeric
+            end
           end
         end
-      rescue Scheme::OverwritingUnspecifiedKeyExpectionsError => e
-        assert e.duplicate_case == Scheme::OverwritingUnspecifiedKeyExpectionsError::NOT_STRICT_TO_ANY_CASE
       end
     end
   end

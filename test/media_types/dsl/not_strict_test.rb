@@ -70,43 +70,43 @@ module MediaTypes
       class OverwritingNotStrictWithNotStrict; end
 
       def test_overwriting_not_strict_with_not_strict_raises_error
-        OverwritingNotStrictWithNotStrict.class_eval do
-          include MediaTypes::Dsl
+        assert_raises Scheme::DuplicateNotStrictRuleError do
+          OverwritingNotStrictWithNotStrict.class_eval do
+            include MediaTypes::Dsl
 
-          def self.organisation
-            'domain.test'
-          end
+            def self.organisation
+              'domain.test'
+            end
 
-          use_name 'test'
+            use_name 'test'
 
-          validations do
-            not_strict
-            not_strict
+            validations do
+              not_strict
+              not_strict
+            end
           end
         end
-      rescue Scheme::OverwritingUnspecifiedKeyExpectionsError => e
-        assert e.duplicate_case == Scheme::OverwritingUnspecifiedKeyExpectionsError::NOT_STRICT_TO_NOT_STRICT_CASE
       end
 
       class OverwritingAnyWithNotStrict; end
 
       def test_overwriting_any_with_not_strict_raises_error
-        OverwritingAnyWithNotStrict.class_eval do
-          include MediaTypes::Dsl
+        assert_raises Scheme::NotStrictOverwritingAnyError do
+          OverwritingAnyWithNotStrict.class_eval do
+            include MediaTypes::Dsl
 
-          def self.organisation
-            'domain.test'
-          end
+            def self.organisation
+              'domain.test'
+            end
 
-          use_name 'test'
+            use_name 'test'
 
-          validations do
-            any Numeric
-            not_strict
+            validations do
+              any Numeric
+              not_strict
+            end
           end
         end
-      rescue Scheme::OverwritingUnspecifiedKeyExpectionsError => e
-        assert e.duplicate_case == Scheme::OverwritingUnspecifiedKeyExpectionsError::ANY_TO_NOT_STRICT_CASE
       end
     end
   end

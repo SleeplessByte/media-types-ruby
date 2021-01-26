@@ -57,15 +57,29 @@ module MediaTypes
     class ExhaustedOutputError < ValidationError; end
 
     # Raised when trying to override a non default rule scheme in the Rules Hash's default object method
-    class OverwritingUnspecifiedKeyExpectionsError < ArgumentError
-      NOT_STRICT_TO_NOT_STRICT_CASE = 'NOT_STRICT_TO_NOT_STRICT'
-      NOT_STRICT_TO_ANY_CASE = 'NOT_STRICT_TO_ANY'
-      ANY_TO_NOT_STRICT_CASE = 'ANY_TO_NOT_STRICT'
-      ANY_TO_ANY_CASE = 'ANY_TO_ANY'
-      attr_reader :duplicate_case
-      def initialize(msg, dup_case)
-        @duplicate_case = dup_case
-        super(msg)
+    class OverwritingRuleError < ArgumentError; end
+
+    class DuplicateAnyRuleError < OverwritingRuleError
+      def message
+        "An 'any' rule has already been defined. Please remove one of the two."
+      end
+    end
+
+    class DuplicateNotStrictRuleError < OverwritingRuleError
+      def message
+        "The 'not_strict' rule has already been defined. Please remove one of the two."
+      end
+    end
+
+    class NotStrictOverwritingAnyError < OverwritingRuleError
+      def message
+        "An 'any' rule has already been defined. Setting 'not_strict' will override that rule. Please remove one of the two."
+      end
+    end
+
+    class AnyOverwritingNotStrictError < OverwritingRuleError
+      def message
+        "The 'not_strict' rule has already been defined. Setting 'any' will override that rule. Please remove one of the two."
       end
     end
   end
