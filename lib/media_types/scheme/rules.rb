@@ -149,16 +149,12 @@ module MediaTypes
 
       def default=(input_default)
         unless default.nil?
-          handle_duplicate_default_rule(input_default)
+          raise DuplicateAnyRuleError if !(default.is_a?(MissingValidation) || default.is_a?(NotStrict)) && !(input_default.is_a?(MissingValidation) || input_default.is_a?(NotStrict))
+          raise DuplicateNotStrictRuleError if default.is_a?(NotStrict) && input_default.is_a?(NotStrict)
+          raise NotStrictOverwritingAnyError if !(default.is_a?(MissingValidation) || default.is_a?(NotStrict)) && input_default.is_a?(NotStrict)
+          raise AnyOverwritingNotStrictError if default.is_a?(NotStrict) && !(input_default.is_a?(MissingValidation) || input_default.is_a?(NotStrict))
         end
         super(input_default)
-      end
-
-      def handle_duplicate_default_rule(input_default)
-        raise DuplicateAnyRuleError if !(default.is_a?(MissingValidation) || default.is_a?(NotStrict)) && !(input_default.is_a?(MissingValidation) || input_default.is_a?(NotStrict))
-        raise DuplicateNotStrictRuleError if default.is_a?(NotStrict) && input_default.is_a?(NotStrict)
-        raise NotStrictOverwritingAnyError if !(default.is_a?(MissingValidation) || default.is_a?(NotStrict)) && input_default.is_a?(NotStrict)
-        raise AnyOverwritingNotStrictError if default.is_a?(NotStrict) && !(input_default.is_a?(MissingValidation) || input_default.is_a?(NotStrict))
       end
 
       alias get []
