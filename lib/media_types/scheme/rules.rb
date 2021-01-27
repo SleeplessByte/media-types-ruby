@@ -48,14 +48,22 @@ module MediaTypes
         return unless has_key?(key)
 
         if key.is_a?(Symbol)
-          raise DuplicateSymbolKeyError.new(val.class.name.split('::').last, key) if get_original_key_type(key) == Symbol
-
-          raise SymbolOverwritingStringError.new(val.class.name.split('::').last, key)
+          duplicate_symbol_key_name(key, val)
         else
-          raise DuplicateStringKeyError.new(val.class.name.split('::').last, key) if get_original_key_type(key) == String
-
-          raise StringOverwritingSymbolError.new(val.class.name.split('::').last, key)
+          duplicate_string_key_name(key, val)
         end
+      end
+
+      def duplicate_symbol_key_name(key, val)
+        raise DuplicateSymbolKeyError.new(val.class.name.split('::').last, key) if get_original_key_type(key) == Symbol
+
+        raise SymbolOverwritingStringError.new(val.class.name.split('::').last, key)
+      end
+
+      def duplicate_string_key_name(key, val)
+        raise DuplicateStringKeyError.new(val.class.name.split('::').last, key) if get_original_key_type(key) == String
+
+        raise StringOverwritingSymbolError.new(val.class.name.split('::').last, key)
       end
 
       def []=(key, val)
