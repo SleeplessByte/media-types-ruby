@@ -149,16 +149,19 @@ module MediaTypes
       end
 
       def validations(&block)
-        unless block_given?
-          raise "No validations defined for #{name}" if media_type_validations.nil?
+        return lookup_validations unless block_given?
 
-          return media_type_validations
-        end
         self.media_type_validations = Validations.new(to_constructable, &block)
 
         self
       rescue UninitializedConstructable => e
         raise e.class, 'Have you called `use_name(name)` before the validations?'
+      end
+
+      def lookup_validations
+        raise "No validations defined for #{name}" if media_type_validations.nil?
+
+        media_type_validations
       end
     end
   end
