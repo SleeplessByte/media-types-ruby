@@ -420,7 +420,7 @@ module MediaTypes
 
       @fixtures.each do |fixture_data|
         begin
-          process_fixture_data(fixture_data, expect_symbol_keys)
+          validate_fixture(fixture_data, expect_symbol_keys)
         rescue UnexpectedValidationResultError => e
           @failed_fixtures << (e.caller.path + ':' + e.caller.lineno.to_s).to_s
           next
@@ -432,29 +432,15 @@ module MediaTypes
       self.asserted_sane = true
     end
 
-    def process_fixture_data(fixture_data, expect_symbol_keys)
-      errors = []
+    def validate_fixture(fixture_data, expect_symbol_keys)
       json = JSON.parse(fixture_data.fixture, { symbolize_names: expect_symbol_keys })
       expected_key_type = expect_symbol_keys ? Symbol : String
-      output = fixture_data.expect_to_pass ? process_assert_pass(json, fixture_data.caller, expected_key_type) : process_assert_fail(json, fixture_data.caller, expected_key_type)
-      errors << output unless output.nil?
-      errors
-    end
 
-    def process_assert_fail(json, caller, expected_key_type)
       begin
         validate(json, expected_key_type: expected_key_type)
       rescue MediaTypes::Scheme::ValidationError
-        expectation_met = true
+        raise UnexpectedValidationResultError.new(caller) if fixture_data.expect_to_pass
       end
-      raise UnexpectedValidationResultError.new(caller) unless expectation_met
-    end
-
-    def process_assert_pass(json, caller, expected_key_type)
-      validate(json, expected_key_type: expected_key_type)
-      nil
-    rescue MediaTypes::Scheme::ValidationError
-      raise UnexpectedValidationResultError.new(caller)
     end
 
     private
