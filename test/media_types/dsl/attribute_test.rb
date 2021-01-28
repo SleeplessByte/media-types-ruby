@@ -217,7 +217,7 @@ module MediaTypes
             end
 
             use_name 'test'
-            
+
             validations do
               attribute Object, Numeric
             end
