@@ -407,7 +407,7 @@ Returns a list of all the schemas that are defined.
 
 ### Overview & Rational
 
-It is vital that when using this library, your MediaTypes enforce the specification you actually intend them to, as the rules they _do_ enforce will significantly impact code elsewhere in your codebase. To this end, we provide you with a few avenues to check whether MediaTypes enforce the specifications you actually intend by checking examples of JSON you expect to be complient/non-complient with the specifications you design. These are as follows:
+It is vital that when using this library, your MediaTypes enforce the specification you actually intend them to, as the rules they _do_ enforce will significantly impact code elsewhere in your codebase. To this end, we provide you with a few avenues to check whether MediaTypes enforce the specifications you actually intend by checking examples of JSON you expect to be compliant/non-compliant with the specifications you design. These are as follows:
 
 1. We provide you with two methods (`assert_pass` and `assert fail`), which enable you to specify JSON fixtures you expect to be compliant/non-compliant
 
