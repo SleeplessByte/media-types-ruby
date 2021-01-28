@@ -5,7 +5,7 @@ module MediaTypes
     module ClassMethods
       class UninitializedConstructable < RuntimeError
         def message
-          'Constructable has not been initialized'
+          'Unable to generate constructable without a name, have you called `use_name(name)`?'
         end
       end
 

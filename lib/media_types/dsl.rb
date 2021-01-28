@@ -155,8 +155,6 @@ module MediaTypes
         self.media_type_validations = Validations.new(to_constructable, &block)
 
         self
-      rescue UninitializedConstructable => e
-        raise e.class, 'Have you called `use_name(name)` before the validations?'
       end
 
       def lookup_validations
