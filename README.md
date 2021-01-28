@@ -421,7 +421,7 @@ These four options are examined in more detail below:
 
 ### Media Type Checking in Test Suites
 
-In the context of your tests, we provide the `test_specification` method,which allows you to run the checks you queue up for a particular `MediaType` within your tests with `assert_pass` and `assert_fail` in a Minitest context. This method is automatically added to the `Minitest::Test`, so If you are already using a Minitest suite, you should gain access to it.
+In the context of your tests, we provide the `test_specification` method, which allows you to run the checks you queue up for a particular `MediaType` within your tests with `assert_pass` and `assert_fail` in a Minitest context. This method is automatically added to the `Minitest::Test`, so If you are already using a Minitest suite, you should gain access to it.
 
 The example below demonstrates how to use `assert_pass` and `assert_fail` within a MediaType, and how to use the `test_specification` method to generate MiniTest tests from them.
 
