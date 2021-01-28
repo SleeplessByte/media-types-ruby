@@ -411,7 +411,7 @@ It is vital that when using this library, your MediaTypes enforce the specificat
 
 1. We provide you with two methods (`assert_pass` and `assert fail`), which enable you to specify JSON fixtures you expect to be compliant/non-compliant
 
-2. We provide methods to turn those fixtures into tests with the `test_specification` method.
+2. We provide methods to turn those fixtures into tests with the `assert_mediatype_specification` method.
 
 3. We automatically check a MediaType's checks defined by (1) the first time it is validated, and throw an error if any fail.
 
@@ -421,9 +421,9 @@ These four options are examined in more detail below:
 
 ### Media Type Checking in Test Suites
 
-In the context of your tests, we provide the `test_specification` method, which allows you to run the checks you queue up for a particular `MediaType` within your tests with `assert_pass` and `assert_fail` in a Minitest context. This method is automatically added to the `Minitest::Test`, so If you are already using a Minitest suite, you should gain access to it.
+In the context of your tests, we provide the `assert_mediatype_specification` method, which allows you to run the checks you queue up for a particular `MediaType` within your tests with `assert_pass` and `assert_fail` in a Minitest context. This method is automatically added to the `Minitest::Test`, so If you are already using a Minitest suite, you should gain access to it.
 
-The example below demonstrates how to use `assert_pass` and `assert_fail` within a MediaType, and how to use the `test_specification` method to generate MiniTest tests from them.
+The example below demonstrates how to use `assert_pass` and `assert_fail` within a MediaType, and how to use the `assert_mediatype_specification` method to generate MiniTest tests from them.
 
 ```ruby
 class MyMedia
@@ -461,7 +461,7 @@ class MyMedia
 end
 
 class MyMediaTest < Minitest::Test
-  test_specification MyMedia
+  assert_mediatype_specification MyMedia
    # This transforms all your calls to `assert_pass` and `assert_fail` into tests
 end
 ```
