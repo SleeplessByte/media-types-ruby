@@ -405,17 +405,17 @@ Returns a list of all the schemas that are defined.
 
 ## Ensuring Your MediaTypes Work
 
-### Overview & Rational
+### Overview & Rationale
 
 It is vital that when using this library, your MediaTypes enforce the specification you actually intend them to, as the rules they _do_ enforce will significantly impact code elsewhere in your codebase. To this end, we provide you with a few avenues to check whether MediaTypes enforce the specifications you actually intend by checking examples of JSON you expect to be compliant/non-compliant with the specifications you design. These are as follows:
 
-1. We provide you with two methods (`assert_pass` and `assert fail`), which enable you to specify JSON fixtures you expect to be compliant/non-compliant
+1. We provide you with [two methods](README.md#media-type-checking-in-test-suites) (`assert_pass` and `assert fail`), which enable you to specify JSON fixtures you expect to be compliant/non-compliant
 
-2. We provide methods to turn those fixtures into tests with the [`assert_mediatype_specification`](README.md#media-type-checking-in-test-suites) method.
+2. We provide you with a way to turn those fixtures into tests with the [`assert_mediatype_specification`](README.md#media-type-checking-in-test-suites) method.
 
 3. We automatically check a MediaType's checks defined by (1) the first time it is validated, and throw an error if any fail.
 
-4. We provide you with a way to run the checks carried out by (3) on load, using the method `assert_sane` so that they can be caught then.
+4. We provide you with a way to run the checks carried out by (3) on load, using the method [`assert_sane`](README.md#validation-checks) so that they can be caught then.
 
 These four options are examined in more detail below:
 
