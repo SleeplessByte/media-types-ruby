@@ -411,7 +411,7 @@ It is vital that when using this library, your MediaTypes enforce the specificat
 
 1. We provide you with two methods (`assert_pass` and `assert fail`), which enable you to specify JSON fixtures you expect to be compliant/non-compliant
 
-2. We provide methods to turn those fixtures into tests with the `assert_mediatype_specification` method.
+2. We provide methods to turn those fixtures into tests with the [`assert_mediatype_specification`](README.md#Media Type Checking in Test Suites) method.
 
 3. We automatically check a MediaType's checks defined by (1) the first time it is validated, and throw an error if any fail.
 
