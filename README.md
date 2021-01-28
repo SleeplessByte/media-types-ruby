@@ -496,19 +496,6 @@ class MyMedia
 
   validations do
     any Numeric
-
-    # Only pass keys as strings
-    assert_pass <<-FIXTURE
-    { "foo": 42, "bar": 43 }
-    FIXTURE
-
-    assert_pass '{"foo": 42}'
-    assert_pass '{}'
-
-    # Using symbol keys will result in failed validation
-    assert_fail <<-FIXTURE
-    { "foo": 42, "bar": 43 }
-    FIXTURE
   end
 
   assert_sane!
