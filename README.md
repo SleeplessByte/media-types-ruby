@@ -465,6 +465,7 @@ class MyMediaTest < Minitest::Test
    # This transforms all your calls to `assert_pass` and `assert_fail` into tests
 end
 ```
+
 ### Validation Checks
 
 The  `assert_pass` and `assert_fail` methods take a JSON string (as shown below) and store assertions to be carried out later. The first time the `validate!` method is called on a Media Type, the collection of assertions stored (defined by `assert_pass` and `assert_fail`) for that Media Type are executed.
