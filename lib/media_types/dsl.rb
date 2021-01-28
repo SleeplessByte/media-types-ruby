@@ -52,8 +52,7 @@ module MediaTypes
       end
 
       def validate!(output, **opts)
-        target_scheme = media_type_validations.scheme
-        assert_sane! unless target_scheme.asserted_sane?
+        assert_sane!
         to_constructable.validate!(output, **opts)
       end
 
@@ -107,6 +106,8 @@ module MediaTypes
       end
 
       def assert_sane!
+        return if media_type_validations.scheme.asserted_sane?
+
         media_type_validations.run_queued_fixture_checks(symbol_keys?)
       end
 
