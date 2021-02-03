@@ -83,6 +83,11 @@ module MediaTypes
       instance_exec(&block) if block_given?
     end
 
+    def initialize_copy(original_fighter)
+      self.rules = self.rules.clone
+      @fixtures = []
+    end
+
     attr_accessor :type_attributes, :fixtures
     attr_writer :asserted_sane
     attr_reader :rules
@@ -408,11 +413,11 @@ module MediaTypes
     end
 
     def assert_pass(fixture)
-      @fixtures << FixtureData.new(caller_locations[1], fixture, true)
+      @fixtures << [FixtureData.new(caller_locations[1], fixture, true), self.clone]
     end
 
     def assert_fail(fixture)
-      @fixtures << FixtureData.new(caller_locations[1], fixture, false)
+      @fixtures << [FixtureData.new(caller_locations[1], fixture, false), self.clone]
     end
 
     def run_queued_fixture_checks(expect_symbol_keys)
@@ -433,18 +438,19 @@ module MediaTypes
     end
 
     def validate_fixture(fixture_data, expect_symbol_keys)
-      json = JSON.parse(fixture_data.fixture, { symbolize_names: expect_symbol_keys })
+      json = JSON.parse(fixture_data[0].fixture, { symbolize_names: expect_symbol_keys })
       expected_key_type = expect_symbol_keys ? Symbol : String
 
       begin
-        validate(json, expected_key_type: expected_key_type)
+        fixture_data[1].validate(json, expected_key_type: expected_key_type)
       rescue MediaTypes::Scheme::ValidationError
-        raise UnexpectedValidationResultError.new(fixture_data.caller) if fixture_data.expect_to_pass
+        raise UnexpectedValidationResultError.new(fixture_data[0].caller) if fixture_data[0].expect_to_pass
       end
     end
 
     private
 
     attr_writer :rules
+
   end
 end
