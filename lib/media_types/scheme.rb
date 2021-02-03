@@ -443,6 +443,7 @@ module MediaTypes
 
       begin
         fixture_data[1].validate(json, expected_key_type: expected_key_type)
+        raise UnexpectedValidationResultError.new(fixture_data[0].caller) unless fixture_data[0].expect_to_pass
       rescue MediaTypes::Scheme::ValidationError
         raise UnexpectedValidationResultError.new(fixture_data[0].caller) if fixture_data[0].expect_to_pass
       end
