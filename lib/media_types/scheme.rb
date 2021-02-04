@@ -83,8 +83,8 @@ module MediaTypes
       instance_exec(&block) if block_given?
     end
 
-    def initialize_copy(original_fighter)
-      self.rules = self.rules.clone
+    def initialize_copy(_original_fighter)
+      self.rules = rules.clone
       @fixtures = []
     end
 
@@ -413,11 +413,11 @@ module MediaTypes
     end
 
     def assert_pass(fixture)
-      @fixtures << [FixtureData.new(caller_locations[1], fixture, true), self.clone]
+      @fixtures << [FixtureData.new(caller_locations[1], fixture, true), clone]
     end
 
     def assert_fail(fixture)
-      @fixtures << [FixtureData.new(caller_locations[1], fixture, false), self.clone]
+      @fixtures << [FixtureData.new(caller_locations[1], fixture, false), clone]
     end
 
     def run_queued_fixture_checks(expect_symbol_keys)
@@ -438,14 +438,15 @@ module MediaTypes
     end
 
     def validate_fixture(fixture_data, expect_symbol_keys)
-      json = JSON.parse(fixture_data[0].fixture, { symbolize_names: expect_symbol_keys })
+      test_case, expected_scheme = fixture_data
+      json = JSON.parse(test_case.fixture, { symbolize_names: expect_symbol_keys })
       expected_key_type = expect_symbol_keys ? Symbol : String
 
       begin
-        fixture_data[1].validate(json, expected_key_type: expected_key_type)
-        raise UnexpectedValidationResultError.new(fixture_data[0].caller) unless fixture_data[0].expect_to_pass
+        expected_scheme.validate(json, expected_key_type: expected_key_type)
+        raise UnexpectedValidationResultError, fixture_data[0].caller unless fixture_data[0].expect_to_pass
       rescue MediaTypes::Scheme::ValidationError
-        raise UnexpectedValidationResultError.new(fixture_data[0].caller) if fixture_data[0].expect_to_pass
+        raise UnexpectedValidationResultError, fixture_data[0].caller if fixture_data[0].expect_to_pass
       end
     end
 
