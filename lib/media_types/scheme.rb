@@ -434,7 +434,7 @@ module MediaTypes
       end
       
       @rules.each do |key, rule|
-        if rule.is_a?(Scheme)
+        if rule.is_a?(Scheme) || rule.is_a?(Links)
           begin
             rule.run_queued_fixture_checks(expect_symbol_keys)
           rescue AssertionError => e
