@@ -89,10 +89,54 @@ class IntermediateFixtureAssertTest < Minitest::Test
     end
   end
 
+  class TestThatWholeContextOfBlockIsUsedCollection
+    include MediaTypes::Dsl
+
+    expect_string_keys
+
+    def self.organisation
+        'domain.test'
+    end
+
+    use_name 'TestThatWholeContextOfBlockIsUsedCollection'
+
+    validations do
+      assert_pass '{"foo":[{"bar":9}]}' # Test that we can define a fixture in a block before the rules
+      collection :foo do
+        assert_pass '[{"bar":9}]' # Test that we can define a fixture in a block before the rules
+        attribute :bar, Numeric
+        assert_pass '[{"bar":11}]' # And afterwards
+      end
+      assert_pass '{"foo":[{"bar":11}]}' # And afterwards
+    end
+  end
+
+  class TestThatOptionalIsUsedCorrectlyCollection
+    include MediaTypes::Dsl
+
+    expect_string_keys
+
+    def self.organisation
+        'domain.test'
+    end
+
+    use_name 'TestThatOptionalIsUsedCorrectlyCollection'
+
+    validations do
+      collection :foo, optional: true do
+        attribute :bar, Numeric
+        assert_pass '[{"bar":9}]'
+      end
+      assert_pass '{}'
+    end
+  end
+
   [BasicFixtureTypeNestedAttribute,
     TestThatWholeContextOfBlockIsUsedAttribute,
     TestThatOptionalIsUsedCorrectlyAttribute,
-    BasicFixtureTypeCollection
+    BasicFixtureTypeCollection,
+    TestThatWholeContextOfBlockIsUsedCollection,
+    TestThatOptionalIsUsedCorrectlyCollection
     ].each do |type|
     assert_mediatype_specification type
   end

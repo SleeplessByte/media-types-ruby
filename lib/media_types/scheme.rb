@@ -330,6 +330,8 @@ module MediaTypes
     #   # => true
     #
     def collection(key, scheme = nil, allow_empty: false, expected_type: ::Array, optional: false, &block)
+      raise ConflictingTypeDefinitionError, 'You cannot apply a block to a typed collection, either remove the type or the block' if block_given? && !scheme.nil?
+
       unless block_given?
         return rules.add(
           key,
