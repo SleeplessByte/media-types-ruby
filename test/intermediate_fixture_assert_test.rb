@@ -3,8 +3,9 @@
 require_relative './test_helper'
 
 class IntermediateFixtureAssertTest < Minitest::Test
+  ### Attribute ###
 
-  class BasicFixtureType
+  class BasicFixtureTypeNestedAttribute
     include MediaTypes::Dsl
 
     expect_string_keys
@@ -13,22 +14,17 @@ class IntermediateFixtureAssertTest < Minitest::Test
         'domain.test'
     end
 
-    use_name 'test'
-
-    # Some first time tests to find out how current code behaves and how we want it to behave
+    use_name 'BasicFixtureType'
 
     # default attribute (=hash object)
     validations do
-        assert_pass '{}' # I assume that we test all of the current rules, which is none so far
-        attribute :foo do
-            assert_pass '{}' # Are we testing the contents of :foo? which defaults to hash
-            assert_pass '{"foo" : {}}' # Or are we testing everything up to this point?
-        end
-        assert_pass '{"foo" : {}}' # This should definiatly be the ruleset by now, right?
+      attribute :foo do
+        assert_pass '{}' # Test everything in this block, which is just an empty hash
+      end
     end
   end
-
-  class BasicFixtureTypeNonDefaultAttribute
+  
+  class TestThatWholeContextOfBlockIsUsedAttribute
     include MediaTypes::Dsl
 
     expect_string_keys
@@ -37,23 +33,21 @@ class IntermediateFixtureAssertTest < Minitest::Test
         'domain.test'
     end
 
-    use_name 'testNonDefaultAttribute'
+    use_name 'TestThatWholeContextOfBlockIsUsed'
 
-    # Some first time tests to find out how current code behaves and how we want it to behave
-    # This time a little fancier with an specified attribute type. Most things commented out because WIP
-
-    # non-default attribute
+    # default attribute (=hash object)
     validations do
-        #assert_pass '{}' # I assume that we test all of the current rules, which is none so far
-        attribute :foo, Numeric do # Is this 'do' block even possible here?
-            #assert_pass '{9}' # Are we testing the contents of :foo? which defaults to hash
-            #assert_pass '{"foo" : 9}' # Or are we testing everything up to this point?
-        end
-        #assert_pass '{"foo" : 9}' # This should definiatly be the ruleset by now, right?
+      assert_pass '{"foo":{"bar":9}}' # Test that we can define a fixture in a block before the rules
+      attribute :foo do
+        assert_pass '{"bar":9}' # Test that we can define a fixture in a block before the rules
+        attribute :bar, Numeric
+        assert_pass '{"bar":11}' # And afterwards
+      end
+      assert_pass '{"foo":{"bar":11}}' # And afterwards
     end
   end
 
-  class BasicFixtureTypeDouble
+  class TestThatOptionalIsUsedCorrectlyAttribute
     include MediaTypes::Dsl
 
     expect_string_keys
@@ -62,24 +56,71 @@ class IntermediateFixtureAssertTest < Minitest::Test
         'domain.test'
     end
 
-    use_name 'test_double'
+    use_name 'TestThatOptionalIsUsedCorrectly'
 
-    # See how nested things are handled. Still WIP
-
+    # default attribute (=hash object)
     validations do
-        attribute :foo do
-          assert_pass '{"foo": 9}'
-        end
-        attribute :bar do
-            assert_pass '{"bar": 9}'
-        end
+      attribute :foo, optional: true do
+        attribute :bar, Numeric
+        assert_pass '{"bar":9}'
+      end
+      assert_pass '{}'
     end
   end
 
-  [BasicFixtureType,
-    BasicFixtureTypeNonDefaultAttribute,
-    BasicFixtureTypeDouble].each do |type|
+  ### Collection ###
+
+  class BasicFixtureTypeCollection
+    include MediaTypes::Dsl
+
+    expect_string_keys
+
+    def self.organisation
+        'domain.test'
+    end
+
+    use_name 'BasicFixtureType'
+
+    validations do
+      collection :foo do
+        assert_pass '[]'
+        assert_fail '{}'
+      end
+    end
+  end
+
+  [BasicFixtureTypeNestedAttribute,
+    TestThatWholeContextOfBlockIsUsedAttribute,
+    TestThatOptionalIsUsedCorrectlyAttribute,
+    BasicFixtureTypeCollection
+    ].each do |type|
     assert_mediatype_specification type
+  end
+
+  class NestedAssertsType
+    include MediaTypes::Dsl
+
+    expect_string_keys
+
+    def self.organisation
+        'domain.test'
+    end
+
+    use_name 'nested_assert_pass'
+
+    validations do
+      attribute :foo do
+        assert_pass '{"bar": "9"}'
+        assert_fail '{"bar": "9"}'
+        attribute :bar, Numeric
+      end
+    end
+  end
+
+  def test_nested_asserts_are_evaluated
+    assert_raises MediaTypes::AssertionError do
+      NestedAssertsType.assert_sane!
+    end
   end
 
 end

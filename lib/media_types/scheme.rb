@@ -30,6 +30,7 @@ module MediaTypes
     end
 
     attr_reader :caller
+    attr_reader :error
   end
 
   class FixtureData
@@ -186,8 +187,11 @@ module MediaTypes
     #   MyMedia.valid?({ foo: { bar: 'my-string' }})
     #   # => true
     #
-    def attribute(key, type = ::Object, optional: false, **opts, &block)
-      if block_given?
+    def attribute(key, type = nil, optional: false, **opts, &block) 
+      raise ConflictingTypeDefinitionError, 'You cannot apply a block to a typed attribute, either remove the type or the block' if block_given? && !type.nil?
+      type ||= ::Object
+
+      if block_given? 
         return collection(key, expected_type: ::Hash, optional: optional, **opts, &block)
       end
 
@@ -422,8 +426,19 @@ module MediaTypes
         begin
           validate_fixture(fixture_data, expect_symbol_keys)
         rescue UnexpectedValidationResultError => e
-          @failed_fixtures << (e.caller.path + ':' + e.caller.lineno.to_s).to_s
+          @failed_fixtures << e.message
           next
+        end
+      end
+      
+      @rules.each do |key, rule|
+        if rule.is_a?(Scheme)
+          begin
+            rule.run_queued_fixture_checks(expect_symbol_keys)
+          rescue AssertionError => e
+            @failed_fixtures << e.message
+            next
+          end
         end
       end
 
@@ -438,9 +453,13 @@ module MediaTypes
 
       begin
         validate(json, expected_key_type: expected_key_type)
-        raise UnexpectedValidationResultError.new(fixture_data.caller) unless fixture_data.expect_to_pass
-      rescue MediaTypes::Scheme::ValidationError
-        raise UnexpectedValidationResultError.new(fixture_data.caller) if fixture_data.expect_to_pass
+        unless fixture_data.expect_to_pass
+          message = (fixture_data.caller.path + ':' + fixture_data.caller.lineno.to_s + " -> No error encounterd whilst expecting to").to_s
+          raise UnexpectedValidationResultError.new(message)
+        end
+      rescue MediaTypes::Scheme::ValidationError => e
+        message = (fixture_data.caller.path + ':' + fixture_data.caller.lineno.to_s + " -> " + e.class.to_s + ": " + e.message).to_s
+        raise UnexpectedValidationResultError.new(message) if fixture_data.expect_to_pass
       end
     end
 
