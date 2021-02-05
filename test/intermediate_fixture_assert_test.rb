@@ -14,7 +14,7 @@ class IntermediateFixtureAssertTest < Minitest::Test
         'domain.test'
     end
 
-    use_name 'BasicFixtureType'
+    use_name 'BasicFixtureTypeNestedAttribute'
 
     # default attribute (=hash object)
     validations do
@@ -33,7 +33,7 @@ class IntermediateFixtureAssertTest < Minitest::Test
         'domain.test'
     end
 
-    use_name 'TestThatWholeContextOfBlockIsUsed'
+    use_name 'TestThatWholeContextOfBlockIsUsedAttribute'
 
     # default attribute (=hash object)
     validations do
@@ -56,7 +56,7 @@ class IntermediateFixtureAssertTest < Minitest::Test
         'domain.test'
     end
 
-    use_name 'TestThatOptionalIsUsedCorrectly'
+    use_name 'TestThatOptionalIsUsedCorrectlyAttribute'
 
     # default attribute (=hash object)
     validations do
@@ -79,7 +79,7 @@ class IntermediateFixtureAssertTest < Minitest::Test
         'domain.test'
     end
 
-    use_name 'BasicFixtureType'
+    use_name 'BasicFixtureTypeCollection'
 
     validations do
       collection :foo do
@@ -128,6 +128,48 @@ class IntermediateFixtureAssertTest < Minitest::Test
         assert_pass '[{"bar":9}]'
       end
       assert_pass '{}'
+    end
+  end
+
+  ### Any ###
+
+  class BasicFixtureTypeAny
+    include MediaTypes::Dsl
+
+    expect_string_keys
+
+    def self.organisation
+        'domain.test'
+    end
+
+    use_name 'BasicFixtureTypeAny'
+
+    validations do
+      any do
+        assert_pass '{}'
+      end
+    end
+  end
+
+  class TestThatWholeContextOfBlockIsUsedAny
+    include MediaTypes::Dsl
+
+    expect_string_keys
+
+    def self.organisation
+        'domain.test'
+    end
+
+    use_name 'TestThatWholeContextOfBlockIsUsedAny'
+
+    validations do
+      assert_pass '{"foo":{"bar":9}}' # Test that we can define a fixture in a block before the rules
+      any do
+        assert_pass '{"bar":9}' # Test that we can define a fixture in a block before the rules
+        attribute :bar, Numeric
+        assert_pass '{"bar":11}' # And afterwards
+      end
+      assert_pass '{"foo":{"bar":11}}' # And afterwards
     end
   end
 
@@ -201,6 +243,8 @@ class IntermediateFixtureAssertTest < Minitest::Test
     BasicFixtureTypeCollection,
     TestThatWholeContextOfBlockIsUsedCollection,
     TestThatOptionalIsUsedCorrectlyCollection,
+    BasicFixtureTypeAny,
+    TestThatWholeContextOfBlockIsUsedAny,
     BasicFixtureTypeLink,
     TestThatWholeContextOfBlockIsUsedLink,
     TestThatOptionalIsUsedCorrectlyLink
@@ -257,6 +301,32 @@ class IntermediateFixtureAssertTest < Minitest::Test
   def test_nested_asserts_are_evaluated
     assert_raises MediaTypes::AssertionError do
       NestedAssertsTypeCollection.assert_sane!
+    end
+  end
+
+  class NestedAssertsTypeAny
+    include MediaTypes::Dsl
+
+    expect_string_keys
+
+    def self.organisation
+        'domain.test'
+    end
+
+    use_name 'nested_assert_pass'
+
+    validations do
+      any do
+        assert_pass '{"bar": "9"}'
+        assert_fail '{"bar": "9"}'
+        attribute :bar, Numeric
+      end
+    end
+  end
+
+  def test_nested_asserts_are_evaluated
+    assert_raises MediaTypes::AssertionError do
+      NestedAssertsTypeAny.assert_sane!
     end
   end
 

@@ -286,7 +286,7 @@ module MediaTypes
 
       class TypeAndBlockCombined; end
 
-      def test_attributes_cannot_be_defined_with_both_a_type_and_a_block
+      def test_collection_cannot_be_defined_with_both_a_type_and_a_block
         assert_raises Scheme::ConflictingTypeDefinitionError do
           TypeAndBlockCombined.class_eval do
             include MediaTypes::Dsl

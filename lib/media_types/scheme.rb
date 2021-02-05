@@ -243,6 +243,8 @@ module MediaTypes
     #   # => true
     #
     def any(scheme = nil, expected_type: ::Hash, allow_empty: false, &block)
+      raise ConflictingTypeDefinitionError, 'You cannot apply a block to a typed collection, either remove the type or the block' if block_given? && !scheme.nil?
+      
       unless block_given?
         if scheme.is_a?(Scheme)
           return rules.default = scheme
