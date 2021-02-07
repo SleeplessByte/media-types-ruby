@@ -30,6 +30,7 @@ module MediaTypes
     end
 
     attr_reader :caller
+    attr_reader :error
   end
 
   class FixtureData
@@ -81,11 +82,6 @@ module MediaTypes
       self.asserted_sane = false
 
       instance_exec(&block) if block_given?
-    end
-
-    def initialize_copy(_original_fighter)
-      self.rules = rules.clone
-      @fixtures = []
     end
 
     attr_accessor :type_attributes, :fixtures
@@ -191,8 +187,11 @@ module MediaTypes
     #   MyMedia.valid?({ foo: { bar: 'my-string' }})
     #   # => true
     #
-    def attribute(key, type = ::Object, optional: false, **opts, &block)
-      if block_given?
+    def attribute(key, type = nil, optional: false, **opts, &block) 
+      raise ConflictingTypeDefinitionError, 'You cannot apply a block to a typed attribute, either remove the type or the block' if block_given? && !type.nil?
+      type ||= ::Object
+
+      if block_given? 
         return collection(key, expected_type: ::Hash, optional: optional, **opts, &block)
       end
 
@@ -244,6 +243,8 @@ module MediaTypes
     #   # => true
     #
     def any(scheme = nil, expected_type: ::Hash, allow_empty: false, &block)
+      raise ConflictingTypeDefinitionError, 'You cannot apply a block to a typed collection, either remove the type or the block' if block_given? && !scheme.nil?
+      
       unless block_given?
         if scheme.is_a?(Scheme)
           return rules.default = scheme
@@ -331,6 +332,8 @@ module MediaTypes
     #   # => true
     #
     def collection(key, scheme = nil, allow_empty: false, expected_type: ::Array, optional: false, &block)
+      raise ConflictingTypeDefinitionError, 'You cannot apply a block to a typed collection, either remove the type or the block' if block_given? && !scheme.nil?
+
       unless block_given?
         return rules.add(
           key,
@@ -413,11 +416,11 @@ module MediaTypes
     end
 
     def assert_pass(fixture)
-      @fixtures << [FixtureData.new(caller_locations[1], fixture, true), clone]
+      @fixtures << FixtureData.new(caller_locations[1], fixture, true)
     end
 
     def assert_fail(fixture)
-      @fixtures << [FixtureData.new(caller_locations[1], fixture, false), clone]
+      @fixtures << FixtureData.new(caller_locations[1], fixture, false)
     end
 
     def run_queued_fixture_checks(expect_symbol_keys)
@@ -427,8 +430,19 @@ module MediaTypes
         begin
           validate_fixture(fixture_data, expect_symbol_keys)
         rescue UnexpectedValidationResultError => e
-          @failed_fixtures << (e.caller.path + ':' + e.caller.lineno.to_s).to_s
+          @failed_fixtures << e.message
           next
+        end
+      end
+      
+      @rules.each do |key, rule|
+        if rule.is_a?(Scheme) || rule.is_a?(Links)
+          begin
+            rule.run_queued_fixture_checks(expect_symbol_keys)
+          rescue AssertionError => e
+            @failed_fixtures << e.message
+            next
+          end
         end
       end
 
@@ -438,15 +452,18 @@ module MediaTypes
     end
 
     def validate_fixture(fixture_data, expect_symbol_keys)
-      test_case, expected_scheme = fixture_data
-      json = JSON.parse(test_case.fixture, { symbolize_names: expect_symbol_keys })
+      json = JSON.parse(fixture_data.fixture, { symbolize_names: expect_symbol_keys })
       expected_key_type = expect_symbol_keys ? Symbol : String
 
       begin
-        expected_scheme.validate(json, expected_key_type: expected_key_type)
-        raise UnexpectedValidationResultError, fixture_data[0].caller unless fixture_data[0].expect_to_pass
-      rescue MediaTypes::Scheme::ValidationError
-        raise UnexpectedValidationResultError, fixture_data[0].caller if fixture_data[0].expect_to_pass
+        validate(json, expected_key_type: expected_key_type)
+        unless fixture_data.expect_to_pass
+          message = (fixture_data.caller.path + ':' + fixture_data.caller.lineno.to_s + " -> No error encounterd whilst expecting to").to_s
+          raise UnexpectedValidationResultError.new(message)
+        end
+      rescue MediaTypes::Scheme::ValidationError => e
+        message = (fixture_data.caller.path + ':' + fixture_data.caller.lineno.to_s + " -> " + e.class.to_s + ": " + e.message).to_s
+        raise UnexpectedValidationResultError.new(message) if fixture_data.expect_to_pass
       end
     end
 

@@ -224,6 +224,28 @@ module MediaTypes
           end
         end
       end
+
+      class TypeAndBlockCombined; end
+
+      def test_attributes_cannot_be_defined_with_both_a_type_and_a_block
+        assert_raises Scheme::ConflictingTypeDefinitionError do
+          TypeAndBlockCombined.class_eval do
+            include MediaTypes::Dsl
+
+            def self.organisation
+              'domain.test'
+            end
+
+            use_name 'test'
+
+            validations do
+              attribute :foo, Numeric do
+              end
+            end
+          end
+        end
+      end
+
     end
   end
 end

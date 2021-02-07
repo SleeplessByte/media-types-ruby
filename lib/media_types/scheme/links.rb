@@ -31,6 +31,23 @@ module MediaTypes
         "[Scheme::Links #{links.keys}]"
       end
 
+      def run_queued_fixture_checks(expect_symbol_keys)
+        @failed_fixtures = []
+
+        @links.each do |key, rule|
+          if rule.is_a?(Scheme)
+            begin
+              rule.run_queued_fixture_checks(expect_symbol_keys)
+            rescue AssertionError => e
+              @failed_fixtures << e.message
+              next
+            end
+          end
+        end
+
+        raise AssertionError, @failed_fixtures unless @failed_fixtures.empty?
+      end
+
       private
 
       attr_accessor :links

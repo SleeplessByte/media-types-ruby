@@ -2,6 +2,7 @@
 
 module MediaTypes
   class Scheme
+    class ConflictingTypeDefinitionError < ArgumentError; end
 
     # Base class for all validations errors
     class ValidationError < ArgumentError; end
