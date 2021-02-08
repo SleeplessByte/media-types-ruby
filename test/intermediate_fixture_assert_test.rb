@@ -271,7 +271,7 @@ class IntermediateFixtureAssertTest < Minitest::Test
     end
   end
 
-  def test_nested_asserts_are_evaluated
+  def test_nested_asserts_are_evaluated_attribute
     assert_raises MediaTypes::AssertionError do
       NestedAssertsTypeAttribute.assert_sane!
     end
@@ -297,7 +297,7 @@ class IntermediateFixtureAssertTest < Minitest::Test
     end
   end
 
-  def test_nested_asserts_are_evaluated
+  def test_nested_asserts_are_evaluated_collection
     assert_raises MediaTypes::AssertionError do
       NestedAssertsTypeCollection.assert_sane!
     end
@@ -323,7 +323,7 @@ class IntermediateFixtureAssertTest < Minitest::Test
     end
   end
 
-  def test_nested_asserts_are_evaluated
+  def test_nested_asserts_are_evaluated_any
     assert_raises MediaTypes::AssertionError do
       NestedAssertsTypeAny.assert_sane!
     end
@@ -349,7 +349,7 @@ class IntermediateFixtureAssertTest < Minitest::Test
     end
   end
 
-  def test_nested_asserts_are_evaluated
+  def test_nested_asserts_are_evaluated_link
     assert_raises MediaTypes::AssertionError do
       NestedAssertsTypeLink.assert_sane!
     end
