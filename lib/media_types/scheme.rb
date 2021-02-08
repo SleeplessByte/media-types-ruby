@@ -446,6 +446,14 @@ module MediaTypes
         end
       end
 
+      if @rules.default.respond_to?(:run_queued_fixture_checks)
+        begin
+          @rules.default.run_queued_fixture_checks(expect_symbol_keys)
+        rescue AssertionError => e
+          @failed_fixtures << e.message
+        end
+      end
+
       raise AssertionError, @failed_fixtures unless @failed_fixtures.empty?
 
       self.asserted_sane = true
