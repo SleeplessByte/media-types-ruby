@@ -416,11 +416,13 @@ module MediaTypes
     end
 
     def assert_pass(fixture)
-      @fixtures << FixtureData.new(caller_locations[1], fixture, true)
+      position =  caller_locations[0].to_s.match?(/.*`block \(\d+ levels\) in <class:\w+>'/) ? 0 : 1 
+      @fixtures << FixtureData.new(caller_locations[position], fixture, true)
     end
 
     def assert_fail(fixture)
-      @fixtures << FixtureData.new(caller_locations[1], fixture, false)
+      position =  caller_locations[0].to_s.match?(/.*`block \(\d+ levels\) in <class:\w+>'/) ? 0 : 1 
+      @fixtures << FixtureData.new(caller_locations[position], fixture, false)
     end
 
     def run_queued_fixture_checks(expect_symbol_keys)
