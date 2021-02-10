@@ -6,7 +6,7 @@ module Minitest
   class Test < Minitest::Runnable
     include MediaTypes::Assertions
     def self.assert_mediatype_specification(mediatype)
-      define_method "test_fixtures_for_#{mediatype.to_constructable}" do
+      define_method "test_preflight_fixture_checks_for_#{mediatype.to_constructable}" do
         mediatype.assert_sane!
       end
     end
