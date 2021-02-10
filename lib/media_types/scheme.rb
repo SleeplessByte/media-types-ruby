@@ -187,11 +187,12 @@ module MediaTypes
     #   MyMedia.valid?({ foo: { bar: 'my-string' }})
     #   # => true
     #
-    def attribute(key, type = nil, optional: false, **opts, &block) 
+    def attribute(key, type = nil, optional: false, **opts, &block)
       raise ConflictingTypeDefinitionError, 'You cannot apply a block to a typed attribute, either remove the type or the block' if block_given? && !type.nil?
+
       type ||= ::Object
 
-      if block_given? 
+      if block_given?
         return collection(key, expected_type: ::Hash, optional: optional, **opts, &block)
       end
 
@@ -244,7 +245,7 @@ module MediaTypes
     #
     def any(scheme = nil, expected_type: ::Hash, allow_empty: false, &block)
       raise ConflictingTypeDefinitionError, 'You cannot apply a block to a typed collection, either remove the type or the block' if block_given? && !scheme.nil?
-      
+
       unless block_given?
         if scheme.is_a?(Scheme)
           return rules.default = scheme
@@ -416,12 +417,12 @@ module MediaTypes
     end
 
     def assert_pass(fixture)
-      position =  caller_locations[0].to_s.match?(/.*`block \(\d+ levels\) in <class:\w+>'/) ? 0 : 1 
+      position = caller_locations[0].to_s.match?(/.*`block \(\d+ levels\) in <class:\w+>'/) ? 0 : 1
       @fixtures << FixtureData.new(caller_locations[position], fixture, true)
     end
 
     def assert_fail(fixture)
-      position =  caller_locations[0].to_s.match?(/.*`block \(\d+ levels\) in <class:\w+>'/) ? 0 : 1 
+      position = caller_locations[0].to_s.match?(/.*`block \(\d+ levels\) in <class:\w+>'/) ? 0 : 1
       @fixtures << FixtureData.new(caller_locations[position], fixture, false)
     end
 
@@ -436,15 +437,15 @@ module MediaTypes
           next
         end
       end
-      
-      @rules.each do |key, rule|
-        if rule.is_a?(Scheme) || rule.is_a?(Links)
-          begin
-            rule.run_queued_fixture_checks(expect_symbol_keys)
-          rescue AssertionError => e
-            @failed_fixtures << e.message
-            next
-          end
+
+      @rules.each do |_key, rule|
+        next unless rule.is_a?(Scheme) || rule.is_a?(Links)
+
+        begin
+          rule.run_queued_fixture_checks(expect_symbol_keys)
+        rescue AssertionError => e
+          @failed_fixtures << e.message
+          next
         end
       end
 
@@ -468,12 +469,12 @@ module MediaTypes
       begin
         validate(json, expected_key_type: expected_key_type)
         unless fixture_data.expect_to_pass
-          message = (fixture_data.caller.path + ':' + fixture_data.caller.lineno.to_s + " -> No error encounterd whilst expecting to").to_s
-          raise UnexpectedValidationResultError.new(message)
+          message = (fixture_data.caller.path + ':' + fixture_data.caller.lineno.to_s + ' -> No error encounterd whilst expecting to').to_s
+          raise UnexpectedValidationResultError, message
         end
       rescue MediaTypes::Scheme::ValidationError => e
-        message = (fixture_data.caller.path + ':' + fixture_data.caller.lineno.to_s + " -> " + e.class.to_s + ": " + e.message).to_s
-        raise UnexpectedValidationResultError.new(message) if fixture_data.expect_to_pass
+        message = (fixture_data.caller.path + ':' + fixture_data.caller.lineno.to_s + ' -> ' + e.class.to_s + ': ' + e.message).to_s
+        raise UnexpectedValidationResultError, message if fixture_data.expect_to_pass
       end
     end
 
