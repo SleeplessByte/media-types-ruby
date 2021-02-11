@@ -433,7 +433,6 @@ module MediaTypes
           validate_fixture(fixture_data, expect_symbol_keys)
         rescue UnexpectedValidationResultError => e
           @failed_fixtures << e.message
-          next
         end
       end
     end
@@ -446,7 +445,6 @@ module MediaTypes
           rule.run_fixture_validations(expect_symbol_keys)
         rescue AssertionError => e
           @failed_fixtures << e.message
-          next
         end
       end
     end
