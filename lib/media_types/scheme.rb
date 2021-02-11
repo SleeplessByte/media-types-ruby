@@ -77,13 +77,12 @@ module MediaTypes
       self.type_attributes = {}
 
       @fixtures = []
-      @failed_fixtures = []
       self.asserted_sane = false
 
       instance_exec(&block) if block_given?
     end
 
-    attr_accessor :type_attributes, :fixtures, :failed_fixtures
+    attr_accessor :type_attributes, :fixtures
     attr_writer :asserted_sane
     attr_reader :rules
 
@@ -426,41 +425,47 @@ module MediaTypes
     end
 
     def validate_scheme_fixtures(expect_symbol_keys)
+      failed_fixtures = []
       @fixtures.each do |fixture_data|
         begin
           validate_fixture(fixture_data, expect_symbol_keys)
         rescue UnexpectedValidationResultError => e
-          @failed_fixtures << e.message
+          failed_fixtures << e.message
         end
       end
+      failed_fixtures
     end
 
     def validate_nested_scheme_fixtures(expect_symbol_keys)
+      failed_fixtures = []
       @rules.each do |_key, rule|
         next unless rule.is_a?(Scheme) || rule.is_a?(Links)
 
         begin
           rule.run_fixture_validations(expect_symbol_keys)
         rescue AssertionError => e
-          @failed_fixtures += e.fixture_errors
+          failed_fixtures += e.fixture_errors
         end
       end
+      failed_fixtures
     end
 
     def validate_default_scheme_fixtures(expect_symbol_keys)
-      return unless @rules.default.is_a?(Scheme)
+      return [] unless @rules.default.is_a?(Scheme)
 
       @rules.default.run_fixture_validations(expect_symbol_keys)
+      []
     rescue AssertionError => e
-      @failed_fixtures += e.fixture_errors
+      return e.fixture_errors
     end
 
     def run_fixture_validations(expect_symbol_keys)
-      validate_scheme_fixtures(expect_symbol_keys)
-      validate_nested_scheme_fixtures(expect_symbol_keys)
-      validate_default_scheme_fixtures(expect_symbol_keys)
+      failed_fixtures = []
+      failed_fixtures += validate_scheme_fixtures(expect_symbol_keys)
+      failed_fixtures += validate_nested_scheme_fixtures(expect_symbol_keys)
+      failed_fixtures += validate_default_scheme_fixtures(expect_symbol_keys)
 
-      raise AssertionError.new(@failed_fixtures) unless @failed_fixtures.empty?
+      raise AssertionError.new(failed_fixtures) unless failed_fixtures.empty?
 
       self.asserted_sane = true
     end
