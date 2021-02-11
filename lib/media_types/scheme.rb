@@ -79,12 +79,13 @@ module MediaTypes
       self.type_attributes = {}
 
       @fixtures = []
+      @failed_fixtures = []
       self.asserted_sane = false
 
       instance_exec(&block) if block_given?
     end
 
-    attr_accessor :type_attributes, :fixtures
+    attr_accessor :type_attributes, :fixtures, :failed_fixtures
     attr_writer :asserted_sane
     attr_reader :rules
 
@@ -417,18 +418,20 @@ module MediaTypes
     end
 
     def assert_pass(fixture)
-      position = caller_locations[0].to_s.match?(/.*`block \(\d+ levels\) in <class:\w+>'/) ? 0 : 1
-      @fixtures << FixtureData.new(caller_locations[position], fixture, true)
+      reduced_stack = caller_locations.filter { |location| !location.path.include?(__dir__) }
+      @fixtures << FixtureData.new(reduced_stack.first, fixture, true)
+      # Needs to be changed to
+      # @fixtures << FixtureData.new(caller: reduced_stack.first,fixture: fixture, expect_to_pass: true)
+      # But, this is a little glitchy I can't work out why that isn't working.
+      # DJ pointed that keyword arguments would be a little clearer/better here
     end
 
     def assert_fail(fixture)
-      position = caller_locations[0].to_s.match?(/.*`block \(\d+ levels\) in <class:\w+>'/) ? 0 : 1
-      @fixtures << FixtureData.new(caller_locations[position], fixture, false)
+      reduced_stack = caller_locations.filter { |location| !location.path.include?(__dir__) }
+      @fixtures << FixtureData.new(reduced_stack.first, fixture, false)
     end
 
-    def run_queued_fixture_checks(expect_symbol_keys)
-      @failed_fixtures = []
-
+    def run_fixtures_against_current_scheme(expect_symbol_keys)
       @fixtures.each do |fixture_data|
         begin
           validate_fixture(fixture_data, expect_symbol_keys)
@@ -437,7 +440,9 @@ module MediaTypes
           next
         end
       end
+    end
 
+    def run_checks_for_rules_that_contain_schemes(expect_symbol_keys)
       @rules.each do |_key, rule|
         next unless rule.is_a?(Scheme) || rule.is_a?(Links)
 
@@ -448,14 +453,18 @@ module MediaTypes
           next
         end
       end
+    end
 
-      if @rules.default.respond_to?(:run_queued_fixture_checks)
-        begin
-          @rules.default.run_queued_fixture_checks(expect_symbol_keys)
-        rescue AssertionError => e
-          @failed_fixtures << e.message
-        end
-      end
+    def run_fixture_check_when_default_rules_object_is_scheme(expect_symbol_keys)
+      @rules.default.run_queued_fixture_checks(expect_symbol_keys)
+    rescue AssertionError => e
+      @failed_fixtures << e.message
+    end
+
+    def run_queued_fixture_checks(expect_symbol_keys)
+      run_fixtures_against_current_scheme(expect_symbol_keys)
+      run_checks_for_rules_that_contain_schemes(expect_symbol_keys)
+      run_fixture_check_when_default_rules_object_is_scheme(expect_symbol_keys) if @rules.default.respond_to?(:run_queued_fixture_checks)
 
       raise AssertionError, @failed_fixtures unless @failed_fixtures.empty?
 
