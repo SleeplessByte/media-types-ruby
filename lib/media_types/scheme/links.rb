@@ -32,20 +32,19 @@ module MediaTypes
       end
 
       def run_fixture_validations(expect_symbol_keys)
-        @failed_fixtures = []
+        failed_fixtures = []
 
         @links.each do |key, rule|
           if rule.is_a?(Scheme)
             begin
               rule.run_fixture_validations(expect_symbol_keys)
             rescue AssertionError => e
-              @failed_fixtures << e.message
-              next
+              failed_fixtures << e.message
             end
           end
         end
 
-        raise AssertionError, @failed_fixtures unless @failed_fixtures.empty?
+        raise AssertionError, failed_fixtures unless failed_fixtures.empty?
       end
 
       private
