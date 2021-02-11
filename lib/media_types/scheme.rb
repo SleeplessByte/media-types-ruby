@@ -34,7 +34,7 @@ module MediaTypes
   end
 
   class FixtureData
-    def initialize(caller, fixture, expect_to_pass)
+    def initialize(caller:, fixture:, expect_to_pass:)
       @caller = caller
       @fixture = fixture
       @expect_to_pass = expect_to_pass
@@ -419,16 +419,12 @@ module MediaTypes
 
     def assert_pass(fixture)
       reduced_stack = caller_locations.filter { |location| !location.path.include?(__dir__) }
-      @fixtures << FixtureData.new(reduced_stack.first, fixture, true)
-      # Needs to be changed to
-      # @fixtures << FixtureData.new(caller: reduced_stack.first,fixture: fixture, expect_to_pass: true)
-      # But, this is a little glitchy I can't work out why that isn't working.
-      # DJ pointed that keyword arguments would be a little clearer/better here
+      @fixtures << FixtureData.new(caller: reduced_stack.first, fixture: fixture, expect_to_pass: true)
     end
 
     def assert_fail(fixture)
       reduced_stack = caller_locations.filter { |location| !location.path.include?(__dir__) }
-      @fixtures << FixtureData.new(reduced_stack.first, fixture, false)
+      @fixtures << FixtureData.new(caller: reduced_stack.first, fixture: fixture, expect_to_pass: false)
     end
 
     def run_fixtures_against_current_scheme(expect_symbol_keys)
