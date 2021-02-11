@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative './test_helper'
+require_relative '../test_helper'
 
 class IntermediateFixtureAssertTest < Minitest::Test
   ### Attribute ###
@@ -235,22 +235,6 @@ class IntermediateFixtureAssertTest < Minitest::Test
     end
   end
 
-  ### Calling assert_sane on all the test cases ###
-
-  [BasicFixtureTypeNestedAttribute,
-   TestThatWholeContextOfBlockIsUsedAttribute,
-   TestThatOptionalIsUsedCorrectlyAttribute,
-   BasicFixtureTypeCollection,
-   TestThatWholeContextOfBlockIsUsedCollection,
-   TestThatOptionalIsUsedCorrectlyCollection,
-   BasicFixtureTypeAny,
-   TestThatWholeContextOfBlockIsUsedAny,
-   BasicFixtureTypeLink,
-   TestThatWholeContextOfBlockIsUsedLink,
-   TestThatOptionalIsUsedCorrectlyLink].each do |type|
-    assert_mediatype_specification type
-  end
-
   class NestedAssertsTypeAttribute
     include MediaTypes::Dsl
 
@@ -355,4 +339,17 @@ class IntermediateFixtureAssertTest < Minitest::Test
     end
   end
 
+  [BasicFixtureTypeNestedAttribute,
+   TestThatWholeContextOfBlockIsUsedAttribute,
+   TestThatOptionalIsUsedCorrectlyAttribute,
+   BasicFixtureTypeCollection,
+   TestThatWholeContextOfBlockIsUsedCollection,
+   TestThatOptionalIsUsedCorrectlyCollection,
+   BasicFixtureTypeAny,
+   TestThatWholeContextOfBlockIsUsedAny,
+   BasicFixtureTypeLink,
+   TestThatWholeContextOfBlockIsUsedLink,
+   TestThatOptionalIsUsedCorrectlyLink].each do |type|
+    assert_mediatype_specification type
+  end
 end
