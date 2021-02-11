@@ -21,17 +21,15 @@ require 'json'
 
 module MediaTypes
   class AssertionError < StandardError
-  end
-
-  class UnexpectedValidationResultError < StandardError
-    def initialize(caller)
-      @caller = caller
+    def initialize(errors)
+      @fixture_errors = errors
       super
     end
 
-    attr_reader :caller
-    attr_reader :error
+    attr_reader :fixture_errors
   end
+
+  class UnexpectedValidationResultError < StandardError; end
 
   class FixtureData
     def initialize(caller:, fixture:, expect_to_pass:)
@@ -444,7 +442,7 @@ module MediaTypes
         begin
           rule.run_fixture_validations(expect_symbol_keys)
         rescue AssertionError => e
-          @failed_fixtures << e.message
+          @failed_fixtures += e.fixture_errors
         end
       end
     end
@@ -454,7 +452,7 @@ module MediaTypes
 
       @rules.default.run_fixture_validations(expect_symbol_keys)
     rescue AssertionError => e
-      @failed_fixtures << e.message
+      @failed_fixtures += e.fixture_errors
     end
 
     def run_fixture_validations(expect_symbol_keys)
@@ -462,7 +460,7 @@ module MediaTypes
       validate_nested_scheme_fixtures(expect_symbol_keys)
       validate_default_scheme_fixtures(expect_symbol_keys)
 
-      raise AssertionError, @failed_fixtures unless @failed_fixtures.empty?
+      raise AssertionError.new(@failed_fixtures) unless @failed_fixtures.empty?
 
       self.asserted_sane = true
     end

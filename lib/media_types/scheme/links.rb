@@ -39,7 +39,7 @@ module MediaTypes
             begin
               rule.run_fixture_validations(expect_symbol_keys)
             rescue AssertionError => e
-              failed_fixtures << e.message
+              failed_fixtures += e.fixture_errors
             end
           end
         end
