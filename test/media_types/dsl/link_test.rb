@@ -95,8 +95,10 @@ module MediaTypes
         refute OptionalLink.valid?({}), 'Expected input to be invalid'
       end
 
-      [SingleLink, LinkWithAttribute, OptionalLink].each do |type|
-        assert_mediatype_specification type
+      def test_mediatype_specifications
+        [SingleLink, LinkWithAttribute, OptionalLink].each do |type|
+          assert_mediatype_specification type
+        end
       end
 
       class DuplicateSymbolSymbol; end

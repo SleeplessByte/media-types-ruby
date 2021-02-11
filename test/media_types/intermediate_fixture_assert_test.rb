@@ -339,17 +339,19 @@ class IntermediateFixtureAssertTest < Minitest::Test
     end
   end
 
-  [BasicFixtureTypeNestedAttribute,
-   TestThatWholeContextOfBlockIsUsedAttribute,
-   TestThatOptionalIsUsedCorrectlyAttribute,
-   BasicFixtureTypeCollection,
-   TestThatWholeContextOfBlockIsUsedCollection,
-   TestThatOptionalIsUsedCorrectlyCollection,
-   BasicFixtureTypeAny,
-   TestThatWholeContextOfBlockIsUsedAny,
-   BasicFixtureTypeLink,
-   TestThatWholeContextOfBlockIsUsedLink,
-   TestThatOptionalIsUsedCorrectlyLink].each do |type|
-    assert_mediatype_specification type
+  def test_mediatype_specifications
+    [BasicFixtureTypeNestedAttribute,
+     TestThatWholeContextOfBlockIsUsedAttribute,
+     TestThatOptionalIsUsedCorrectlyAttribute,
+     BasicFixtureTypeCollection,
+     TestThatWholeContextOfBlockIsUsedCollection,
+     TestThatOptionalIsUsedCorrectlyCollection,
+     BasicFixtureTypeAny,
+     TestThatWholeContextOfBlockIsUsedAny,
+     BasicFixtureTypeLink,
+     TestThatWholeContextOfBlockIsUsedLink,
+     TestThatOptionalIsUsedCorrectlyLink].each do |type|
+      assert_mediatype_specification type
+    end
   end
 end

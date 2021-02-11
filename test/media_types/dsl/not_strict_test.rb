@@ -63,8 +63,10 @@ module MediaTypes
         refute NotStrictCollectionType.valid?(foo: nil), 'Expected input to be invalid'
       end
 
-      [NotStrictType, NotStrictCollectionType].each do |type|
-        assert_mediatype_specification type
+      def test_mediatype_specifications
+        [NotStrictType, NotStrictCollectionType].each do |type|
+          assert_mediatype_specification type
+        end
       end
 
       class OverwritingNotStrictWithNotStrict; end

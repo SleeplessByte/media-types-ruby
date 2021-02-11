@@ -8,8 +8,6 @@ require 'media_types/object'
 require 'media_types/scheme'
 require 'media_types/dsl'
 require 'media_types/errors'
-require 'media_types/minitest/assert_media_type_format'
-require 'media_types/minitest/test_factory'
 
 require 'media_types/views'
 

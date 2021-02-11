@@ -207,8 +207,15 @@ module MediaTypes
         refute OptionalAttributeInsideOptionalAttribute.valid?(foo: nil), 'Expected input to be invalid'
       end
 
-      [OptionalAttribute, OptionalAttributeInsideAny, OptionalAttributeInsideCollection, OptionalCollection, OptionalAttributeInsideAttribute, OptionalAttributeInsideOptionalAttribute].each do |type|
-        assert_mediatype_specification type
+      def test_mediatype_specifications
+        [OptionalAttribute,
+         OptionalAttributeInsideAny,
+         OptionalAttributeInsideCollection,
+         OptionalCollection,
+         OptionalAttributeInsideAttribute,
+         OptionalAttributeInsideOptionalAttribute].each do |type|
+          assert_mediatype_specification type
+        end
       end
     end
   end
