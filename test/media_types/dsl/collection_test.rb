@@ -176,10 +176,8 @@ module MediaTypes
         refute CollectionForceHashType.valid?(foo: nil), 'Expected input to be invalid'
       end
 
-      def test_mediatype_specifications
-        [CollectionType, CollectionCollectionType, CollectionSchemeType, CollectionSchemeTypeEmpty, CollectionOptionsType, CollectionForceHashType].each do |type|
-          assert_mediatype_specification type
-        end
+      [CollectionType, CollectionCollectionType, CollectionSchemeType, CollectionSchemeTypeEmpty, CollectionOptionsType, CollectionForceHashType].each do |type|
+        create_specification_tests_for type
       end
 
       class DuplicateSymbolSymbol; end

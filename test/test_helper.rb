@@ -29,6 +29,7 @@ Minitest::Reporters.use!
 # Run at exit
 require 'minitest/autorun'
 require_relative './assertions'
+require_relative '../lib/media_types/minitest/test_factory'
 
 module Minitest
   class Test < Minitest::Runnable

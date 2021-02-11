@@ -117,10 +117,8 @@ module MediaTypes
         refute AttributeType.valid?({}), 'Expected input to be invalid'
       end
 
-      def test_mediatype_specifications
-        [AttributeType, AttributeCollectionType, AttributeSchemeType, AttributeOptionsType].each do |type|
-          assert_mediatype_specification type
-        end
+      [AttributeType, AttributeCollectionType, AttributeSchemeType, AttributeOptionsType].each do |type|
+        create_specification_tests_for type
       end
 
       class DuplicateSymbolSymbol; end

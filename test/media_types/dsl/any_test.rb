@@ -239,10 +239,8 @@ module MediaTypes
         refute AnyWithForce.valid?(foo: nil), 'Expected input to be invalid'
       end
 
-      def test_mediatype_specifications
-        [AnyType, AnyOfScheme, AnyWithOptions, AnyWithOptionsOrNil, AnyWithScheme, AnyWithForce].each do |type|
-          assert_mediatype_specification type
-        end
+      [AnyType, AnyOfScheme, AnyWithOptions, AnyWithOptionsOrNil, AnyWithScheme, AnyWithForce].each do |type|
+        create_specification_tests_for type
       end
 
       class OverwritingAnyWithAny; end
