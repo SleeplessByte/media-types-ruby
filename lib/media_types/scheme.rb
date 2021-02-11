@@ -452,6 +452,8 @@ module MediaTypes
     end
 
     def run_fixture_check_when_default_rules_object_is_scheme(expect_symbol_keys)
+      return unless @rules.default.respond_to?(:run_queued_fixture_checks)
+
       @rules.default.run_queued_fixture_checks(expect_symbol_keys)
     rescue AssertionError => e
       @failed_fixtures << e.message
@@ -460,7 +462,7 @@ module MediaTypes
     def run_queued_fixture_checks(expect_symbol_keys)
       run_fixtures_against_current_scheme(expect_symbol_keys)
       run_checks_for_rules_that_contain_schemes(expect_symbol_keys)
-      run_fixture_check_when_default_rules_object_is_scheme(expect_symbol_keys) if @rules.default.respond_to?(:run_queued_fixture_checks)
+      run_fixture_check_when_default_rules_object_is_scheme(expect_symbol_keys)
 
       raise AssertionError, @failed_fixtures unless @failed_fixtures.empty?
 
