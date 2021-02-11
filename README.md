@@ -468,13 +468,44 @@ end
 
 ### Validation Checks
 
-The  `assert_pass` and `assert_fail` methods take a JSON string (as shown below) and store assertions to be carried out later. The first time the `validate!` method is called on a Media Type, the collection of assertions stored (defined by `assert_pass` and `assert_fail`) for that Media Type are executed.
+The `assert_pass` and `assert_fail` methods take a JSON string (as shown below) and store assertions to be carried out later. The first time the `validate!` method is called on a Media Type, the collection of assertions stored (defined by `assert_pass` and `assert_fail`) for that Media Type are executed.
 
 This is done as a last line of defence against introducing faulty MediaTypes into your software. Ideally, you want to carry out these checks on load rather than when your server/project is already up and running, this functionality is provided by the `assert_sane!` method. Which can be called on a particular class
 
 ```ruby
   MyMedia.assert_sane!
   # true
+```
+
+### Intermediate Checks
+The fixtures provided to the `assert_pass` and `assert_fail` methods are evaluated within the context of the block they are placed in. This way you can, for example, write a test for a (complex) optional attribute, without the need to have that test clutter the fixtures for the entire mediatype.
+
+```ruby
+  class MyMedia
+    include MediaTypes::Dsl
+
+    expect_string_keys
+
+    def self.organisation
+      'acme'
+    end
+
+    use_name 'test'
+
+    validations do
+      # default attribute type is a Hash object
+      attribute :foo, optional: true do
+        attribute :bar, Numeric
+
+        # This passes, since in this context we require for the input to contain an Numeric attribute "bar"
+        assert_pass '{"bar": 42}'
+      end
+      attribute :rep, Numeric
+      
+      # This passes, since the attribute "foo" is optional. And we don't need to test it again, since we gave it its own seperate test
+      assert_pass '{"rep": 42}'
+    end
+  end
 ```
 
 ## Key type validation
