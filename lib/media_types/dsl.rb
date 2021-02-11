@@ -108,7 +108,7 @@ module MediaTypes
       def assert_sane!
         return if media_type_validations.scheme.asserted_sane?
 
-        media_type_validations.run_queued_fixture_checks(symbol_keys?)
+        media_type_validations.run_fixture_validations(symbol_keys?)
       end
 
       private

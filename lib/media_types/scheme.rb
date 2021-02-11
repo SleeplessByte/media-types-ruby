@@ -427,7 +427,7 @@ module MediaTypes
       @fixtures << FixtureData.new(caller: reduced_stack.first, fixture: fixture, expect_to_pass: false)
     end
 
-    def run_fixtures_against_current_scheme(expect_symbol_keys)
+    def validate_scheme_fixtures(expect_symbol_keys)
       @fixtures.each do |fixture_data|
         begin
           validate_fixture(fixture_data, expect_symbol_keys)
@@ -438,12 +438,12 @@ module MediaTypes
       end
     end
 
-    def run_checks_for_rules_that_contain_schemes(expect_symbol_keys)
+    def validate_nested_scheme_fixtures(expect_symbol_keys)
       @rules.each do |_key, rule|
         next unless rule.is_a?(Scheme) || rule.is_a?(Links)
 
         begin
-          rule.run_queued_fixture_checks(expect_symbol_keys)
+          rule.run_fixture_validations(expect_symbol_keys)
         rescue AssertionError => e
           @failed_fixtures << e.message
           next
@@ -451,18 +451,18 @@ module MediaTypes
       end
     end
 
-    def run_fixture_check_when_default_rules_object_is_scheme(expect_symbol_keys)
-      return unless @rules.default.respond_to?(:run_queued_fixture_checks)
+    def validate_default_scheme_fixtures(expect_symbol_keys)
+      return unless @rules.default.is_a?(Scheme)
 
-      @rules.default.run_queued_fixture_checks(expect_symbol_keys)
+      @rules.default.run_fixture_validations(expect_symbol_keys)
     rescue AssertionError => e
       @failed_fixtures << e.message
     end
 
-    def run_queued_fixture_checks(expect_symbol_keys)
-      run_fixtures_against_current_scheme(expect_symbol_keys)
-      run_checks_for_rules_that_contain_schemes(expect_symbol_keys)
-      run_fixture_check_when_default_rules_object_is_scheme(expect_symbol_keys)
+    def run_fixture_validations(expect_symbol_keys)
+      validate_scheme_fixtures(expect_symbol_keys)
+      validate_nested_scheme_fixtures(expect_symbol_keys)
+      validate_default_scheme_fixtures(expect_symbol_keys)
 
       raise AssertionError, @failed_fixtures unless @failed_fixtures.empty?
 
