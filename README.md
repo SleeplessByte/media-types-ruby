@@ -532,8 +532,6 @@ class MyMedia
   validations do
     any Numeric
   end
-
-  assert_sane!
 end
 ```
 
