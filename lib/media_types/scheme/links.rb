@@ -31,13 +31,13 @@ module MediaTypes
         "[Scheme::Links #{links.keys}]"
       end
 
-      def run_fixture_validations(expect_symbol_keys)
+      def run_fixture_validations(expect_symbol_keys, backtrace = [])
         failed_fixtures = []
 
         @links.each do |key, rule|
           if rule.is_a?(Scheme)
             begin
-              rule.run_fixture_validations(expect_symbol_keys)
+              rule.run_fixture_validations(expect_symbol_keys, backtrace.dup.append(key))
             rescue AssertionError => e
               failed_fixtures += e.fixture_errors
             end
