@@ -541,7 +541,7 @@ Key type expectations can also be set at the module level, each MediaType within
 
 ```ruby
 module Acme
-  expect_string_keys
+  MediaTypes.expect_string_keys(self)
 
   # The MyMedia class will be expecting string keys, as inherited from the Acme module.
   class MyMedia
