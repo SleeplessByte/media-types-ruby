@@ -28,7 +28,7 @@ module MediaTypes
 
       def raise_type_error!(type:, backtrace:)
         raise OutputTypeMismatch, format(
-          'Expected a %<expected>s, got a %<actual>s at %<backtrace>s',
+          'Expected %<expected>s, got %<actual>s at %<backtrace>s',
           expected: expected_type,
           actual: type,
           backtrace: backtrace.join('->')
