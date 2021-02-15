@@ -118,7 +118,7 @@ Adds an attribute to the schema, if a +block+ is given, uses that to test agains
 | --------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | key       | `Symbol`                  | the attribute name                                                                                                                                                             |
 | opts      | `Hash`                    | options to pass to `Scheme` or `Attribute`                                                                                                                                     |
-| type      | `Class`, `===`, Scheme    | The type of the value, can be anything that responds to `===`,  or scheme to use if no `&block` is given. Defaults to `Object` without a `&block` and to Hash with a `&block`. |
+| type      | `Class`, `===`, Scheme    | The type of the value can be anything that responds to `===`,  or scheme to use if no `&block` is given. Defaults to `Object` without a `&block` and to Hash with a `&block`. |
 | optional: | `TrueClass`, `FalseClass` | if true, key may be absent, defaults to `false`                                                                                                                                |
 | &block    | `Block`                   | defines the scheme of the value of this attribute                                                                                                                              |
 
@@ -365,7 +365,7 @@ Allows passing in validation options as a second parameter.
 
 Example: `Venue.version(42).validatable?`
 
-Tests wether the current configuration of the schema has a validation defined.
+Tests whether the current configuration of the schema has a validation defined.
 
 ### `register`
 
@@ -407,9 +407,9 @@ Returns a list of all the schemas that are defined.
 
 ### Overview & Rationale
 
-If the MediaTypes you create enforce a specification you _do not expect them to_, it will cause problems that will be very difficult to fix, as other code, which utilises your MediaType, would break when you change the specification. This is because the faulty MediaType definition will start to make other code dependent on the specification it defined.
+If the MediaTypes you create enforce a specification you _do not expect them to_, it will cause problems that will be very difficult to fix, as other code, which utilises your MediaType, would break when you change the specification. This is because the faulty MediaType definition will start to make other code dependent on the specification it defines.
 
-For example, consider what would happen if you release a MediaType which defines an attribute `foo` to be a `String`, and run a server which define such a specification. Later, you realise you _actually_ wanted `foo` to be `Numeric`. What can you do?
+For example, consider what would happen if you release a MediaType which defines an attribute `foo` to be a `String`, and run a server which defines such a specification. Later, you realise you _actually_ wanted `foo` to be `Numeric`. What can you do?
 
 Well, during this time, other people started to write code which conformed to the specification defined by the faulty MediaType. So, it's going to be extremely difficult to revert your mistake.
 
@@ -607,7 +607,7 @@ end
 
 ### Setting The JSON Parser With The Wrong Key Type
 
-If you parse JSON witht the wrong key type, as shown below, the resultant object will fail the validations
+If you parse JSON with the wrong key type, as shown below, the resultant object will fail the validations
 
 ```ruby
   json = JSON.parse('{"foo": {}}', { symbolize_names: false })
