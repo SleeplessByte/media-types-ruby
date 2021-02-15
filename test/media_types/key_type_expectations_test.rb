@@ -57,15 +57,14 @@ module MediaTypes
 
     private
 
-    # Diagram
-    #                    ---------->NoKeyTypeSpecified
-    #                   |
-    # parent module()-------------->StringKeyTypeSpecified
-    #                  |
-    #                  ------------->SymbolKeyTypeSpecified
-    #
-    # The method below builds out a tree, where the above depicts a single unit of the overall structure.
-    # Each module gets all three possibilities nested in it and becomes a parent itself.
+    # The goal is to test that key type inheritance works for all orders of inheritance.
+    # There are three possible settings that need to be inherited: NoKeyTypeSpecified, StringKeyTypeSpecified, SymbolKeyTypeSpecified
+    # There are three ways in which a module can handle inheritance: being a parent, being a child, being both a parent and a child
+    # This means there are a lot cases we need to test for. To simplify that, we create tree structure to cover every case.
+    # Starting with a root node, an object with each of the three key type options are added.
+    # For each of the three just added options, we add again a node for each of the three key type options
+    # And for the nine options added in the previous step, we add again each of the three key type options
+    # Now we test the inheritance for each node in the tree. If they all pass, we've tested every possible iteration of inheritance
 
     def build_module_tree(target_module, depth = 1, module_tree = [])
       # This method creates a tree of nested modules, three levels deep,
