@@ -26,9 +26,7 @@ module MediaTypes
     end
 
     def message
-      @fixture_errors.map { |error|
-        error.message
-      }.to_s
+      fixture_errors.map(&:message).join(', ')
     end
 
     attr_reader :fixture_errors
