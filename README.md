@@ -408,11 +408,11 @@ Returns a list of all the schemas that are defined.
 ### Overview & Rationale
 
 
-If the MediaTypes you create enforce a specification you _do not expect them to_ it will cause problems that will be very difficult to fix, as other code which utilises 
+If the MediaTypes you create enforce a specification you _do not expect them to_ it will cause problems that will be very difficult to fix, as other code which utilises your MediaType would break when you change the specification.
 
 The faulty MediaType definition will start to depend on it. For example,Consider what would happen if you release a MediaType which defines an attribute `foo` to be a `string`, and run a server which enforces such a specification. Later, you realise you _actually_ wanted `foo` to be `Numeric`, What can you do?
 
-Well, during this time, your users started to write code which conformed to the specification outlined by the faulty MediaType. So, it's going to be extreamly difficult to revert your mistake. 
+Well, during this time, your users started to write code which conformed to the specification outlined by the faulty MediaType. So, it's going to be extremely difficult to revert your mistake. 
 
 For this reason,it is vital that when using this library, your MediaTypes enforce the _correct_ specification, as the rules they enforce will significantly impact code elsewhere in your codebase. To this end, we provide you with a few avenues to check whether MediaTypes enforce the specifications you actually intend by checking examples of JSON you expect to be compliant/non-compliant with the specifications you design. These are as follows:
 
@@ -420,21 +420,21 @@ For this reason,it is vital that when using this library, your MediaTypes enforc
 
 2. The library provides you with a way to validate those fixtures with the [`assert_mediatype_specification`](README.md#media-type-checking-in-test-suites) method.
 
-3. The library automatically check a MediaType's checks defined by (1) the first time it is validated, and throw an error if any fail.
+3. The library automatically performs a MediaType's checks defined by (1) the first time it is validated, and throw an error if any fail.
 
-4. The library provides you with a way to run the checks carried out by (3) on load, using the method [`assert_sane`](README.md#validation-checks) so that your server will not run should any of the checks show a MediaType in your code is faulty.
+4. The library provides you with a way to run the checks carried out by (3) on load, using the method [`assert_sane!`](README.md#validation-checks) so that your server will not run should any of the checks show a MediaType in your code is faulty.
 
 These four options are examined in more detail below.
 
 ### Media Type Checking in Test Suites
 
-The library provides the `assert_mediatype_specification` method, which allows running the checks for a particular `MediaType` within Minitest with `assert_pass` and `assert_fail`. In order to use `assert_mediatype_specification`, include the following module:
+The library provides the `assert_mediatype_specification` method, which allows running the checks for a particular `MediaType` within Minitest with `assert_pass` and `assert_fail`. In order to use `assert_mediatype_specification`, include the following module in your `Minitest::Runnable` class:
 
 ```ruby
 include MediaTypes::Assertions
 ```
 
-The example below demonstrates how to use `assert_pass` and `assert_fail` within a MediaType, and how to use the `assert_mediatype_specification` method in MiniTest tests to validate them.
+The example below demonstrates how to use `assert_pass` and `assert_fail` within a MediaType, and how to use the `assert_mediatype` method in MiniTest tests to validate them.
 
 ```ruby
 class MyMedia

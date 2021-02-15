@@ -449,6 +449,8 @@ module MediaTypes
     end
 
     # Removes all calls originating in current dir from given stack
+    # We need this so that we find out the caller of an assert_pass/fail in the caller_locations
+    # Which gets polluted by Scheme consecutively executing blocks within the validation blocks
     def remove_current_dir_from_stack(stack)
       stack.reject { |location| location.path.include?(__dir__) }
     end
