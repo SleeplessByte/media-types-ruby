@@ -36,13 +36,15 @@ module MediaTypes
 
       def iterate(mark)
         OutputIteratorWithPredicate.call(output, options, rules: rules) do |key, value, options:, context:|
-          raise ValidationError,
-              format(
-                'Expected key as %<type>s, got %<actual>s at [%<backtrace>s]',
-                type: options.expected_key_type,
-                actual: key.class,
-                backtrace: options.trace(key).backtrace.join('->')
-              ) unless key.class == options.expected_key_type || rules.get(key).class == NotStrict
+          unless key.class == options.expected_key_type || rules.get(key).class == NotStrict
+            raise ValidationError,
+                format(
+                  'Expected key as %<type>s, got %<actual>s at [%<backtrace>s]',
+                  type: options.expected_key_type,
+                  actual: key.class,
+                  backtrace: options.trace(key).backtrace.join('->')
+                )
+          end
 
           mark.call(key)
 
