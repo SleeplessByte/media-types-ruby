@@ -2,7 +2,7 @@
 
 module MediaTypes
   module Assertions
-    def assert_mediatype_specification(mediatype)
+    def assert_mediatype(mediatype)
       mediatype.assert_sane!
       assert mediatype.media_type_validations.scheme.asserted_sane?
     rescue MediaTypes::AssertionError => e

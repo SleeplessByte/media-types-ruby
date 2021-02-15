@@ -32,19 +32,17 @@ module MediaTypes
       end
 
       def run_fixture_validations(expect_symbol_keys, backtrace = [])
-        failed_fixtures = []
-
-        @links.each do |key, rule|
+        fixture_errors = @links.map {|key, rule|
           if rule.is_a?(Scheme)
             begin
               rule.run_fixture_validations(expect_symbol_keys, backtrace.dup.append(key))
             rescue AssertionError => e
-              failed_fixtures += e.fixture_errors
+              e.fixture_errors
             end
           end
-        end
+        }.flatten
 
-        raise AssertionError, failed_fixtures unless failed_fixtures.empty?
+        raise AssertionError.new(fixture_errors) unless fixture_errors.empty?
       end
 
       private

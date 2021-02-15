@@ -29,10 +29,15 @@ Minitest::Reporters.use!
 # Run at exit
 require 'minitest/autorun'
 require_relative './assertions'
-require_relative '../lib/media_types/minitest/test_factory'
 
 module Minitest
   class Test < Minitest::Runnable
     include MediaTypes::Assertions
+
+    def self.create_specification_tests_for(mediatype)
+      define_method "test_mediatype_specification_of_#{mediatype.name}" do
+        assert_mediatype mediatype
+      end
+    end
   end
 end
