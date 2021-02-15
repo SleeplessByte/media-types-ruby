@@ -418,7 +418,7 @@ For this reason,it is vital that when using this library, your MediaTypes enforc
 
 1. The library provides you with [two methods](README.md#media-type-checking-in-test-suites) (`assert_pass` and `assert_fail`), which allow specifying JSON fixtures that are expected to be compliant (`assert_pass`) or non-compliant (`assert_fail`).
 
-2. The library provides you with a way to validate those fixtures with the [`assert_mediatype_specification`](README.md#media-type-checking-in-test-suites) method.
+2. The library provides you with a way to validate those fixtures with the [`assert_mediatype`](README.md#media-type-checking-in-test-suites) method.
 
 3. The library automatically check a MediaType's checks defined by (1) the first time it is validated, and throw an error if any fail.
 
@@ -428,13 +428,14 @@ These four options are examined in more detail below.
 
 ### Media Type Checking in Test Suites
 
-The library provides the `assert_mediatype_specification` method, which allows running the checks for a particular `MediaType` within Minitest with `assert_pass` and `assert_fail`. In order to use `assert_mediatype_specification`, include the following module:
+The library provides the `assert_mediatype` method, which allows running the checks for a particular `MediaType` within Minitest with `assert_pass` and `assert_fail`. In order to use `assert_mediatype`, include the following module:
 
 ```ruby
 include MediaTypes::Assertions
 ```
+If you are using Minitest you can make `assert_mediatype` available by calling `include MediaTypes::Assertions`.
 
-The example below demonstrates how to use `assert_pass` and `assert_fail` within a MediaType, and how to use the `assert_mediatype_specification` method in MiniTest tests to validate them.
+The example below demonstrates how to use `assert_pass` and `assert_fail` within a MediaType, and how to use the `assert_mediatype` method in MiniTest tests to validate them.
 
 ```ruby
 class MyMedia
@@ -475,20 +476,16 @@ class MyMediaTest < Minitest::Test
   include MediaTypes::Assertions
 
   def test_mediatype_specification
-    assert_mediatype_specification MyMedia
+    assert_mediatype MyMedia
   end
 end
 ```
-### Testing Without Minitest
-
-If you are using another testing framework, you will not be able to make use of the `assert_mediatype_specification` method described above. Instead you can test your MediaTypes by wrapping the `assert_sane!` method (documented below) in a way that is suited to the requirements of your testing tool.
 
 ### Validation Checks
 
-The `assert_pass` and `assert_fail` methods take a JSON string (as shown below). The first time the `validate!` method is called on a Media Type, the assertions for that media type are run.
-This is done as a last line of defence against introducing faulty MediaTypes into your software. 
+The `assert_pass` and `assert_fail` methods take a JSON string (as shown below) and store assertions to be carried out later. The first time the `validate!` method is called on a Media Type, the collection of assertions stored (defined by `assert_pass` and `assert_fail`) for that Media Type are executed.
 
-Ideally, you want to carry out these checks on load rather than when your server/project is already up and running, this functionality is provided by the `assert_sane!` method. Which can be called on a particular class
+This is done as a last line of defence against introducing faulty MediaTypes into your software. Ideally, you want to carry out these checks on load rather than when your server/project is already up and running, this functionality is provided by the `assert_sane!` method. Which can be called on a particular class
 
 ```ruby
   MyMedia.assert_sane!
@@ -496,7 +493,7 @@ Ideally, you want to carry out these checks on load rather than when your server
 ```
 
 ### Intermediate Checks
-The fixtures provided to the `assert_pass` and `assert_fail` methods are evaluated within the context of the block they are placed in. This way you can, for example, write a test for a (complex) optional attribute, without the need to have that test clutter the fixtures for the entire mediatype.
+`assert_pass` and `assert_fail` can be executed inside `validations` blocks, as demonstrated below
 
 ```ruby
   class MyMedia
@@ -528,8 +525,10 @@ The fixtures provided to the `assert_pass` and `assert_fail` methods are evaluat
 
 ## Key type validation
 
-Users are provided with the ability to specify the expected type of keys in the media type, by default symbol keys are expected.
-This can be set by calling either `expect_symbol_keys` or `expect_string_keys` when defining the MediaType.
+When users are interacting with Ruby objects defined by your MediaType, you want to avoid having them looking up a value and getting nil, just because they used the wrong key type.
+To this end, the library provides the ability to specify the expected type of keys in a MediaType; by default symbol keys are expected.
+
+This can be set by calling either expect_symbol_keys or expect_string_keys when defining the MediaType.
 
 ```ruby
 class MyMedia
@@ -551,7 +550,7 @@ end
 
 ### Inheriting key type expectations
 
-Key type expectations can also be set at the module level, each MediaType within this module will inherit the expectation set by that module.
+Key type expectations can also be set at the module level. Each MediaType within this module will inherit the expectation set by that module.
 
 ```ruby
 module Acme
@@ -590,6 +589,17 @@ module Acme
   end
 end
 ```
+### Setting The JSON Parser With The Wrong Key Type
+
+If you parse JSON witht the wrong key type, as shown below, the resultant object will fail the validations
+
+```ruby
+  json = JSON.parse('{"foo": {}}', { symbolize_names: false })
+  # If MyMedia expects symbol keys
+  MyMedia.valid?(json)
+  # Returns false
+```
+
 
 ## Related
 
