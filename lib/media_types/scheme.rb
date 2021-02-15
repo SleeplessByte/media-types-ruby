@@ -460,7 +460,7 @@ module MediaTypes
     end
 
     def validate_nested_scheme_fixtures(expect_symbol_keys, backtrace)
-      @rules.map { |key, rule|
+      @rules.flat_map { |key, rule|
         next unless rule.is_a?(Scheme) || rule.is_a?(Links)
 
         begin
@@ -469,16 +469,16 @@ module MediaTypes
         rescue AssertionError => e
           e.fixture_errors
         end
-      }.flatten.compact
+      }.compact
     end
 
     def validate_default_scheme_fixtures(expect_symbol_keys, backtrace)
       return [] unless @rules.default.is_a?(Scheme)
 
       @rules.default.run_fixture_validations(expect_symbol_keys, backtrace.dup.append('*'))
-      return []
+      []
     rescue AssertionError => e
-      return e.fixture_errors
+      e.fixture_errors
     end
 
     def run_fixture_validations(expect_symbol_keys, backtrace = [])

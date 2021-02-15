@@ -32,7 +32,7 @@ module MediaTypes
       end
 
       def run_fixture_validations(expect_symbol_keys, backtrace = [])
-        fixture_errors = @links.map {|key, rule|
+        fixture_errors = @links.flat_map {|key, rule|
           if rule.is_a?(Scheme)
             begin
               rule.run_fixture_validations(expect_symbol_keys, backtrace.dup.append(key))
@@ -41,7 +41,7 @@ module MediaTypes
               e.fixture_errors
             end
           end
-        }.flatten.compact
+        }.compact
 
         raise AssertionError.new(fixture_errors) unless fixture_errors.empty?
       end
