@@ -439,13 +439,18 @@ module MediaTypes
     end
 
     def assert_pass(fixture)
-      reduced_stack = caller_locations.filter { |location| !location.path.include?(__dir__) }
+      reduced_stack = remove_current_dir_from_stack(caller_locations)
       @fixtures << FixtureData.new(caller: reduced_stack.first, fixture: fixture, expect_to_pass: true)
     end
 
     def assert_fail(fixture)
-      reduced_stack = caller_locations.filter { |location| !location.path.include?(__dir__) }
+      reduced_stack = remove_current_dir_from_stack(caller_locations)
       @fixtures << FixtureData.new(caller: reduced_stack.first, fixture: fixture, expect_to_pass: false)
+    end
+
+    # Removes all calls originating in current dir from given stack
+    def remove_current_dir_from_stack(stack)
+      stack.reject { |location| location.path.include?(__dir__) }
     end
 
     def validate_scheme_fixtures(expect_symbol_keys, backtrace)
