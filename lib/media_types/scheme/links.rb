@@ -36,11 +36,12 @@ module MediaTypes
           if rule.is_a?(Scheme)
             begin
               rule.run_fixture_validations(expect_symbol_keys, backtrace.dup.append(key))
+              nil
             rescue AssertionError => e
               e.fixture_errors
             end
           end
-        }.flatten
+        }.flatten.compact
 
         raise AssertionError.new(fixture_errors) unless fixture_errors.empty?
       end

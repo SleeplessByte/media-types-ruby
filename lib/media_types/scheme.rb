@@ -449,13 +449,14 @@ module MediaTypes
     end
 
     def validate_scheme_fixtures(expect_symbol_keys, backtrace)
-      @fixtures.map do |fixture_data|
+      @fixtures.map { |fixture_data|
         begin
           validate_fixture(fixture_data, expect_symbol_keys, backtrace)
+          nil
         rescue UnexpectedValidationResultError => error
           error
         end
-      end
+      }.compact
     end
 
     def validate_nested_scheme_fixtures(expect_symbol_keys, backtrace)
@@ -464,6 +465,7 @@ module MediaTypes
 
         begin
           rule.run_fixture_validations(expect_symbol_keys, backtrace.dup.append(key))
+          nil
         rescue AssertionError => e
           e.fixture_errors
         end
@@ -474,6 +476,7 @@ module MediaTypes
       return [] unless @rules.default.is_a?(Scheme)
 
       @rules.default.run_fixture_validations(expect_symbol_keys, backtrace.dup.append('*'))
+      return []
     rescue AssertionError => e
       return e.fixture_errors
     end
