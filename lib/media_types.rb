@@ -54,7 +54,6 @@ module MediaTypes
       current_module = modules.join('::')
       expect_symbol = @key_expectations[current_module]
       @key_expectations_used[current_module] = true
-      modules = current_module.split('::')
       modules.pop
     end
 
