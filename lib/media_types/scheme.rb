@@ -26,9 +26,7 @@ module MediaTypes
     end
 
     def message
-      @fixture_errors.map { |error|
-        error.message
-      }.to_s
+      fixture_errors.map(&:message).join(', ')
     end
 
     attr_reader :fixture_errors
@@ -36,16 +34,17 @@ module MediaTypes
 
   class UnexpectedValidationResultError < StandardError
     def initialize(fixtureCaller, error)
-      @fixtureCaller = fixtureCaller
-      @error = error
+      self.fixtureCaller = fixtureCaller
+      self.error = error
     end
 
     def message
-      if @error.is_a?(MediaTypes::Scheme::ValidationError)
-        @fixtureCaller.path + ':' + @fixtureCaller.lineno.to_s + ' -> ' + error.class.to_s + ': ' + error.message
-      else
-        @fixtureCaller.path + ':' + @fixtureCaller.lineno.to_s + ' -> ' + error.to_s
-      end
+      format(
+        '%<callerPath>s:%<callerLine>s -> %<error>s',
+        callerPath: fixtureCaller.path,
+        callerLine: fixtureCaller.lineno,
+        error: error.is_a?(MediaTypes::Scheme::ValidationError) ? "#{error.class.to_s}:#{error.message}" : error
+      )
     end
 
     attr_accessor :fixtureCaller, :error
@@ -53,16 +52,14 @@ module MediaTypes
 
   class FixtureData
     def initialize(caller:, fixture:, expect_to_pass:)
-      @caller = caller
-      @fixture = fixture
-      @expect_to_pass = expect_to_pass
-    end
-
-    def expect_to_pass?
-      @expect_to_pass
+      self.caller = caller
+      self.fixture = fixture
+      self.expect_to_pass = expect_to_pass
     end
 
     attr_accessor :caller, :fixture, :expect_to_pass
+
+    alias expect_to_pass? expect_to_pass
   end
 
   ##
@@ -99,20 +96,16 @@ module MediaTypes
     def initialize(allow_empty: false, expected_type: ::Object, &block)
       self.rules = Rules.new(allow_empty: allow_empty, expected_type: expected_type)
       self.type_attributes = {}
-
-      @fixtures = []
+      self.fixtures = []
       self.asserted_sane = false
 
       instance_exec(&block) if block_given?
     end
 
     attr_accessor :type_attributes, :fixtures
-    attr_writer :asserted_sane
-    attr_reader :rules
+    attr_reader :rules, :asserted_sane
 
-    def asserted_sane?
-      @asserted_sane
-    end
+    alias asserted_sane? asserted_sane
 
     ##
     # Checks if the +output+ is valid
@@ -514,7 +507,7 @@ module MediaTypes
 
     private
 
-    attr_writer :rules
+    attr_writer :rules, :asserted_sane
 
   end
 end
