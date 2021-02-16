@@ -114,13 +114,13 @@ If you include 'MediaTypes::Dsl' in your class you can use the following functio
 
 Adds an attribute to the schema, if a +block+ is given, uses that to test against instead of +type+
 
-| param     | type                      | description                                                                                                                                                                    |
-| --------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| key       | `Symbol`                  | the attribute name                                                                                                                                                             |
-| opts      | `Hash`                    | options to pass to `Scheme` or `Attribute`                                                                                                                                     |
+| param     | type                      | description                                                                                                                                                                   |
+| --------- | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| key       | `Symbol`                  | the attribute name                                                                                                                                                            |
+| opts      | `Hash`                    | options to pass to `Scheme` or `Attribute`                                                                                                                                    |
 | type      | `Class`, `===`, Scheme    | The type of the value can be anything that responds to `===`,  or scheme to use if no `&block` is given. Defaults to `Object` without a `&block` and to Hash with a `&block`. |
-| optional: | `TrueClass`, `FalseClass` | if true, key may be absent, defaults to `false`                                                                                                                                |
-| &block    | `Block`                   | defines the scheme of the value of this attribute                                                                                                                              |
+| optional: | `TrueClass`, `FalseClass` | if true, key may be absent, defaults to `false`                                                                                                                               |
+| &block    | `Block`                   | defines the scheme of the value of this attribute                                                                                                                             |
 
 #### Add an attribute named foo, expecting a string
 ```Ruby
@@ -407,13 +407,9 @@ Returns a list of all the schemas that are defined.
 
 ### Overview & Rationale
 
-If the MediaTypes you create enforce a specification you _do not expect them to_, it will cause problems that will be very difficult to fix, as other code, which utilises your MediaType, would break when you change the specification. This is because the faulty MediaType definition will start to make other code dependent on the specification it defines.
+If the MediaTypes you create enforce a specification you _do not expect them to_, it will cause problems that will be very difficult to fix, as other code, which utilises your MediaType, would break when you change the specification. This is because the faulty MediaType definition will start to make other code dependent on the specification it defines. For example, consider what would happen if you release a MediaType which defines an attribute `foo` to be a `String`, and run a server which defines such a specification. Later, you realise you _actually_ wanted `foo` to be `Numeric`. What can you do?
 
-For example, consider what would happen if you release a MediaType which defines an attribute `foo` to be a `String`, and run a server which defines such a specification. Later, you realise you _actually_ wanted `foo` to be `Numeric`. What can you do?
-
-Well, during this time, other people started to write code which conformed to the specification defined by the faulty MediaType. So, it's going to be extremely difficult to revert your mistake.
-
-For this reason, it is vital that, when using this library, your MediaTypes define the _correct_ specification.
+Well, during this time, other people started to write code which conformed to the specification defined by the faulty MediaType. So, it's going to be extremely difficult to revert your mistake. For this reason, it is vital that, when using this library, your MediaTypes define the _correct_ specification.
 
 To this end, we provide you with a few avenues to check whether MediaTypes define the specifications you actually intend by checking examples of JSON you expect to be compliant/non-compliant with the MediaType definitions you write out.
 
@@ -433,6 +429,7 @@ The library provides the `assert_mediatype_specification` method, which allows r
 ```ruby
 include MediaTypes::Assertions
 ```
+
 If you are using Minitest you can make `assert_mediatype` available by calling `include MediaTypes::Assertions`.
 
 The example below demonstrates how to use `assert_pass` and `assert_fail` within a MediaType, and how to use the `assert_mediatype` method in MiniTest tests to validate them.
@@ -491,18 +488,26 @@ end
 
 ### Testing Without Minitest
 
-If you are using another testing framework, you will can't use the `assert_mediatype_specification` method. Instead, you can test your MediaTypes by using the `assert_sane!` method (documented below) and rescuing the errors it will throw when it fails.
+If you are using another testing framework, you will not be able to use the `assert_mediatype_specification` method. Instead, you can test your MediaTypes by using the `assert_sane!` method (documented below) and rescuing the errors it will throw when it fails.The snippet below shows an example adaptation for MiniTest, which you can use as a guide.
+
+```ruby
+ def test_mediatype(mediatype)
+      mediatype.assert_sane!
+      assert mediatype.media_type_validations.scheme.asserted_sane?
+    rescue MediaTypes::AssertionError => e
+      flunk e.message
+    end
+  end
+```
 
 ### Validation Checks
 
 The `assert_pass` and `assert_fail` methods take a JSON string (as shown below). The first time the `validate!` method is called on a MediaType, the assertions for that media type are run.
-This is done as a last line of defence against introducing faulty MediaTypes into your software. 
-
-Ideally, you want to carry out these checks on load rather than on a running application. This functionality is provided by the `assert_sane!` method, which can be called on a particular MediaType:
+This is done as a last line of defence against introducing faulty MediaTypes into your software. Ideally, you want to carry out these checks on load rather than on a running application. This functionality is provided by the `assert_sane!` method, which can be called on a particular MediaType:
 
 ```ruby
-  MyMedia.assert_sane!
-  # true
+MyMedia.assert_sane!
+# true
 ```
 
 ### Intermediate Checks
@@ -510,62 +515,40 @@ Ideally, you want to carry out these checks on load rather than on a running app
 The fixtures provided to the `assert_pass` and `assert_fail` methods are evaluated within the context of the block they are placed in. It's therefore possible to write a test for a (complex) optional attribute, without that test cluttering the fixtures for the entire mediatype.
 
 ```ruby
-  class MyMedia
-    include MediaTypes::Dsl
-
-    expect_string_keys
-
-    def self.organisation
-      'acme'
-    end
-
-    use_name 'test'
-
-    validations do
-      # default attribute type is a Hash
-      attribute :foo, optional: true do
-        attribute :bar, Numeric
-
-        # This passes, since in this context the "bar" key is required to have a Numeric value. 
-        assert_pass '{"bar": 42}'
-      end
-      attribute :rep, Numeric
-
-      # This passes, since the attribute "foo" is optional.
-      assert_pass '{"rep": 42}'
-    end
-  end
-```
-
-## Key Type Validation
-
-When interacting with Ruby objects defined by your MediaType, you want to avoid having them looking up a value and getting `nil`, just because they used the wrong key type.
-To this end, the library provides the ability to specify the expected type of keys in a MediaType; by default symbol keys are expected.
-
-The key type expectation can be set by calling either `expect_symbol_keys` or `expect_string_keys` when defining the MediaType.
-
-```ruby
 class MyMedia
   include MediaTypes::Dsl
+
+  expect_string_keys
 
   def self.organisation
     'acme'
   end
 
   use_name 'test'
-  
-  # Expect keys to be strings
-  expect_string_keys
 
   validations do
-    any Numeric
+    # default attribute type is a Hash
+    attribute :foo, optional: true do
+      attribute :bar, Numeric
+
+      # This passes, since in this context the "bar" key is required to have a Numeric value. 
+      assert_pass '{"bar": 42}'
+    end
+    attribute :rep, Numeric
+
+    # This passes, since the attribute "foo" is optional.
+    assert_pass '{"rep": 42}'
   end
 end
 ```
 
-### Inheriting Key Type Expectations
+## Key Type Validation
 
-Key type expectations can also be set at the module level, each MediaType within this module will inherit the expectation set by that module.
+When interacting with Ruby objects defined by your MediaType, you want to avoid having them looking up a value and getting `nil`, just because they used the wrong key type. To this end, the library provides the ability to specify the expected type of keys in a MediaType; by default symbol keys are expected.
+
+### Setting Key Type Expectations
+
+Key type expectations can be set at the module level. Each MediaType within this module will inherit the expectation set by that module.
 
 ```ruby
 module Acme
@@ -605,11 +588,61 @@ module Acme
 end
 ```
 
-### Setting The JSON Parser With The Wrong Key Type
+## Overriding Key Type Expectations
 
-If you parse JSON with the wrong key type, as shown below, the resultant object will fail the validations
+A key type expectation set by a Module can be overridden by calling either `expect_symbol_keys` or `expect_string_keys` inside the MediaType class.
 
 ```ruby
+class MyMedia
+  include MediaTypes::Dsl
+
+  def self.organisation
+    'acme'
+  end
+
+  use_name 'test'
+  
+  # Expect keys to be strings
+  expect_string_keys
+
+  validations do
+    any Numeric
+  end
+end
+```
+
+If you now validate an object with a different key type than expected, an error will be thrown:
+
+```ruby
+  MediaType.validate! { "something": 42 }
+  # => passes, because all keys are a string
+
+  MediaType.validate! { something: 42 }
+  # => throws MediaTypes::Scheme::ValidationError: Expected key as Symbol, got String at [.->foo->bar]
+```
+
+### Setting The JSON Parser With The Wrong Key Type
+
+If you parse JSON with the wrong key type, as shown below, the resultant object will fail the validations.
+
+```ruby
+  class MyMedia
+    include MediaTypes::Dsl
+
+    def self.organisation
+      'acme'
+    end
+
+    use_name 'test'
+    
+    # Expect keys to be symbols
+    expect_symbol_keys
+
+    validations do
+      any Numeric
+    end
+  end
+
   json = JSON.parse('{"foo": {}}', { symbolize_names: false })
   # If MyMedia expects symbol keys
   MyMedia.valid?(json)
