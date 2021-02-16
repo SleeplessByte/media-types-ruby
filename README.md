@@ -618,7 +618,7 @@ If you now validate an object with a different key type than expected, an error 
   # => passes, because all keys are a string
 
   MediaType.validate! { something: 42 }
-  # => throws MediaTypes::Scheme::ValidationError: Expected key as Symbol, got String at [.->foo->bar]
+  # => throws a ValidationError , because 'something' is a symbol key
 ```
 
 ### Setting The JSON Parser With The Wrong Key Type
