@@ -33,21 +33,21 @@ module MediaTypes
   end
 
   class UnexpectedValidationResultError < StandardError
-    def initialize(fixtureCaller, error)
-      self.fixtureCaller = fixtureCaller
+    def initialize(fixture_caller, error)
+      self.fixture_caller = fixture_caller
       self.error = error
     end
 
     def message
       format(
-        '%<callerPath>s:%<callerLine>s -> %<error>s',
-        callerPath: fixtureCaller.path,
-        callerLine: fixtureCaller.lineno,
-        error: error.is_a?(MediaTypes::Scheme::ValidationError) ? "#{error.class.to_s}:#{error.message}" : error
+        '%<caller_path>s:%<caller_line>s -> %<error>s',
+        caller_path: fixture_caller.path,
+        caller_line: fixture_caller.lineno,
+        error: error.is_a?(MediaTypes::Scheme::ValidationError) ? "#{error.class}:#{error.message}" : error
       )
     end
 
-    attr_accessor :fixtureCaller, :error
+    attr_accessor :fixture_caller, :error
   end
 
   class FixtureData
@@ -449,18 +449,18 @@ module MediaTypes
     end
 
     def validate_scheme_fixtures(expect_symbol_keys, backtrace)
-      @fixtures.map { |fixture_data|
+      @fixtures.map do |fixture_data|
         begin
           validate_fixture(fixture_data, expect_symbol_keys, backtrace)
           nil
-        rescue UnexpectedValidationResultError => error
-          error
+        rescue UnexpectedValidationResultError => e
+          e
         end
-      }.compact
+      end.compact
     end
 
     def validate_nested_scheme_fixtures(expect_symbol_keys, backtrace)
-      @rules.flat_map { |key, rule|
+      @rules.flat_map do |key, rule|
         next unless rule.is_a?(Scheme) || rule.is_a?(Links)
 
         begin
@@ -469,7 +469,7 @@ module MediaTypes
         rescue AssertionError => e
           e.fixture_errors
         end
-      }.compact
+      end.compact
     end
 
     def validate_default_scheme_fixtures(expect_symbol_keys, backtrace)
@@ -486,7 +486,7 @@ module MediaTypes
       fixture_errors += validate_nested_scheme_fixtures(expect_symbol_keys, backtrace)
       fixture_errors += validate_default_scheme_fixtures(expect_symbol_keys, backtrace)
 
-      raise AssertionError.new(fixture_errors) unless fixture_errors.empty?
+      raise AssertionError, fixture_errors unless fixture_errors.empty?
 
       self.asserted_sane = true
     end
@@ -500,8 +500,8 @@ module MediaTypes
         unless fixture_data.expect_to_pass?
           raise UnexpectedValidationResultError.new(fixture_data.caller, 'No error encounterd whilst expecting to')
         end
-      rescue MediaTypes::Scheme::ValidationError => error
-        raise UnexpectedValidationResultError.new(fixture_data.caller, error) if fixture_data.expect_to_pass?
+      rescue MediaTypes::Scheme::ValidationError => e
+        raise UnexpectedValidationResultError.new(fixture_data.caller, e) if fixture_data.expect_to_pass?
       end
     end
 
