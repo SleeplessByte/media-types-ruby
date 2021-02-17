@@ -122,7 +122,10 @@ module MediaTypes
             else
               resolved_org = MediaTypes.get_organisation(self)
 
-              raise format('Implement the class method "organisation" in %<klass>s or specify a global organisation using MediaTypes::set_organisation', klass: self) if resolved_org.nil?
+              if resolved_org.nil?
+              raise OrganisationNotSetError,
+                format('Implement the class method "organisation" in %<klass>s or specify a global organisation using MediaTypes::set_organisation', klass: self)
+              end
             end
             raise ArgumentError, 'Unable to create a name for a schema with a nil name.' if type.nil?
             raise ArgumentError, 'Unable to create a name for a schema with a nil organisation.' if resolved_org.nil?
@@ -158,7 +161,7 @@ module MediaTypes
       end
 
       def lookup_validations
-        raise "No validations defined for #{name}" if media_type_validations.nil?
+        raise MissingValidationError, "No validations defined for #{name}" if media_type_validations.nil?
 
         media_type_validations
       end

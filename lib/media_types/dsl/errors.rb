@@ -11,6 +11,10 @@ module MediaTypes
 
       # Raised when an error occurs during setting expected key type
       class KeyTypeExpectationError < StandardError; end
+
+      class MissingValidationError < StandardError; end
+
+      class OrganisationNotSetError < StandardError; end
     end
   end
 end
