@@ -416,7 +416,7 @@ To this end, we provide you with a few avenues to check whether MediaTypes defin
 These are as follows:
 
 1. The library provides [two methods](README.md#media-type-checking-in-test-suites) (`assert_pass` and `assert_fail`), which allow specifying JSON fixtures that are compliant (`assert_pass`) or non-compliant (`assert_fail`).
-2. The library provides a way to validate those fixtures against the MediaType specification with the [`assert_mediatype_specification`](README.md#media-type-checking-in-test-suites) method.
+2. The library provides a way to validate those fixtures against the MediaType specification with the [`assert_mediatype`](README.md#media-type-checking-in-test-suites) method.
 3. The library automatically performs a MediaType's checks defined by (1) the first time an object is validated against the MediaType, and throws an error if any of the checks fail.
 4. The library provides a way to run the checks carried out by (3) on load, using the method [`assert_sane!`](README.md#validation-checks) so that an application will not run if any of the MediaType's checks don't pass.
 
@@ -424,13 +424,16 @@ These four options are examined in detail below.
 
 ### MediaType Checking in Test Suites
 
-The library provides the `assert_mediatype_specification` method, which allows running the checks for a particular `MediaType` within Minitest with `assert_pass` and `assert_fail`. In order to use `assert_mediatype_specification`, include the following module in the test class (e.g. `Minitest::Runnable`):
+The library provides the `assert_mediatype` method, which allows running the checks for a particular `MediaType` within Minitest with `assert_pass` and `assert_fail`.
+If you are using Minitest you can make `assert_mediatype` available by calling `include MediaTypes::Testing::Assertions` in the test class (e.g. `Minitest::Runnable`):
 
 ```ruby
-include MediaTypes::Assertions
+module Minitest
+  class Test < Minitest::Runnable
+    include MediaTypes::Testing::Assertions
+  end
+end
 ```
-
-If you are using Minitest you can make `assert_mediatype` available by calling `include MediaTypes::Assertions`.
 
 The example below demonstrates how to use `assert_pass` and `assert_fail` within a MediaType, and how to use the `assert_mediatype` method in MiniTest tests to validate them.
 
@@ -469,7 +472,7 @@ class MyMedia
 end
 
 class MyMediaTest < Minitest::Test
-  include MediaTypes::Assertions
+  include MediaTypes::Testing::Assertions
 
   def test_mediatype_specification
     assert_mediatype MyMedia
@@ -477,10 +480,10 @@ class MyMediaTest < Minitest::Test
 end
 
 class MyMediaTest < Minitest::Test
-  include MediaTypes::Assertions
+  include MediaTypes::Testing::Assertions
 
   def test_mediatype_specification
-    assert_mediatype_specification MyMedia
+    assert_mediatype MyMedia
   end
 end
 
@@ -488,7 +491,7 @@ end
 
 ### Testing Without Minitest
 
-If you are using another testing framework, you will not be able to use the `assert_mediatype_specification` method. Instead, you can test your MediaTypes by using the `assert_sane!` method (documented below) and rescuing the errors it will throw when it fails.The snippet below shows an example adaptation for MiniTest, which you can use as a guide.
+If you are using another testing framework, you will not be able to use the `assert_mediatype` method. Instead, you can test your MediaTypes by using the `assert_sane!` method (documented below) and rescuing the errors it will throw when it fails. The snippet below shows an example adaptation for MiniTest, which you can use as a guide.
 
 ```ruby
  def test_mediatype(mediatype)
