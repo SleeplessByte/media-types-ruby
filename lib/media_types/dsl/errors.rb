@@ -2,19 +2,17 @@
 
 module MediaTypes
   module Dsl
-    module ClassMethods
-      class UninitializedConstructable < RuntimeError
-        def message
-          'Unable to generate constructable without a name, have you called `use_name(name)`?'
-        end
+    class UninitializedConstructable < RuntimeError
+      def message
+        'Unable to generate constructable without a name, have you called `use_name(name)`?'
       end
-
-      # Raised when an error occurs during setting expected key type
-      class KeyTypeExpectationError < StandardError; end
-
-      class MissingValidationError < StandardError; end
-
-      class OrganisationNotSetError < StandardError; end
     end
+
+    # Raised when an error occurs during setting expected key type
+    class KeyTypeExpectationError < StandardError; end
+
+    class MissingValidationError < StandardError; end
+
+    class OrganisationNotSetError < StandardError; end
   end
 end
