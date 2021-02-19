@@ -529,8 +529,7 @@ class MyMedia
   use_name 'test'
 
   validations do
-    # default attribute type is a Hash
-    attribute :foo, optional: true do
+    attribute :foo, Hash, optional: true do
       attribute :bar, Numeric
 
       # This passes, since in this context the "bar" key is required to have a Numeric value. 
