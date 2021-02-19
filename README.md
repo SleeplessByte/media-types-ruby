@@ -546,7 +546,8 @@ end
 
 ## Key Type Validation
 
-When interacting with Ruby objects defined by your MediaType, you want to avoid having them looking up a value and getting `nil`, just because they used the wrong key type. To this end, the library provides the ability to specify the expected type of keys in a MediaType; by default symbol keys are expected.
+When interacting with Ruby objects defined by your MediaType, you want to avoid getting `nil` values, just because the the wrong key type is being used (e.g. `obj['foo']` instead of `obj[:foo]`).
+To this end, the library provides the ability to specify the expected type of keys in a MediaType; by default symbol keys are expected.
 
 ### Setting Key Type Expectations
 
@@ -570,17 +571,37 @@ module Acme
       any Numeric
     end
   end
+end
+```
 
-  # The inherited key preference can be overridden inside the MediaType class
-  class MySecondMedia
+If you validate an object with a different key type than expected, an error will be thrown:
+
+```ruby
+  Acme::MyMedia.validate! { "something": 42 }
+  # => passes, because all keys are a string
+
+  Acme::MyMedia.validate! { something: 42 }
+  # => throws a ValidationError , because 'something' is a symbol key
+```
+
+## Overriding Key Type Expectations
+
+A key type expectation set by a Module can be overridden by calling either `expect_symbol_keys` or `expect_string_keys` inside the MediaType class.
+
+```ruby
+module Acme
+  MediaTypes.expect_string_keys(self)
+
+  class MyOverridingMedia
     include MediaTypes::Dsl
 
     def self.organisation
       'acme'
     end
 
-    use_name 'test2'
-    # Override parent module key type expectation
+    use_name 'test'
+    
+    # Expect keys to be symbols
     expect_symbol_keys
 
     validations do
@@ -590,37 +611,14 @@ module Acme
 end
 ```
 
-## Overriding Key Type Expectations
-
-A key type expectation set by a Module can be overridden by calling either `expect_symbol_keys` or `expect_string_keys` inside the MediaType class.
+Now the MediaType throws an error when string keys are used.
 
 ```ruby
-class MyMedia
-  include MediaTypes::Dsl
+  Acme::MyOverridingMedia.validate! { something: 42 }
+  # => passes, because all keys are a symbol
 
-  def self.organisation
-    'acme'
-  end
-
-  use_name 'test'
-  
-  # Expect keys to be strings
-  expect_string_keys
-
-  validations do
-    any Numeric
-  end
-end
-```
-
-If you now validate an object with a different key type than expected, an error will be thrown:
-
-```ruby
-  MediaType.validate! { "something": 42 }
-  # => passes, because all keys are a string
-
-  MediaType.validate! { something: 42 }
-  # => throws a ValidationError , because 'something' is a symbol key
+  Acme::MyOverridingMedia.validate! { "something": 42 }
+  # => throws a ValidationError , because 'something' is a string key
 ```
 
 ### Setting The JSON Parser With The Wrong Key Type
