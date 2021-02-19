@@ -425,7 +425,7 @@ These four options are examined in detail below.
 ### MediaType Checking in Test Suites
 
 The library provides the `assert_mediatype` method, which allows running the checks for a particular `MediaType` within Minitest with `assert_pass` and `assert_fail`.
-If you are using Minitest you can make `assert_mediatype` available by calling `include MediaTypes::Testing::Assertions` in the test class (e.g. `Minitest::Runnable`):
+If you are using Minitest, you can make `assert_mediatype` available by calling `include MediaTypes::Testing::Assertions` in the test class (e.g. `Minitest::Runnable`):
 
 ```ruby
 module Minitest
