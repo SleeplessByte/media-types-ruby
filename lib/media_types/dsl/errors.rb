@@ -4,7 +4,7 @@ module MediaTypes
   module Dsl
     class UninitializedConstructable < RuntimeError
       def message
-        'Unable to generate constructable without a name, have you called `use_name(name)`?'
+        'Unable to generate constructable without a name, make sure to have called `use_name(name)` before.'
       end
     end
 
