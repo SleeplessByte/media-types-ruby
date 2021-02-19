@@ -448,20 +448,19 @@ class MyMedia
   use_name 'test'
 
   validations do
+    # Using "any Numeric" this MediaType doesn't care what key names you use.
+    # However, it does care that those keys point to a Numeric value.
     any Numeric
 
+    assert_pass '{"foo": 42}'
     assert_pass <<-FIXTURE
     { "foo": 42, "bar": 43 }
     FIXTURE
 
-    assert_pass '{"foo": 42}'
-    # "Any" means there are no required keys, so having no keys should also pass
+    # The keyword "any" means there are no required keys, so having no keys should also pass.
     assert_pass '{}'
 
-    # Using "Any" this MediaType doesn't care what key names you use,
-    # but, it does care that those keys point to a Numeric value, 
-    # as indicated by "Numeric" at the top of the block
-
+    # This MediaType should not accept anything other then a Numeric value.
     assert_fail <<-FIXTURE
     { "foo": { "bar": "string" } }
     FIXTURE
