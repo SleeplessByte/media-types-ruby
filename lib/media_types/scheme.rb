@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'json'
+
 require 'media_types/scheme/validation_options'
 require 'media_types/scheme/enumeration_context'
 require 'media_types/scheme/errors'
@@ -17,10 +19,47 @@ require 'media_types/scheme/output_empty_guard'
 require 'media_types/scheme/output_type_guard'
 require 'media_types/scheme/rules_exhausted_guard'
 
-require 'json'
-
 module MediaTypes
   class AssertionError < StandardError
+    def initialize(errors)
+      @fixture_errors = errors
+    end
+
+    def message
+      fixture_errors.map(&:message).join(', ')
+    end
+
+    attr_reader :fixture_errors
+  end
+
+  class UnexpectedValidationResultError < StandardError
+    def initialize(fixture_caller, error)
+      self.fixture_caller = fixture_caller
+      self.error = error
+    end
+
+    def message
+      format(
+        '%<caller_path>s:%<caller_line>s -> %<error>s',
+        caller_path: fixture_caller.path,
+        caller_line: fixture_caller.lineno,
+        error: error.is_a?(MediaTypes::Scheme::ValidationError) ? "#{error.class}:#{error.message}" : error
+      )
+    end
+
+    attr_accessor :fixture_caller, :error
+  end
+
+  class FixtureData
+    def initialize(caller:, fixture:, expect_to_pass:)
+      self.caller = caller
+      self.fixture = fixture
+      self.expect_to_pass = expect_to_pass
+    end
+
+    attr_accessor :caller, :fixture, :expect_to_pass
+
+    alias expect_to_pass? expect_to_pass
   end
 
   ##
@@ -57,11 +96,16 @@ module MediaTypes
     def initialize(allow_empty: false, expected_type: ::Object, &block)
       self.rules = Rules.new(allow_empty: allow_empty, expected_type: expected_type)
       self.type_attributes = {}
+      self.fixtures = []
+      self.asserted_sane = false
 
       instance_exec(&block) if block_given?
     end
 
-    attr_accessor :type_attributes
+    attr_accessor :type_attributes, :fixtures
+    attr_reader :rules, :asserted_sane
+
+    alias asserted_sane? asserted_sane
 
     ##
     # Checks if the +output+ is valid
@@ -158,11 +202,10 @@ module MediaTypes
     #   MyMedia.valid?({ foo: { bar: 'my-string' }})
     #   # => true
     #
-    def attribute(key, type = ::Object, optional: false, **opts, &block)
-      raise KeyTypeError, "Unexpected key type #{key.class.name}, please use either a symbol or string." unless key.is_a?(String) || key.is_a?(Symbol)
-      raise DuplicateKeyError, "An attribute with key #{key.to_s} has already been defined. Please remove one of the two." if rules.has_key?(key)
-      raise DuplicateKeyError, "A string attribute with the same string representation as the symbol :#{key.to_s} already exists. Please remove one of the two." if key.is_a?(Symbol)&& rules.has_key?(key.to_s)
-      raise DuplicateKeyError, "A symbol attribute with the same string representation as the string '#{key}' already exists. Please remove one of the two." if key.is_a?(String) && rules.has_key?(key.to_sym)
+    def attribute(key, type = nil, optional: false, **opts, &block)
+      raise ConflictingTypeDefinitionError, 'You cannot apply a block to a non-hash typed attribute, either remove the type or the block' if type != ::Hash && block_given? && !type.nil?
+
+      type ||= ::Object
 
       if block_given?
         return collection(key, expected_type: ::Hash, optional: optional, **opts, &block)
@@ -216,6 +259,8 @@ module MediaTypes
     #   # => true
     #
     def any(scheme = nil, expected_type: ::Hash, allow_empty: false, &block)
+      raise ConflictingTypeDefinitionError, 'You cannot apply a block to a non-hash typed property, either remove the type or the block' if scheme != ::Hash && block_given? && !scheme.nil?
+
       unless block_given?
         if scheme.is_a?(Scheme)
           return rules.default = scheme
@@ -303,6 +348,8 @@ module MediaTypes
     #   # => true
     #
     def collection(key, scheme = nil, allow_empty: false, expected_type: ::Array, optional: false, &block)
+      raise ConflictingTypeDefinitionError, 'You cannot apply a block to a non-hash typed collection, either remove the type or the block' if scheme != ::Hash && block_given? && !scheme.nil?
+
       unless block_given?
         return rules.add(
           key,
@@ -385,24 +432,82 @@ module MediaTypes
     end
 
     def assert_pass(fixture)
-      json = JSON.parse(fixture, { symbolize_names: true })
-
-      validate(json)
+      reduced_stack = remove_current_dir_from_stack(caller_locations)
+      @fixtures << FixtureData.new(caller: reduced_stack.first, fixture: fixture, expect_to_pass: true)
     end
-    
+
     def assert_fail(fixture)
-      json = JSON.parse(fixture, { symbolize_names: true })
+      reduced_stack = remove_current_dir_from_stack(caller_locations)
+      @fixtures << FixtureData.new(caller: reduced_stack.first, fixture: fixture, expect_to_pass: false)
+    end
+
+    # Removes all calls originating in current dir from given stack
+    # We need this so that we find out the caller of an assert_pass/fail in the caller_locations
+    # Which gets polluted by Scheme consecutively executing blocks within the validation blocks
+    def remove_current_dir_from_stack(stack)
+      stack.reject { |location| location.path.include?(__dir__) }
+    end
+
+    def validate_scheme_fixtures(expect_symbol_keys, backtrace)
+      @fixtures.map do |fixture_data|
+        begin
+          validate_fixture(fixture_data, expect_symbol_keys, backtrace)
+          nil
+        rescue UnexpectedValidationResultError => e
+          e
+        end
+      end.compact
+    end
+
+    def validate_nested_scheme_fixtures(expect_symbol_keys, backtrace)
+      @rules.flat_map do |key, rule|
+        next unless rule.is_a?(Scheme) || rule.is_a?(Links)
+
+        begin
+          rule.run_fixture_validations(expect_symbol_keys, backtrace.dup.append(key))
+          nil
+        rescue AssertionError => e
+          e.fixture_errors
+        end
+      end.compact
+    end
+
+    def validate_default_scheme_fixtures(expect_symbol_keys, backtrace)
+      return [] unless @rules.default.is_a?(Scheme)
+
+      @rules.default.run_fixture_validations(expect_symbol_keys, backtrace.dup.append('*'))
+      []
+    rescue AssertionError => e
+      e.fixture_errors
+    end
+
+    def run_fixture_validations(expect_symbol_keys, backtrace = [])
+      fixture_errors = validate_scheme_fixtures(expect_symbol_keys, backtrace)
+      fixture_errors += validate_nested_scheme_fixtures(expect_symbol_keys, backtrace)
+      fixture_errors += validate_default_scheme_fixtures(expect_symbol_keys, backtrace)
+
+      raise AssertionError, fixture_errors unless fixture_errors.empty?
+
+      self.asserted_sane = true
+    end
+
+    def validate_fixture(fixture_data, expect_symbol_keys, backtrace = [])
+      json = JSON.parse(fixture_data.fixture, { symbolize_names: expect_symbol_keys })
+      expected_key_type = expect_symbol_keys ? Symbol : String
 
       begin
-        validate(json)
-      rescue MediaTypes::Scheme::ValidationError
-        return
+        validate(json, expected_key_type: expected_key_type, backtrace: backtrace)
+        unless fixture_data.expect_to_pass?
+          raise UnexpectedValidationResultError.new(fixture_data.caller, 'No error encounterd whilst expecting to')
+        end
+      rescue MediaTypes::Scheme::ValidationError => e
+        raise UnexpectedValidationResultError.new(fixture_data.caller, e) if fixture_data.expect_to_pass?
       end
-      raise AssertionError
     end
 
     private
 
-    attr_accessor :rules
+    attr_writer :rules, :asserted_sane
+
   end
 end

@@ -197,5 +197,49 @@ module MediaTypes
         TestSchemeType.validate!(PASSING_DATA.dup.merge(key_with_defined_scheme: [{ defined: 'me' }]))
       end
     end
+
+    class PassFails
+      include MediaTypes::Dsl
+
+      def self.organisation
+        'acme'
+      end
+
+      use_name 'PassFails'
+
+      validations do
+        attribute :foo, Numeric
+
+        assert_pass '{"foo": "42"}'
+      end
+    end
+
+    def test_assert_pass_raises_on_validation_error
+      assert_raises AssertionError do
+        PassFails.assert_sane!
+      end
+    end
+
+    class FailPasses
+      include MediaTypes::Dsl
+
+      def self.organisation
+        'acme'
+      end
+
+      use_name 'FailPasses'
+
+      validations do
+        attribute :foo, Numeric
+
+        assert_fail '{"foo": 42}'
+      end
+    end
+
+    def test_assert_fail_raises_on_validation_pass
+      assert_raises AssertionError do
+        FailPasses.assert_sane!
+      end
+    end
   end
 end

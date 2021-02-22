@@ -18,7 +18,7 @@ module MediaTypes
     end
 
     def test_it_is_not_validatable
-      assert_raises RuntimeError do
+      assert_raises MediaTypes::Dsl::MissingValidationError do
         TestSchemeType.validatable?
       end
     end

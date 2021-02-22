@@ -10,7 +10,7 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'trailervote'
+          'acme'
         end
 
         use_name 'test'
@@ -37,10 +37,10 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'trailervote'
+          'acme'
         end
 
-        use_name 'test'
+        use_name 'OptionalAttributeInsideAny'
 
         validations do
           any do
@@ -67,10 +67,10 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'trailervote'
+          'acme'
         end
 
-        use_name 'test'
+        use_name 'OptionalAttributeInsideCollection'
 
         validations do
           collection :foo do
@@ -104,10 +104,10 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'trailervote'
+          'acme'
         end
 
-        use_name 'test'
+        use_name 'OptionalCollection'
 
         validations do
           collection :foo, optional: true do
@@ -139,10 +139,10 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'trailervote'
+          'acme'
         end
 
-        use_name 'test'
+        use_name 'OptionalAttributeInsideAttribute'
 
         validations do
           attribute :foo do
@@ -174,10 +174,10 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'trailervote'
+          'acme'
         end
 
-        use_name 'test'
+        use_name 'OptionalAttributeInsideOptionalAttribute'
 
         validations do
           attribute :foo, optional: true do
@@ -205,6 +205,15 @@ module MediaTypes
         refute OptionalAttributeInsideOptionalAttribute.valid?(foo: [nil]), 'Expected input to be invalid'
         # Expects foo to be a Hash
         refute OptionalAttributeInsideOptionalAttribute.valid?(foo: nil), 'Expected input to be invalid'
+      end
+
+      [OptionalAttribute,
+       OptionalAttributeInsideAny,
+       OptionalAttributeInsideCollection,
+       OptionalCollection,
+       OptionalAttributeInsideAttribute,
+       OptionalAttributeInsideOptionalAttribute].each do |type|
+        create_specification_tests_for type
       end
     end
   end

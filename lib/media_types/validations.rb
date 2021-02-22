@@ -12,6 +12,8 @@ module MediaTypes
   #
   class Validations
 
+    attr_reader :scheme
+
     ##
     # Creates a new stack of validations
     #
@@ -48,7 +50,7 @@ module MediaTypes
       if scheme.respond_to?(method_name)
         media_type.__getobj__.media_type_combinations ||= Set.new
         media_type.__getobj__.media_type_combinations.add(media_type.as_key)
-      
+
         return scheme.send(method_name, *arguments, &block)
       end
 
@@ -61,7 +63,8 @@ module MediaTypes
 
     private
 
-    attr_accessor :media_type, :registry, :scheme
+    attr_accessor :media_type, :registry
+    attr_writer :scheme
 
     ##
     # Switches the inner block to a specific version

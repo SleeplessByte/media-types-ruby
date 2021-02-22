@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 $LOAD_PATH.unshift File.expand_path(File.join('..', 'lib'), __dir__)
 
 # Loads gems from gemfile so you don't need bundle exec
@@ -26,8 +28,16 @@ Minitest::Reporters.use!
 
 # Run at exit
 require 'minitest/autorun'
-require_relative './assertions'
+require 'media_types/testing/assertions'
 
-class Minitest::Test < Minitest::Runnable
-  include MediaTypes::Assertions
+module Minitest
+  class Test < Minitest::Runnable
+    include MediaTypes::Testing::Assertions
+
+    def self.create_specification_tests_for(mediatype)
+      define_method "test_mediatype_specification_of_#{mediatype.name}" do
+        assert_mediatype mediatype
+      end
+    end
+  end
 end
