@@ -28,9 +28,10 @@ module MediaTypes
   # Keep track of modules setting their key expectations
   def self.set_key_expectation(mod, expect_symbol_keys)
     @key_expectations ||= {}
+    @key_expectations_used ||= {}
 
     raise KeyExpectationSetError.new(mod: mod) unless @key_expectations[mod.name].nil?
-    raise KeyExpectationUsedError.new(mod: mod) if @key_expectations_used && @key_expectations_used[mod.name]
+    raise KeyExpectationUsedError.new(mod: mod) if @key_expectations_used[mod.name]
 
     @key_expectations[mod.name] = expect_symbol_keys
   end
