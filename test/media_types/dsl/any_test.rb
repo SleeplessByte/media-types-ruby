@@ -268,7 +268,7 @@ module MediaTypes
 
       def test_overwriting_noy_strict_with_any_raises_error
         assert_raises Scheme::AnyOverwritingNotStrictError do
-          OverwritingAnyWithAny.class_eval do
+          OverwritingNotStrictWithAny.class_eval do
             include MediaTypes::Dsl
 
             def self.organisation
