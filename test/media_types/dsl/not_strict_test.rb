@@ -10,10 +10,10 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'trailervote'
+          'acme'
         end
 
-        use_name 'test'
+        use_name 'NotStrictType'
 
         validations do
           attribute :foo, Numeric
@@ -36,10 +36,10 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'trailervote'
+          'acme'
         end
 
-        use_name 'test'
+        use_name 'NotStrictCollectionType'
 
         validations do
           collection :foo do
@@ -61,6 +61,52 @@ module MediaTypes
         refute NotStrictCollectionType.valid?({ foo: [] }), 'Expected input to be invalid'
         refute NotStrictCollectionType.valid?({ foo: [nil] }), 'Expected input to be invalid'
         refute NotStrictCollectionType.valid?({ foo: nil }), 'Expected input to be invalid'
+      end
+
+      [NotStrictType, NotStrictCollectionType].each do |type|
+        create_specification_tests_for type
+      end
+
+      class OverwritingNotStrictWithNotStrict; end
+
+      def test_overwriting_not_strict_with_not_strict_raises_error
+        assert_raises Scheme::DuplicateNotStrictRuleError do
+          OverwritingNotStrictWithNotStrict.class_eval do
+            include MediaTypes::Dsl
+
+            def self.organisation
+              'domain.test'
+            end
+
+            use_name 'test'
+
+            validations do
+              not_strict
+              not_strict
+            end
+          end
+        end
+      end
+
+      class OverwritingAnyWithNotStrict; end
+
+      def test_overwriting_any_with_not_strict_raises_error
+        assert_raises Scheme::NotStrictOverwritingAnyError do
+          OverwritingAnyWithNotStrict.class_eval do
+            include MediaTypes::Dsl
+
+            def self.organisation
+              'domain.test'
+            end
+
+            use_name 'test'
+
+            validations do
+              any Numeric
+              not_strict
+            end
+          end
+        end
       end
     end
   end

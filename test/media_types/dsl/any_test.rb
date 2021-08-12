@@ -10,7 +10,7 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'trailervote'
+          'acme'
         end
 
         use_name 'test'
@@ -48,7 +48,7 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'trailervote'
+          'acme'
         end
 
         use_name 'test'
@@ -86,7 +86,7 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'trailervote'
+          'acme'
         end
 
         use_name 'test'
@@ -124,7 +124,7 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'trailervote'
+          'acme'
         end
 
         use_name 'test'
@@ -163,7 +163,7 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'trailervote'
+          'acme'
         end
 
         use_name 'test'
@@ -203,7 +203,7 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'trailervote'
+          'acme'
         end
 
         use_name 'test'
@@ -238,6 +238,74 @@ module MediaTypes
         # Expects any value to be an Array
         refute AnyWithForce.valid?({ foo: nil }), 'Expected input to be invalid'
       end
+
+      [AnyType, AnyOfScheme, AnyWithOptions, AnyWithOptionsOrNil, AnyWithScheme, AnyWithForce].each do |type|
+        create_specification_tests_for type
+      end
+
+      class OverwritingAnyWithAny; end
+
+      def test_overwriting_any_with_any_raises_error
+        assert_raises Scheme::DuplicateAnyRuleError do
+          OverwritingAnyWithAny.class_eval do
+            include MediaTypes::Dsl
+
+            def self.organisation
+              'domain.test'
+            end
+
+            use_name 'test'
+
+            validations do
+              any Numeric
+              any Numeric
+            end
+          end
+        end
+      end
+
+      class OverwritingNotStrictWithAny; end
+
+      def test_overwriting_noy_strict_with_any_raises_error
+        assert_raises Scheme::AnyOverwritingNotStrictError do
+          OverwritingNotStrictWithAny.class_eval do
+            include MediaTypes::Dsl
+
+            def self.organisation
+              'domain.test'
+            end
+
+            use_name 'test'
+
+            validations do
+              not_strict
+              any Numeric
+            end
+          end
+        end
+      end
+
+      class TypeAndBlockCombined; end
+
+      def test_any_cannot_be_defined_with_both_a_type_and_a_block
+        assert_raises Scheme::ConflictingTypeDefinitionError do
+          TypeAndBlockCombined.class_eval do
+            include MediaTypes::Dsl
+
+            def self.organisation
+              'domain.test'
+            end
+
+            use_name 'test'
+
+            validations do
+              any Numeric do
+              end
+            end
+          end
+        end
+      end
+
     end
   end
 end

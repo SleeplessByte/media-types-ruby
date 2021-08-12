@@ -10,10 +10,10 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'trailervote'
+          'acme'
         end
 
-        use_name 'test'
+        use_name 'AttributeType'
 
         validations do
           attribute :foo, Numeric
@@ -34,7 +34,7 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'trailervote'
+          'acme'
         end
 
         use_name 'test'
@@ -61,7 +61,7 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'trailervote'
+          'acme'
         end
 
         use_name 'test'
@@ -90,10 +90,10 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'trailervote'
+          'acme'
         end
 
-        use_name 'test'
+        use_name 'AttributeOptionsType'
 
         validations do
           attribute :foo, Numeric, allow_nil: true
@@ -113,8 +113,137 @@ module MediaTypes
       end
 
       def test_indifferent_access
-        refute AttributeType.valid?({'foo' => nil}), 'Expected input to be invalid'
+        refute AttributeType.valid?({ 'foo' => nil }), 'Expected input to be invalid'
         refute AttributeType.valid?({}), 'Expected input to be invalid'
+      end
+
+      [AttributeType, AttributeCollectionType, AttributeSchemeType, AttributeOptionsType].each do |type|
+        create_specification_tests_for type
+      end
+
+      class DuplicateSymbolSymbol; end
+
+      def test_duplicate_attribute_raises_error_for_case_symbol_symbol
+        assert_raises Scheme::DuplicateSymbolKeyError do
+          DuplicateSymbolSymbol.class_eval do
+            include MediaTypes::Dsl
+
+            def self.organisation
+              'domain.test'
+            end
+
+            use_name 'test'
+
+            validations do
+              attribute :foo, Numeric
+              attribute :foo, Numeric
+            end
+          end
+        end
+      end
+
+      class DuplicateteSymbolString; end
+
+      def test_duplicate_attribute_raises_error_for_case_symbol_string
+        assert_raises Scheme::StringOverwritingSymbolError do
+          DuplicateteSymbolString.class_eval do
+            include MediaTypes::Dsl
+
+            def self.organisation
+              'domain.test'
+            end
+
+            use_name 'test'
+
+            validations do
+              attribute :foo, Numeric
+              attribute 'foo', Numeric
+            end
+          end
+        end
+      end
+
+      class DuplicateStringSymbol; end
+
+      def test_duplicate_attribute_raises_error_for_case_string_symbol
+        assert_raises Scheme::SymbolOverwritingStringError do
+          DuplicateStringSymbol.class_eval do
+            include MediaTypes::Dsl
+
+            def self.organisation
+              'domain.test'
+            end
+
+            use_name 'test'
+
+            validations do
+              attribute 'foo', Numeric
+              attribute :foo, Numeric
+            end
+          end
+        end
+      end
+
+      class DuplicateStringString; end
+
+      def test_duplicate_attribute_raises_error_for_case_string_string
+        assert_raises Scheme::DuplicateStringKeyError do
+          DuplicateStringString.class_eval do
+            include MediaTypes::Dsl
+
+            def self.organisation
+              'domain.test'
+            end
+
+            use_name 'test'
+
+            validations do
+              attribute 'foo', Numeric
+              attribute 'foo', Numeric
+            end
+          end
+        end
+      end
+
+      class NonStringOrSymbolKeytype; end
+
+      def test_non_string_or_symbol_attribute_raises_keytype_error
+        assert_raises Scheme::KeyTypeError do
+          NonStringOrSymbolKeytype.class_eval do
+            include MediaTypes::Dsl
+
+            def self.organisation
+              'domain.test'
+            end
+
+            use_name 'test'
+
+            validations do
+              attribute Object, Numeric
+            end
+          end
+        end
+      end
+
+      class TypeAndBlockCombined; end
+
+      def test_attributes_cannot_be_defined_with_both_a_type_and_a_block
+        assert_raises Scheme::ConflictingTypeDefinitionError do
+          TypeAndBlockCombined.class_eval do
+            include MediaTypes::Dsl
+
+            def self.organisation
+              'domain.test'
+            end
+
+            use_name 'test'
+
+            validations do
+              attribute :foo, Numeric do
+              end
+            end
+          end
+        end
       end
 
     end

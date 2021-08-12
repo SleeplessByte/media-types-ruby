@@ -31,6 +31,21 @@ module MediaTypes
         "[Scheme::Links #{links.keys}]"
       end
 
+      def run_fixture_validations(expect_symbol_keys, backtrace = [])
+        fixture_errors = @links.flat_map {|key, rule|
+          if rule.is_a?(Scheme)
+            begin
+              rule.run_fixture_validations(expect_symbol_keys, backtrace.dup.append(key))
+              nil
+            rescue AssertionError => e
+              e.fixture_errors
+            end
+          end
+        }.compact
+
+        raise AssertionError.new(fixture_errors) unless fixture_errors.empty?
+      end
+
       private
 
       attr_accessor :links

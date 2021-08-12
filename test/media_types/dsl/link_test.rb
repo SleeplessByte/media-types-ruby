@@ -10,10 +10,10 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'trailervote'
+          'acme'
         end
 
-        use_name 'test'
+        use_name 'SingleLink'
 
         validations do
           link :self
@@ -38,10 +38,10 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'trailervote'
+          'acme'
         end
 
-        use_name 'test'
+        use_name 'LinkWithAttribute'
 
         validations do
           link :self do
@@ -72,10 +72,10 @@ module MediaTypes
         include MediaTypes::Dsl
 
         def self.organisation
-          'trailervote'
+          'acme'
         end
 
-        use_name 'test'
+        use_name 'OptionalLink'
 
         validations do
           link :self, optional: true
@@ -93,6 +93,114 @@ module MediaTypes
         refute OptionalLink.valid?({ _links: { self: { href: nil } } }), 'Expected input to be invalid'
         # Missing _links
         refute OptionalLink.valid?({}), 'Expected input to be invalid'
+      end
+
+      [SingleLink, LinkWithAttribute, OptionalLink].each do |type|
+        create_specification_tests_for type
+      end
+
+      class DuplicateSymbolSymbol; end
+
+      def test_duplicate_link_raises_error_for_case_symbol_symbol
+        assert_raises Scheme::DuplicateSymbolKeyError do
+          DuplicateSymbolSymbol.class_eval do
+            include MediaTypes::Dsl
+
+            def self.organisation
+              'domain.test'
+            end
+
+            use_name 'test'
+
+            validations do
+              link :foo
+              link :foo
+            end
+          end
+        end
+      end
+
+      class DuplicateSymbolString; end
+
+      def test_duplicate_link_raises_error_for_case_symbol_string
+        assert_raises Scheme::StringOverwritingSymbolError do
+          DuplicateSymbolString.class_eval do
+            include MediaTypes::Dsl
+
+            def self.organisation
+              'domain.test'
+            end
+
+            use_name 'test'
+
+            validations do
+              link :foo
+              link 'foo'
+            end
+          end
+        end
+      end
+
+      class DuplicateStringSymbol; end
+
+      def test_duplicate_link_raises_error_for_case_string_symbol
+        assert_raises Scheme::SymbolOverwritingStringError do
+          DuplicateStringSymbol.class_eval do
+            include MediaTypes::Dsl
+
+            def self.organisation
+              'domain.test'
+            end
+
+            use_name 'test'
+
+            validations do
+              link 'foo'
+              link :foo
+            end
+          end
+        end
+      end
+
+      class DuplicateStringString; end
+
+      def test_duplicate_link_raises_error_for_case_string_string
+        assert_raises Scheme::DuplicateStringKeyError do
+          DuplicateStringString.class_eval do
+            include MediaTypes::Dsl
+
+            def self.organisation
+              'domain.test'
+            end
+
+            use_name 'test'
+
+            validations do
+              link 'foo'
+              link 'foo'
+            end
+          end
+        end
+      end
+
+      class NonStringOrSymbolKeytype; end
+
+      def test_non_string_or_symbol_link_raises_keytype_error
+        assert_raises Scheme::KeyTypeError do
+          NonStringOrSymbolKeytype.class_eval do
+            include MediaTypes::Dsl
+
+            def self.organisation
+              'domain.test'
+            end
+
+            use_name 'test'
+
+            validations do
+              link Object
+            end
+          end
+        end
       end
     end
   end

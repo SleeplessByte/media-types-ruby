@@ -14,6 +14,7 @@ module MediaTypes
         self.allow_empty = allow_empty
         self.expected_type = expected_type
         self.optional_keys = []
+        self.original_key_type = {}
 
         self.default = MissingValidation.new
       end
@@ -27,11 +28,42 @@ module MediaTypes
       end
 
       def add(key, val, optional: false)
+        validate_input(key, val)
+
         normalized_key = normalize_key(key)
         __getobj__[normalized_key] = val
         optional_keys << normalized_key if optional
+        original_key_type[normalized_key] = key.class
 
         self
+      end
+
+      def validate_input(key, val)
+        raise KeyTypeError, "Unexpected key type #{key.class.name}, please use either a symbol or string." unless key.is_a?(String) || key.is_a?(Symbol)
+
+        validate_key_name(key, val)
+      end
+
+      def validate_key_name(key, val)
+        return unless has_key?(key)
+
+        if key.is_a?(Symbol)
+          duplicate_symbol_key_name(key, val)
+        else
+          duplicate_string_key_name(key, val)
+        end
+      end
+
+      def duplicate_symbol_key_name(key, val)
+        raise DuplicateSymbolKeyError.new(val.class.name.split('::').last, key) if get_original_key_type(key) == Symbol
+
+        raise SymbolOverwritingStringError.new(val.class.name.split('::').last, key)
+      end
+
+      def duplicate_string_key_name(key, val)
+        raise DuplicateStringKeyError.new(val.class.name.split('::').last, key) if get_original_key_type(key) == String
+
+        raise StringOverwritingSymbolError.new(val.class.name.split('::').last, key)
       end
 
       def []=(key, val)
@@ -105,17 +137,36 @@ module MediaTypes
         ].join(': ')
       end
 
+      def has_key?(key)
+        __getobj__.key?(normalize_key(key))
+      end
+
+      def get_original_key_type(key)
+        raise format('Key %<key>s does not exist', key: key) unless has_key?(key)
+
+        original_key_type[normalize_key(key)]
+      end
+
+      def default=(input_default)
+        unless default.nil?
+          raise DuplicateAnyRuleError if !(default.is_a?(MissingValidation) || default.is_a?(NotStrict)) && !(input_default.is_a?(MissingValidation) || input_default.is_a?(NotStrict))
+          raise DuplicateNotStrictRuleError if default.is_a?(NotStrict) && input_default.is_a?(NotStrict)
+          raise NotStrictOverwritingAnyError if !(default.is_a?(MissingValidation) || default.is_a?(NotStrict)) && input_default.is_a?(NotStrict)
+          raise AnyOverwritingNotStrictError if default.is_a?(NotStrict) && !(input_default.is_a?(MissingValidation) || input_default.is_a?(NotStrict))
+        end
+        super(input_default)
+      end
+
       alias get []
       alias remove delete
 
       private
 
-      attr_accessor :allow_empty, :optional_keys
+      attr_accessor :allow_empty, :optional_keys, :original_key_type
       attr_writer :expected_type
 
       def normalize_key(key)
-        # Because default ruby hashes don't treat symbols and string equal we can't normalize them here.
-        key
+        String(key).to_sym
       end
     end
   end

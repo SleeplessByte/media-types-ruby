@@ -12,6 +12,8 @@ module MediaTypes
   #
   class Validations
 
+    attr_reader :scheme
+
     ##
     # Creates a new stack of validations
     #
@@ -61,7 +63,8 @@ module MediaTypes
 
     private
 
-    attr_accessor :media_type, :registry, :scheme
+    attr_accessor :media_type, :registry
+    attr_writer :scheme
 
     ##
     # Switches the inner block to a specific version
