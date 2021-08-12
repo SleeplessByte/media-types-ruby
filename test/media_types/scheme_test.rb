@@ -132,16 +132,16 @@ module MediaTypes
     def test_nested_validations
       assert_media_type_format(
         TestSchemeType.to_constructable.view('create').version(1),
-        bar: 'version1'
+        { bar: 'version1' }
       )
     end
 
     def test_merge
       assert_media_type_format(
-        TestSchemeType.to_constructable.view('create').version(2),
-        foo: 'merging with',
-        bar: 'version1'
-      )
+        TestSchemeType.to_constructable.view('create').version(2), {
+          foo: 'merging with',
+          bar: 'version1'
+        })
     end
 
     def test_it_is_strict_by_default

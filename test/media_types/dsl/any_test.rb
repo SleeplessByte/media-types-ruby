@@ -30,7 +30,7 @@ module MediaTypes
           assert_fail <<-FIXTURE
           { "foo": { "bar": "string" } }
           FIXTURE
-        
+
           # Expects any value to be Numeric, not a Hash
           assert_fail '{"foo": {}}'
           # Expects any value to be Numeric, not a NilClass
@@ -63,23 +63,23 @@ module MediaTypes
       def test_any_of_scheme
         assert AnyOfScheme.validatable?(AnyOfScheme.to_constructable),
                'Expected media type to be validatable'
-        assert AnyOfScheme.validate!(foo: { bar: 42 }, other: { bar: 43 }), 'Expected input to be valid'
-        assert AnyOfScheme.validate!(foo: { bar: 42 }), 'Expected input to be valid'
+        assert AnyOfScheme.validate!({ foo: { bar: 42 }, other: { bar: 43 } }), 'Expected input to be valid'
+        assert AnyOfScheme.validate!({ foo: { bar: 42 } }), 'Expected input to be valid'
         # Any also means none, there are no required keys
         assert AnyOfScheme.validate!({}), 'Expected input to be valid'
 
         # Expects bar to be a number
-        refute AnyOfScheme.valid?(foo: { bar: 'string' }), 'Expected input to be invalid'
+        refute AnyOfScheme.valid?({ foo: { bar: 'string' } }), 'Expected input to be invalid'
         # Expects a Hash
-        refute AnyOfScheme.valid?(foo: [{ bar: 42 }]), 'Expected input to be invalid'
+        refute AnyOfScheme.valid?({ foo: [{ bar: 42 }] }), 'Expected input to be invalid'
         # Has a required rule
-        refute AnyOfScheme.valid?(foo: {}), 'Expected input to be invalid'
+        refute AnyOfScheme.valid?({ foo: {} }), 'Expected input to be invalid'
         # Has a required rule
-        refute AnyOfScheme.valid?(foo: []), 'Expected input to be invalid'
+        refute AnyOfScheme.valid?({ foo: [] }), 'Expected input to be invalid'
         # Expects a Hash
-        refute AnyOfScheme.valid?(foo: nil), 'Expected input to be invalid'
+        refute AnyOfScheme.valid?({ foo: nil }), 'Expected input to be invalid'
         # Expects a Hash
-        refute AnyOfScheme.valid?(foo: [nil]), 'Expected input to be invalid'
+        refute AnyOfScheme.valid?({ foo: [nil] }), 'Expected input to be invalid'
       end
 
       class AnyWithOptions
@@ -101,23 +101,23 @@ module MediaTypes
       def test_any_with_options
         assert AnyWithOptions.validatable?(AnyWithOptions.to_constructable),
                'Expected media type to be validatable'
-        assert AnyWithOptions.validate!(foo: { bar: 42 }, other: { bar: 43 }), 'Expected input to be valid'
-        assert AnyWithOptions.validate!(foo: { bar: 42 }), 'Expected input to be valid'
+        assert AnyWithOptions.validate!({ foo: { bar: 42 }, other: { bar: 43 } }), 'Expected input to be valid'
+        assert AnyWithOptions.validate!({ foo: { bar: 42 } }), 'Expected input to be valid'
         # Expects any value to be a Hash, but that Hash may be empty
-        assert AnyWithOptions.validate!(foo: {}), 'Expect input to be valid'
+        assert AnyWithOptions.validate!({ foo: {} }), 'Expect input to be valid'
         # Any also means none, there are no required keys
         assert AnyWithOptions.validate!({}), 'Expected input to be valid'
 
         # Expects bar to be Numeric
-        refute AnyWithOptions.valid?(foo: { bar: 'string' }), 'Expected input to be invalid'
+        refute AnyWithOptions.valid?({ foo: { bar: 'string' } }), 'Expected input to be invalid'
         # Expects any value to be a Hash
-        refute AnyWithOptions.valid?(foo: [{ bar: 42 }]), 'Expected input to be invalid'
+        refute AnyWithOptions.valid?({ foo: [{ bar: 42 }] }), 'Expected input to be invalid'
         # Expects any value to be a Hash
-        refute AnyWithOptions.valid?(foo: []), 'Expected input to be invalid'
+        refute AnyWithOptions.valid?({ foo: [] }), 'Expected input to be invalid'
         # Expects any value to be a Hash
-        refute AnyWithOptions.valid?(foo: [nil]), 'Expected input to be invalid'
+        refute AnyWithOptions.valid?({ foo: [nil] }), 'Expected input to be invalid'
         # Expects any value to be a Hash
-        refute AnyWithOptions.valid?(foo: nil), 'Expected input to be invalid'
+        refute AnyWithOptions.valid?({ foo: nil }), 'Expected input to be invalid'
       end
 
       class AnyWithOptionsOrNil
@@ -140,23 +140,23 @@ module MediaTypes
       def test_any_with_options_or_nil
         assert AnyWithOptionsOrNil.validatable?(AnyWithOptionsOrNil.to_constructable),
                'Expected media type to be validatable'
-        assert AnyWithOptionsOrNil.validate!(foo: { bar: 42 }, other: { bar: 43 }), 'Expected input to be valid'
-        assert AnyWithOptionsOrNil.validate!(foo: { bar: 42 }), 'Expected input to be valid'
+        assert AnyWithOptionsOrNil.validate!({ foo: { bar: 42 }, other: { bar: 43 } }), 'Expected input to be valid'
+        assert AnyWithOptionsOrNil.validate!({ foo: { bar: 42 } }), 'Expected input to be valid'
         # Expects any value to be a Hash (or NilClass), but that Hash may be empty
-        assert AnyWithOptionsOrNil.validate!(foo: {}), 'Expect input to be valid'
+        assert AnyWithOptionsOrNil.validate!({ foo: {} }), 'Expect input to be valid'
         # Expects any value to be a NilClass (or Hash)
-        assert AnyWithOptionsOrNil.valid?(foo: nil), 'Expected input to be invalid'
+        assert AnyWithOptionsOrNil.valid?({ foo: nil }), 'Expected input to be invalid'
         # Any also means none, there are no required keys
         assert AnyWithOptionsOrNil.validate!({}), 'Expected input to be valid'
 
         # Expects bar to be Numeric
-        refute AnyWithOptionsOrNil.valid?(foo: { bar: 'string' }), 'Expected input to be invalid'
+        refute AnyWithOptionsOrNil.valid?({ foo: { bar: 'string' } }), 'Expected input to be invalid'
         # Expects any value to be a Hash
-        refute AnyWithOptionsOrNil.valid?(foo: [{ bar: 42 }]), 'Expected input to be invalid'
+        refute AnyWithOptionsOrNil.valid?({ foo: [{ bar: 42 }] }), 'Expected input to be invalid'
         # Expects any value to be a Hash
-        refute AnyWithOptionsOrNil.valid?(foo: []), 'Expected input to be invalid'
+        refute AnyWithOptionsOrNil.valid?({ foo: [] }), 'Expected input to be invalid'
         # Expects any value to be a Hash
-        refute AnyWithOptionsOrNil.valid?(foo: [nil]), 'Expected input to be invalid'
+        refute AnyWithOptionsOrNil.valid?({ foo: [nil] }), 'Expected input to be invalid'
       end
 
       class AnyWithScheme
@@ -180,23 +180,23 @@ module MediaTypes
       def test_any_with_scheme
         assert AnyWithScheme.validatable?(AnyWithScheme.to_constructable),
                'Expected media type to be validatable'
-        assert AnyWithScheme.validate!(foo: { bar: 42 }, other: { bar: 43 }), 'Expected input to be valid'
-        assert AnyWithScheme.validate!(foo: { bar: 42 }), 'Expected input to be valid'
+        assert AnyWithScheme.validate!({ foo: { bar: 42 }, other: { bar: 43 } }), 'Expected input to be valid'
+        assert AnyWithScheme.validate!({ foo: { bar: 42 } }), 'Expected input to be valid'
         # Any also means none, has no required parameters
         assert AnyWithScheme.validate!({}), 'Expect input to be valid'
 
         # Expects bar to be numeric
-        refute AnyWithScheme.valid?(foo: { bar: 'string' }), 'Expected input to be invalid'
+        refute AnyWithScheme.valid?({ foo: { bar: 'string' } }), 'Expected input to be invalid'
         # Expects any value to match scheme (thus be a Hash)
-        refute AnyWithScheme.valid?(foo: [{ bar: 42 }]), 'Expected input to be invalid'
+        refute AnyWithScheme.valid?({ foo: [{ bar: 42 }] }), 'Expected input to be invalid'
         # Expects any value to match scheme (thus have an attribute bar)
-        refute AnyWithScheme.valid?(foo: {}), 'Expected input to be invalid'
+        refute AnyWithScheme.valid?({ foo: {} }), 'Expected input to be invalid'
         # Expects any value to match scheme (thus be a Hash)
-        refute AnyWithScheme.valid?(foo: []), 'Expected input to be invalid'
+        refute AnyWithScheme.valid?({ foo: [] }), 'Expected input to be invalid'
         # Expects any value to match scheme (thus be a Hash)
-        refute AnyWithScheme.valid?(foo: [nil]), 'Expected input to be invalid'
+        refute AnyWithScheme.valid?({ foo: [nil] }), 'Expected input to be invalid'
         # Expects any value to match scheme (thus be a Hash)
-        refute AnyWithScheme.valid?(foo: nil), 'Expected input to be invalid'
+        refute AnyWithScheme.valid?({ foo: nil }), 'Expected input to be invalid'
       end
 
       class AnyWithForce
@@ -218,25 +218,25 @@ module MediaTypes
       def test_any_with_force
         assert AnyWithForce.validatable?(AnyWithForce.to_constructable),
                'Expected media type to be validatable'
-        assert AnyWithForce.validate!(foo: [{ bar: 42 }], other: [{ bar: 43 }]), 'Expected input to be valid'
-        assert AnyWithForce.validate!(foo: [{ bar: 42 }]), 'Expected input to be valid'
+        assert AnyWithForce.validate!({ foo: [{ bar: 42 }], other: [{ bar: 43 }] }), 'Expected input to be valid'
+        assert AnyWithForce.validate!({ foo: [{ bar: 42 }] }), 'Expected input to be valid'
         # Any also means none, has no required parameters
         assert AnyWithForce.validate!({}), 'Expect input to be valid'
 
         # Expects bar to be Numeric
-        refute AnyWithForce.valid?(foo: [{ bar: 'string' }]), 'Expected input to be invalid'
+        refute AnyWithForce.valid?({ foo: [{ bar: 'string' }] }), 'Expected input to be invalid'
         # Expects any value to be an Array
-        refute AnyWithForce.valid?(foo: { bar: 42 }), 'Expected input to be invalid'
+        refute AnyWithForce.valid?({ foo: { bar: 42 } }), 'Expected input to be invalid'
         # Don't allow nested arrays
-        refute AnyWithForce.valid?(foo: [[{ bar: 42 }]]), 'Expected input to be invalid'
+        refute AnyWithForce.valid?({ foo: [[{ bar: 42 }]] }), 'Expected input to be invalid'
         # Expects any value to be an Array
-        refute AnyWithForce.valid?(foo: {}), 'Expected input to be invalid'
+        refute AnyWithForce.valid?({ foo: {} }), 'Expected input to be invalid'
         # Expects any value to be an Array with an attribute bar
-        refute AnyWithForce.valid?(foo: []), 'Expected input to be invalid'
+        refute AnyWithForce.valid?({ foo: [] }), 'Expected input to be invalid'
         # Expects any value to be an Array with an attribute bar
-        refute AnyWithForce.valid?(foo: [nil]), 'Expected input to be invalid'
+        refute AnyWithForce.valid?({ foo: [nil] }), 'Expected input to be invalid'
         # Expects any value to be an Array
-        refute AnyWithForce.valid?(foo: nil), 'Expected input to be invalid'
+        refute AnyWithForce.valid?({ foo: nil }), 'Expected input to be invalid'
       end
     end
   end

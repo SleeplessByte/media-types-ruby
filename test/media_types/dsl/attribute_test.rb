@@ -103,13 +103,13 @@ module MediaTypes
       def test_attribute_with_options
         assert AttributeOptionsType.validatable?(AttributeOptionsType.to_constructable),
                'Expected media type to be validatable'
-        assert AttributeOptionsType.validate!(foo: nil), 'Expected input to be valid'
-        assert AttributeOptionsType.validate!(foo: 42), 'Expected input to be valid'
+        assert AttributeOptionsType.validate!({ foo: nil }), 'Expected input to be valid'
+        assert AttributeOptionsType.validate!({ foo: 42 }), 'Expected input to be valid'
 
-        refute AttributeOptionsType.valid?(foo: { bar: 'string' }), 'Expected input to be invalid'
-        refute AttributeOptionsType.valid?(foo: {}), 'Expected input to be invalid'
-        refute AttributeOptionsType.valid?(foo: [42]), 'Expected input to be invalid'
-        refute AttributeOptionsType.valid?(foo: [nil]), 'Expected input to be invalid'
+        refute AttributeOptionsType.valid?({ foo: { bar: 'string' } }), 'Expected input to be invalid'
+        refute AttributeOptionsType.valid?({ foo: {} }), 'Expected input to be invalid'
+        refute AttributeOptionsType.valid?({ foo: [42] }), 'Expected input to be invalid'
+        refute AttributeOptionsType.valid?({ foo: [nil] }), 'Expected input to be invalid'
       end
 
       def test_indifferent_access

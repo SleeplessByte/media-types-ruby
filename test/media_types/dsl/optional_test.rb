@@ -23,13 +23,13 @@ module MediaTypes
 
       def test_optional_attribute
         assert OptionalAttribute.validatable?(OptionalAttribute.to_constructable), 'Expected media type to be validatable'
-        assert OptionalAttribute.validate!(bar: 'string', foo: 'string'), 'Expected input to be valid'
-        assert OptionalAttribute.validate!(bar: 'string'), 'Expected input to be valid'
+        assert OptionalAttribute.validate!({ bar: 'string', foo: 'string' }), 'Expected input to be valid'
+        assert OptionalAttribute.validate!({ bar: 'string' }), 'Expected input to be valid'
 
-        refute OptionalAttribute.valid?(bar: 'string', foo: { bar: 'string' }), 'Expected input to be invalid'
-        refute OptionalAttribute.valid?(bar: 'string', foo: {}), 'Expected input to be invalid'
-        refute OptionalAttribute.valid?(bar: 'string', foo: nil), 'Expected input to be invalid'
-        refute OptionalAttribute.valid?(bar: 'string', foo: ['string']), 'Expected input to be invalid'
+        refute OptionalAttribute.valid?({ bar: 'string', foo: { bar: 'string' } }), 'Expected input to be invalid'
+        refute OptionalAttribute.valid?({ bar: 'string', foo: {} }), 'Expected input to be invalid'
+        refute OptionalAttribute.valid?({ bar: 'string', foo: nil }), 'Expected input to be invalid'
+        refute OptionalAttribute.valid?({ bar: 'string', foo: ['string'] }), 'Expected input to be invalid'
         refute OptionalAttribute.valid?({}), 'Expected input to be invalid'
       end
 
@@ -52,15 +52,15 @@ module MediaTypes
       def test_optional_attribute_inside_any
         assert OptionalAttributeInsideAny.validatable?(OptionalAttributeInsideAny.to_constructable),
                'Expected media type to be validatable'
-        assert OptionalAttributeInsideAny.validate!(foo: { bar: 42 }, other: { bar: 43 }), 'Expected input to be valid'
-        assert OptionalAttributeInsideAny.validate!(foo: { bar: 42 }), 'Expected input to be valid'
-        assert OptionalAttributeInsideAny.validate!(foo: {}), 'Expected input to be valid'
+        assert OptionalAttributeInsideAny.validate!({ foo: { bar: 42 }, other: { bar: 43 } }), 'Expected input to be valid'
+        assert OptionalAttributeInsideAny.validate!({ foo: { bar: 42 } }), 'Expected input to be valid'
+        assert OptionalAttributeInsideAny.validate!({ foo: {} }), 'Expected input to be valid'
 
-        refute OptionalAttributeInsideAny.valid?(foo: { bar: 'string' }), 'Expected input to be invalid'
-        refute OptionalAttributeInsideAny.valid?(foo: [{ bar: 42 }]), 'Expected input to be invalid'
-        refute OptionalAttributeInsideAny.valid?(foo: []), 'Expected input to be invalid'
-        refute OptionalAttributeInsideAny.valid?(foo: [nil]), 'Expected input to be invalid'
-        refute OptionalAttributeInsideAny.valid?(foo: nil), 'Expected input to be invalid'
+        refute OptionalAttributeInsideAny.valid?({ foo: { bar: 'string' } }), 'Expected input to be invalid'
+        refute OptionalAttributeInsideAny.valid?({ foo: [{ bar: 42 }] }), 'Expected input to be invalid'
+        refute OptionalAttributeInsideAny.valid?({ foo: [] }), 'Expected input to be invalid'
+        refute OptionalAttributeInsideAny.valid?({ foo: [nil] }), 'Expected input to be invalid'
+        refute OptionalAttributeInsideAny.valid?({ foo: nil }), 'Expected input to be invalid'
       end
 
       class OptionalAttributeInsideCollection
@@ -82,20 +82,20 @@ module MediaTypes
       def test_optional_attribute_inside_collection
         assert OptionalAttributeInsideCollection.validatable?(OptionalAttributeInsideCollection.to_constructable),
                'Expected media type to be validatable'
-        assert OptionalAttributeInsideCollection.validate!(foo: [{ bar: 42 }, { bar: 43 }]), 'Expected input to be valid'
+        assert OptionalAttributeInsideCollection.validate!({ foo: [{ bar: 42 }, { bar: 43 }] }), 'Expected input to be valid'
         # Attribute bar is optional, leaving no required attributes, so it may be empty
-        assert OptionalAttributeInsideCollection.validate!(foo: [{}]), 'Expected input to be valid'
+        assert OptionalAttributeInsideCollection.validate!({ foo: [{}] }), 'Expected input to be valid'
         # Attribute bar is optional, leaving no required attributes, so there may be no items
-        assert OptionalAttributeInsideCollection.validate!(foo: []), 'Expected input to be valid'
+        assert OptionalAttributeInsideCollection.validate!({ foo: [] }), 'Expected input to be valid'
 
         # Don't allow nil items
-        refute OptionalAttributeInsideCollection.valid?(foo: [nil]), 'Expected input to be invalid'
+        refute OptionalAttributeInsideCollection.valid?({ foo: [nil] }), 'Expected input to be invalid'
         # Expects bar to be Numeric
-        refute OptionalAttributeInsideCollection.valid?(foo: [{ bar: 'string' }]), 'Expected input to be invalid'
+        refute OptionalAttributeInsideCollection.valid?({ foo: [{ bar: 'string' }] }), 'Expected input to be invalid'
         # Expects foo to be an Array
-        refute OptionalAttributeInsideCollection.valid?(foo: { bar: 42 }), 'Expected input to be invalid'
+        refute OptionalAttributeInsideCollection.valid?({ foo: { bar: 42 } }), 'Expected input to be invalid'
         # Expects foo to be an Array
-        refute OptionalAttributeInsideCollection.valid?(foo: nil), 'Expected input to be invalid'
+        refute OptionalAttributeInsideCollection.valid?({ foo: nil }), 'Expected input to be invalid'
         # Expects foo
         refute OptionalAttributeInsideCollection.valid?({}), 'Expected input to be invalid'
       end
@@ -119,20 +119,20 @@ module MediaTypes
       def test_optional_collection
         assert OptionalCollection.validatable?(OptionalCollection.to_constructable),
                'Expected media type to be validatable'
-        assert OptionalCollection.validate!(foo: [{ bar: 42 }, { bar: 43 }]), 'Expected input to be valid'
+        assert OptionalCollection.validate!({ foo: [{ bar: 42 }, { bar: 43 }] }), 'Expected input to be valid'
         # Foo is optional, leaving no required keys
         assert OptionalCollection.validate!({}), 'Expected input to be valid'
 
         # Expects bar to be Numeric
-        refute OptionalCollection.valid?(foo: [{ bar: 'string' }]), 'Expected input to be invalid'
+        refute OptionalCollection.valid?({ foo: [{ bar: 'string' }] }), 'Expected input to be invalid'
         # Expects foo to be an Array
-        refute OptionalCollection.valid?(foo: { bar: 42 }), 'Expected input to be invalid'
+        refute OptionalCollection.valid?({ foo: { bar: 42 } }), 'Expected input to be invalid'
         # Expects foo not to be empty
-        refute OptionalCollection.valid?(foo: []), 'Expected input to be invalid'
+        refute OptionalCollection.valid?({ foo: [] }), 'Expected input to be invalid'
         # Expects element to have an attribute bar
-        refute OptionalCollection.valid?(foo: [nil]), 'Expected input to be invalid'
+        refute OptionalCollection.valid?({ foo: [nil] }), 'Expected input to be invalid'
         # Expects foo to be an Array
-        refute OptionalCollection.valid?(foo: nil), 'Expected input to be invalid'
+        refute OptionalCollection.valid?({ foo: nil }), 'Expected input to be invalid'
       end
 
       class OptionalAttributeInsideAttribute
@@ -154,20 +154,20 @@ module MediaTypes
       def test_optional_attribute_inside_attribute
         assert OptionalAttributeInsideAttribute.validatable?(OptionalAttributeInsideAttribute.to_constructable),
                'Expected media type to be validatable'
-        assert OptionalAttributeInsideAttribute.validate!(foo: { bar: 42 }), 'Expected input to be valid'
+        assert OptionalAttributeInsideAttribute.validate!({ foo: { bar: 42 } }), 'Expected input to be valid'
         # Bar is optional, leaving no required keys
-        assert OptionalAttributeInsideAttribute.validate!(foo: {}), 'Expected input to be valid'
+        assert OptionalAttributeInsideAttribute.validate!({ foo: {} }), 'Expected input to be valid'
 
         # Expects bar to be Numeric
-        refute OptionalAttributeInsideAttribute.valid?(foo: { bar: 'string' }), 'Expected input to be invalid'
+        refute OptionalAttributeInsideAttribute.valid?({ foo: { bar: 'string' } }), 'Expected input to be invalid'
         # Expects foo to be a Hash
-        refute OptionalAttributeInsideAttribute.valid?(foo: [{ bar: 42 }]), 'Expected input to be invalid'
+        refute OptionalAttributeInsideAttribute.valid?({ foo: [{ bar: 42 }] }), 'Expected input to be invalid'
         # Expects foo not to be empty
-        refute OptionalAttributeInsideAttribute.valid?(foo: []), 'Expected input to be invalid'
+        refute OptionalAttributeInsideAttribute.valid?({ foo: [] }), 'Expected input to be invalid'
         # Expects foo to be a Hash
-        refute OptionalAttributeInsideAttribute.valid?(foo: [nil]), 'Expected input to be invalid'
+        refute OptionalAttributeInsideAttribute.valid?({ foo: [nil] }), 'Expected input to be invalid'
         # Expects foo to be a Hash
-        refute OptionalAttributeInsideAttribute.valid?(foo: nil), 'Expected input to be invalid'
+        refute OptionalAttributeInsideAttribute.valid?({ foo: nil }), 'Expected input to be invalid'
       end
 
       class OptionalAttributeInsideOptionalAttribute
@@ -189,22 +189,22 @@ module MediaTypes
       def test_optional_attribute_inside_optional_attribute
         assert OptionalAttributeInsideOptionalAttribute.validatable?(OptionalAttributeInsideOptionalAttribute.to_constructable),
                'Expected media type to be validatable'
-        assert OptionalAttributeInsideOptionalAttribute.validate!(foo: { bar: 42 }), 'Expected input to be valid'
+        assert OptionalAttributeInsideOptionalAttribute.validate!({ foo: { bar: 42 } }), 'Expected input to be valid'
         # Bar is optional, leaving no required keys
-        assert OptionalAttributeInsideOptionalAttribute.validate!(foo: {}), 'Expected input to be valid'
+        assert OptionalAttributeInsideOptionalAttribute.validate!({ foo: {} }), 'Expected input to be valid'
         # Foo is optional, leaving no required keys
         assert OptionalAttributeInsideOptionalAttribute.validate!({}), 'Expected input to be valid'
 
         # Expects bar to be Numeric
-        refute OptionalAttributeInsideOptionalAttribute.valid?(foo: { bar: 'string' }), 'Expected input to be invalid'
+        refute OptionalAttributeInsideOptionalAttribute.valid?({ foo: { bar: 'string' } }), 'Expected input to be invalid'
         # Expects foo to be a Hash
-        refute OptionalAttributeInsideOptionalAttribute.valid?(foo: [{ bar: 42 }]), 'Expected input to be invalid'
+        refute OptionalAttributeInsideOptionalAttribute.valid?({ foo: [{ bar: 42 }] }), 'Expected input to be invalid'
         # Expects foo not to be empty
-        refute OptionalAttributeInsideOptionalAttribute.valid?(foo: []), 'Expected input to be invalid'
+        refute OptionalAttributeInsideOptionalAttribute.valid?({ foo: [] }), 'Expected input to be invalid'
         # Expects foo to be a Hash
-        refute OptionalAttributeInsideOptionalAttribute.valid?(foo: [nil]), 'Expected input to be invalid'
+        refute OptionalAttributeInsideOptionalAttribute.valid?({ foo: [nil] }), 'Expected input to be invalid'
         # Expects foo to be a Hash
-        refute OptionalAttributeInsideOptionalAttribute.valid?(foo: nil), 'Expected input to be invalid'
+        refute OptionalAttributeInsideOptionalAttribute.valid?({ foo: nil }), 'Expected input to be invalid'
       end
     end
   end

@@ -76,7 +76,13 @@ module MediaTypes
       as_key.hash
     end
 
+    def override_suffix(suffix)
+      with(suffix: suffix)
+    end
+
     def suffix
+      return opts[:suffix] if opts.key?(:suffix)
+
       schema = schema_for(self)
       schema.type_attributes.fetch(:suffix, 'json')
     end
@@ -92,7 +98,7 @@ module MediaTypes
         )
       )
     end
-    
+
     def available_validations
       return [] if !validatable?
       [self]
@@ -120,7 +126,7 @@ module MediaTypes
 
     def validatable?
       return false unless media_type_combinations.include? as_key
-      
+
       __getobj__.validatable?(self)
     end
 
