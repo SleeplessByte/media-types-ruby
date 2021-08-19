@@ -33,10 +33,10 @@ DEPENDENCIES
   awesome_print
   bundler (>= 2)
   media_types!
-  minitest (~> 5.0)
+  minitest
   minitest-reporters
   oj
-  rake (>= 12.0)
+  rake
   simplecov
 
 BUNDLED WITH
