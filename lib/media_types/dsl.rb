@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'set'
+
 require 'media_types/constructable'
 require 'media_types/validations'
 

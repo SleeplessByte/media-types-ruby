@@ -46,15 +46,29 @@ module MediaTypes
       end
     end
 
-    def method_missing(method_name, *arguments, **kwargs, &block)
-      if scheme.respond_to?(method_name)
-        media_type.__getobj__.media_type_combinations ||= Set.new
-        media_type.__getobj__.media_type_combinations.add(media_type.as_key)
 
-        return scheme.send(method_name, *arguments, **kwargs, &block)
+    if Gem::Version.new(RUBY_VERSION) > Gem::Version.new('2.7.0')
+      def method_missing(method_name, *arguments, **kwargs, &block)
+        if scheme.respond_to?(method_name)
+          media_type.__getobj__.media_type_combinations ||= Set.new
+          media_type.__getobj__.media_type_combinations.add(media_type.as_key)
+
+          return scheme.send(method_name, *arguments, **kwargs, &block)
+        end
+
+        super
       end
+    else
+      def method_missing(method_name, *arguments, &block)
+        if scheme.respond_to?(method_name)
+          media_type.__getobj__.media_type_combinations ||= Set.new
+          media_type.__getobj__.media_type_combinations.add(media_type.as_key)
 
-      super
+          return scheme.send(method_name, *arguments, &block)
+        end
+
+        super
+      end
     end
 
     def respond_to_missing?(method_name, include_private = false)
