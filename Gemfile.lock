@@ -16,7 +16,7 @@ GEM
       builder
       minitest (>= 5.0)
       ruby-progressbar
-    oj (3.13.1)
+    oj (3.13.10)
     rake (13.0.6)
     ruby-progressbar (1.11.0)
     simplecov (0.21.2)
