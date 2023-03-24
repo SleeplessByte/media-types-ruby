@@ -3,42 +3,41 @@ name: Debian
 on:
   push:
     tags:
-    - '*'
-
+      - "*"
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
-    - name: Set up Ruby 2.5 (debian ruby)
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: 2.5
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        DEBIAN_FRONTEND=noninteractive sudo apt-get --yes install gem2deb bundler ruby-{actionpack,awesome-print,http,minitest,minitest-reporters,oj,simplecov}
-        rm Gemfile.lock || true
-        bundle install --local
-        sudo apt-file update
-    - name: Build
-      run: |
-        bundle exec rake build
-        mkdir debpkg
-        cp pkg/media_types-*.gem media_types.gem
-        #(cd debpkg; gem2tgz media_types.gem)
-        #(cd debpkg; dh-make-ruby media_types-*.tar.gz)
-        #(cd debpkg; dh-make-ruby media_types-*.tar.gz)
-        (cd pkg; gem2deb media_types*.gem)
-        mv pkg/ruby-media-types_*_all.deb ruby-media-types.deb
-    - name: Upload gem
-      uses: actions/upload-artifact@v1
-      with:
-        name: media_types.gem
-        path: media_types.gem
-    - name: Upload deb
-      uses: actions/upload-artifact@v1
-      with:
-        name: ruby-media-types.deb
-        path: ruby-media-types.deb
+      - uses: actions/checkout@v1
+      - name: Set up Ruby 2.7 (debian ruby)
+        uses: ruby/setup-ruby@v2
+        with:
+          ruby-version: 2.7
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          DEBIAN_FRONTEND=noninteractive sudo apt-get --yes install gem2deb bundler ruby-{actionpack,awesome-print,http,minitest,minitest-reporters,oj,simplecov}
+          rm Gemfile.lock || true
+          bundle install --local
+          sudo apt-file update
+      - name: Build
+        run: |
+          bundle exec rake build
+          mkdir debpkg
+          cp pkg/media_types-*.gem media_types.gem
+          #(cd debpkg; gem2tgz media_types.gem)
+          #(cd debpkg; dh-make-ruby media_types-*.tar.gz)
+          #(cd debpkg; dh-make-ruby media_types-*.tar.gz)
+          (cd pkg; gem2deb media_types*.gem)
+          mv pkg/ruby-media-types_*_all.deb ruby-media-types.deb
+      - name: Upload gem
+        uses: actions/upload-artifact@v1
+        with:
+          name: media_types.gem
+          path: media_types.gem
+      - name: Upload deb
+        uses: actions/upload-artifact@v1
+        with:
+          name: ruby-media-types.deb
+          path: ruby-media-types.deb

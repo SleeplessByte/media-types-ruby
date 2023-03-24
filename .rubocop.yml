@@ -1,11 +1,11 @@
 AllCops:
   Include:
-    - '**/Rakefile'
-    - 'lib/**/*.rb'
+    - "**/Rakefile"
+    - "lib/**/*.rb"
   Exclude:
-    - 'Gemfile'
-    - 'bin/**/*'
-  TargetRubyVersion: 2.4
+    - "Gemfile"
+    - "bin/**/*"
+  TargetRubyVersion: 3.0
 
 Layout/EmptyLinesAroundClassBody:
   Enabled: false
