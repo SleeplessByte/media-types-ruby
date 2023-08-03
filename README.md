@@ -81,7 +81,7 @@ class Venue
     
     version 1 do
       attribute :name, String
-      attribute :coords, String
+      attribute :coords, String, optional: :loose
       attribute :updated_at, String
     
       link :self
@@ -467,8 +467,8 @@ class MyMedia
     { "foo": { "bar": "string" } }
     FIXTURE
     assert_fail '{"foo": {}}'
-    assert_fail '{"foo": null}'
-    assert_fail '{"foo": [42]}'
+    assert_fail '{"foo": null}', loose: true
+    assert_fail '{"foo": [42]}', loose: false
   end
 end
 

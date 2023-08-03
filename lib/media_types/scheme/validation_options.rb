@@ -3,18 +3,19 @@
 module MediaTypes
   class Scheme
     class ValidationOptions
-      attr_accessor :exhaustive, :strict, :backtrace, :context, :expected_key_type
+      attr_accessor :exhaustive, :strict, :backtrace, :context, :expected_key_type, :loose
 
-      def initialize(context = {}, exhaustive: true, strict: true, backtrace: [], expected_key_type:)
+      def initialize(context = {}, exhaustive: true, strict: true, backtrace: [], loose: false, expected_key_type:)
         self.exhaustive = exhaustive
         self.strict = strict
         self.backtrace = backtrace
         self.context = context
         self.expected_key_type = expected_key_type
+        self.loose = loose
       end
 
       def inspect
-        "backtrack: #{backtrace.inspect}, strict: #{strict.inspect}, exhaustive: #{exhaustive}, current_obj: #{scoped_output.to_json}"
+        "backtrack: #{backtrace.inspect}, strict: #{strict.inspect}, loose: #{loose}, exhaustive: #{exhaustive}, current_obj: #{scoped_output.to_json}"
       end
 
       def scoped_output
@@ -28,7 +29,7 @@ module MediaTypes
       end
 
       def with_backtrace(backtrace)
-        ValidationOptions.new(context, exhaustive: exhaustive, strict: strict, backtrace: backtrace, expected_key_type: expected_key_type)
+        ValidationOptions.new(context, exhaustive: exhaustive, strict: strict, backtrace: backtrace, expected_key_type: expected_key_type, loose: loose)
       end
 
       def trace(*traces)
@@ -36,7 +37,7 @@ module MediaTypes
       end
 
       def exhaustive!
-        ValidationOptions.new(context, exhaustive: true, strict: strict, backtrace: backtrace, expected_key_type: expected_key_type)
+        ValidationOptions.new(context, exhaustive: true, strict: strict, backtrace: backtrace, expected_key_type: expected_key_type, loose: loose)
       end
     end
   end

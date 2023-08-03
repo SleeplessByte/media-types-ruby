@@ -51,13 +51,14 @@ module MediaTypes
   end
 
   class FixtureData
-    def initialize(caller:, fixture:, expect_to_pass:)
+    def initialize(caller:, fixture:, expect_to_pass:, loose:)
       self.caller = caller
       self.fixture = fixture
       self.expect_to_pass = expect_to_pass
+      self.loose = loose
     end
 
-    attr_accessor :caller, :fixture, :expect_to_pass
+    attr_accessor :caller, :fixture, :expect_to_pass, :loose
 
     alias expect_to_pass? expect_to_pass
   end
@@ -431,14 +432,14 @@ module MediaTypes
       ].join("\n")
     end
 
-    def assert_pass(fixture)
+    def assert_pass(fixture, loose: false)
       reduced_stack = remove_current_dir_from_stack(caller_locations)
-      @fixtures << FixtureData.new(caller: reduced_stack.first, fixture: fixture, expect_to_pass: true)
+      @fixtures << FixtureData.new(caller: reduced_stack.first, fixture: fixture, expect_to_pass: true, loose: loose)
     end
 
-    def assert_fail(fixture)
+    def assert_fail(fixture, loose: false)
       reduced_stack = remove_current_dir_from_stack(caller_locations)
-      @fixtures << FixtureData.new(caller: reduced_stack.first, fixture: fixture, expect_to_pass: false)
+      @fixtures << FixtureData.new(caller: reduced_stack.first, fixture: fixture, expect_to_pass: false, loose: loose)
     end
 
     # Removes all calls originating in current dir from given stack
@@ -496,7 +497,7 @@ module MediaTypes
       expected_key_type = expect_symbol_keys ? Symbol : String
 
       begin
-        validate(json, expected_key_type: expected_key_type, backtrace: backtrace)
+        validate(json, expected_key_type: expected_key_type, backtrace: backtrace, loose: fixture_data.loose)
         unless fixture_data.expect_to_pass?
           raise UnexpectedValidationResultError.new(fixture_data.caller, 'No error encounterd whilst expecting to')
         end

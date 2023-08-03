@@ -26,7 +26,7 @@ module MediaTypes
           return iterate(EMPTY_MARK)
         end
 
-        required_rules = rules.required
+        required_rules = rules.required(loose: options.loose)
         # noinspection RubyScope
         result = iterate(->(key) { required_rules.remove(key) })
         return result if required_rules.empty?

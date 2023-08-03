@@ -29,15 +29,15 @@ module MediaTypes
       attr_accessor :output, :options, :rules
 
       def allow_empty?
-        rules.allow_empty? || rules.required.empty?
+        rules.allow_empty? || rules.required(loose: options.loose).empty?
       end
 
       def raise_empty!(backtrace:, found:)
         raise EmptyOutputError, format(
-          'Expected output, got empty at %<backtrace>s. Required are: %<required>s. Found: %<found>s',
+          'The object at %<backtrace>s was empty but I expected contents. Required keys are: %<required>s.',
           backtrace: backtrace.join('->'),
-          required: rules.required.keys,
-          found: (found.is_a? Hash) ? found.keys : found.class.name,
+          required: rules.required(loose: options.loose).keys,
+          found: (found.respond_to? :keys) ? found.keys : found.class.name,
         )
       end
     end

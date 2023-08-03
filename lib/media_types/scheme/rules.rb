@@ -14,6 +14,7 @@ module MediaTypes
         self.allow_empty = allow_empty
         self.expected_type = expected_type
         self.optional_keys = []
+        self.strict_keys = []
         self.original_key_type = {}
 
         self.default = MissingValidation.new
@@ -32,7 +33,11 @@ module MediaTypes
 
         normalized_key = normalize_key(key)
         __getobj__[normalized_key] = val
-        optional_keys << normalized_key if optional
+        if optional == :loose
+          strict_keys << normalized_key
+        else
+          optional_keys << normalized_key if optional
+        end
         original_key_type[normalized_key] = key.class
 
         self
@@ -87,10 +92,15 @@ module MediaTypes
       #
       # @return [Array<Symbol>] required keys
       #
-      def required
+      def required(loose:)
         clone.tap do |cloned|
           optional_keys.each do |key|
             cloned.delete(key)
+          end
+          if loose
+            strict_keys.each do |key|
+              cloned.delete(key)
+            end
           end
         end
       end
@@ -113,6 +123,9 @@ module MediaTypes
           if rules.respond_to?(:optional_keys, true)
             optional_keys.push(*rules.send(:optional_keys))
           end
+          if rules.respond_to?(:strict_keys, true)
+            strict_keys.push(*rules.send(:strict_keys))
+          end
 
           self
         end
@@ -123,7 +136,7 @@ module MediaTypes
         return "#{prefix}[Error]Depth limit reached[/Error]" if indent > 5_000
 
         [
-          "#{prefix}[Rules n=#{keys.length} optional=#{optional_keys.length} allow_empty=#{allow_empty?}]",
+          "#{prefix}[Rules n=#{keys.length} optional=#{optional_keys.length} strict=#{strict_keys.length} allow_empty=#{allow_empty?}]",
           "#{prefix}  #{inspect_format_attribute(indent, '*', default)}",
           *keys.map { |key| "#{prefix}  #{inspect_format_attribute(indent, key)}" },
           "#{prefix}[/Rules]"
@@ -162,7 +175,7 @@ module MediaTypes
 
       private
 
-      attr_accessor :allow_empty, :optional_keys, :original_key_type
+      attr_accessor :allow_empty, :strict_keys, :optional_keys, :original_key_type
       attr_writer :expected_type
 
       def normalize_key(key)
