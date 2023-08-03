@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.0
+
+ - Add ability to define multiple versions using one block
+
 ## 2.1.1
 
 - Fix Ruby 2.6 to 2.7 incompatible change

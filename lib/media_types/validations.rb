@@ -90,6 +90,19 @@ module MediaTypes
     end
 
     ##
+    # Runs the block for multiple versions
+    #
+    # @param [Array] list of versions to run this on
+    #
+    def versions(versions, &block)
+      versions.each do |v|
+        Validations.new(media_type.version(v), registry) do
+          block(v)
+        end
+      end
+    end
+
+    ##
     # Switches the inner block to a specific view
     #
     # @param [String, Symbol] view the view to switch to
