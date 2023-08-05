@@ -125,6 +125,7 @@ module MediaTypes
     end
 
     def validatable?
+      return false if media_type_combinations.nil?
       return false unless media_type_combinations.include? as_key
 
       __getobj__.validatable?(self)
