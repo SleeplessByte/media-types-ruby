@@ -4,6 +4,8 @@
 
  - Add ability to define multiple versions using one block.
  - Added ability to mark certain attributes as optional when validating with `loose: true` and required otherwise.
+ - Added `index` attribute type that automatically generates a link list compatible with media_types-serialization.
+ - Added support for `collection` to automatically look up a previously defined schema when passing a view.
 
 ## 2.1.1
 
