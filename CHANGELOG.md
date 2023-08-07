@@ -3,9 +3,9 @@
 ## 2.2.0
 
  - Add ability to define multiple versions using one block.
- - Added ability to mark certain attributes as optional when validating with `loose: true` and required otherwise.
- - Added `index` attribute type that automatically generates a link list compatible with media_types-serialization.
- - Added support for `collection` to automatically look up a previously defined schema when passing a view.
+ - Add `index` attribute type that automatically generates a link list compatible with media_types-serialization.
+ - Add support for `collection` to automatically look up a previously defined schema when passing a view.
+ - Add ability to mark certain attributes as optional when validating with `loose: true` and required otherwise.
 
 ## 2.1.1
 
@@ -24,25 +24,25 @@
 
 ## 2.0.0
 
-- Removed ability to set default suffix. All suffixes now default to `+json`.
+- Remove ability to set default suffix. All suffixes now default to `+json`.
 - Suffixes are now set for a given view and version instead of as a block.
-- Added `suffix :yoursuffix` command to override the default `:json` suffix.
-- Removed defaults block.
-- Removed registrations block.
+- Add `suffix :yoursuffix` command to override the default `:json` suffix.
+- Remove defaults block.
+- Remove registrations block.
 
 ## 1.0.0
 
-- Added the ability to do inline tests when defining validations using `assert_pass '<json>'` and `assert_fail '<json>'`.
+- Add the ability to do inline tests when defining validations using `assert_pass '<json>'` and `assert_fail '<json>'`.
 - `media_type` has been replaced with `use_name`.
 - It is no longer possible to set a default version. Please use `version <x> do` instead.
 - You no longer need to specify a custom format string. If you set an organisation with `def self.organisation` or set a module wide organisation with `MediaTypes::set_organisation <module>, '<organisation>'` the library will generate identifiers for you.
 - `self.base_format` has been replaced by `identifier_format do |type:, view:, version:, suffix:|`.
-- Added the `empty` validation to mark an empty object as valid.
-- Added the `identifier` function to get the [Media Type Identifier](https://en.wikipedia.org/wiki/Media_type) for the validator.
-- Added `version(x)` and `view(x)` functions.
-- Added an `available_validations` functions that returns all defined validations.
-- Fixed an issue where validations could accidentally merge if defined with a bad `base_format`.
-- Fixed an issue where undefined validations would accept an empty object.
+- Add the `empty` validation to mark an empty object as valid.
+- Add the `identifier` function to get the [Media Type Identifier](https://en.wikipedia.org/wiki/Media_type) for the validator.
+- Add `version(x)` and `view(x)` functions.
+- Add an `available_validations` functions that returns all defined validations.
+- Fix an issue where validations could accidentally merge if defined with a bad `base_format`.
+- Fix an issue where undefined validations would accept an empty object.
 
 ## 0.6.2
 
