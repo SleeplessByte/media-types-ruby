@@ -94,11 +94,13 @@ module MediaTypes
     #
     # @see MissingValidation
     #
-    def initialize(allow_empty: false, expected_type: ::Object, &block)
+    def initialize(allow_empty: false, expected_type: ::Object, current_type: nil, registry: nil, &block)
       self.rules = Rules.new(allow_empty: allow_empty, expected_type: expected_type)
       self.type_attributes = {}
       self.fixtures = []
       self.asserted_sane = false
+      @registry = registry
+      @current_type = current_type
 
       instance_exec(&block) if block_given?
     end
@@ -270,7 +272,7 @@ module MediaTypes
         return rules.default = Attribute.new(scheme)
       end
 
-      rules.default = Scheme.new(allow_empty: allow_empty, expected_type: expected_type, &block)
+      rules.default = Scheme.new(allow_empty: allow_empty, expected_type: expected_type, registry: @registry, current_type: @current_type, &block)
     end
 
     ##
@@ -348,10 +350,20 @@ module MediaTypes
     #   MyMedia.valid?({ foo: [{ required: 'test', number: 42 }, { required: 'other', number: 0 }] })
     #   # => true
     #
-    def collection(key, scheme = nil, allow_empty: false, expected_type: ::Array, optional: false, &block)
+    def collection(key, scheme = nil, view: nil, allow_empty: false, expected_type: ::Array, optional: false, &block)
       raise ConflictingTypeDefinitionError, 'You cannot apply a block to a non-hash typed collection, either remove the type or the block' if scheme != ::Hash && block_given? && !scheme.nil?
 
       unless block_given?
+        if scheme.nil?
+          dependent_key = @current_type.as_key.dup
+          dependent_key[1] = view
+
+          unless @registry.has_key? dependent_key
+            raise Errors::CollectionDefinitionNotFound.new(@current_type.override_suffix('json').to_s, @current_type.view(view).override_suffix('json').to_s)
+          end
+          scheme = @registry[dependent_key]
+        end
+
         return rules.add(
           key,
           EnumerationOfType.new(
@@ -363,7 +375,16 @@ module MediaTypes
         )
       end
 
-      rules.add(key, Scheme.new(allow_empty: allow_empty, expected_type: expected_type, &block), optional: optional)
+      rules.add(key, Scheme.new(allow_empty: allow_empty, expected_type: expected_type, registry: @registry, current_type: @current_type, &block), optional: optional)
+    end
+
+    ##
+    # Expect an index of links
+    #
+    def index(optional: false)
+      collection(:_links, optional: optional) do
+        link :_self  
+      end
     end
 
     ##

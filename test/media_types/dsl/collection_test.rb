@@ -305,6 +305,33 @@ module MediaTypes
         end
       end
 
+      
+      class IndexCollectionType
+        include MediaTypes::Dsl
+
+        def self.organisation
+          'acme'
+        end
+
+        use_name 'index_test'
+
+        validations do
+          version 1 do
+            attribute :bar, Numeric
+          end
+
+          view :index do
+            version 1 do
+              collection :_embedded
+            end
+          end
+        end
+      end
+
+      def test_index_collections
+        assert IndexCollectionType.view(:index).version(1).validate!({ _embedded: [{ bar: 42 }] }), 'Expected input to be valid'
+      end
+
     end
   end
 end

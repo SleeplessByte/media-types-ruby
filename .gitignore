@@ -10,3 +10,11 @@
 .idea/
 
 /media_types-*.gem
+/media-types-*.tar.gz
+/ruby-media-types-*
+/ruby-media-types_*.deb
+/ruby-media-types_*.buildinfo
+/ruby-media-types_*.changes
+/ruby-media-types_*.debian.tar.xz
+/ruby-media-types_*.dsc
+/ruby-media-types_*.orig.tar.gz

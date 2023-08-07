@@ -15,5 +15,11 @@ module MediaTypes
         super(format('Unable to change key type expectation for %<mod>s since its current expectation is already used', mod: mod.name))
       end
     end
+
+    class CollectionDefinitionNotFound < StandardError
+      def initialize(current, target)
+        super(format('Unable to use %<target>s as a collection inside %<current>s, no such schema has been defined.', current: current, target: target))
+      end
+    end
   end
 end
