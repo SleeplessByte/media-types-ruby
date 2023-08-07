@@ -94,8 +94,10 @@ class Venue
         attribute :altitude, AllowNil(Numeric)
       end
       
-      version 1 do
+      versions [1, 2] do |v|
         collection :location do
+          link :extra if v > 1
+          
           attribute :latitude, Numeric
           attribute :longitude, Numeric
           attribute :altitude, AllowNil(Numeric)
