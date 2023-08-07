@@ -2,6 +2,8 @@
 
 ## 2.2.0
 
+ - Add ability to define multiple versions using one block.
+ - Add ability to mark certain attributes as optional when validating with `loose: true` and required otherwise.
  - Add ability to define multiple versions using one block
 
 ## 2.1.1
