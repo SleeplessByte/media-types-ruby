@@ -1,11 +1,15 @@
 # Changelog
 
-## 2.2.0
+## 2.3.0
 
  - Add ability to define multiple versions using one block.
  - Add `index` attribute type that automatically generates a link list compatible with media_types-serialization.
  - Add support for `collection` to automatically look up a previously defined schema when passing a view.
  - Add ability to mark certain attributes as optional when validating with `loose: true` and required otherwise.
+
+## 2.2.0
+
+ - Change dependencies and build output to be debian compatible
 
 ## 2.1.1
 
