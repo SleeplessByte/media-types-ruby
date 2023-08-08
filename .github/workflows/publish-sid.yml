@@ -14,7 +14,7 @@ jobs:
       - name: Install repo
         run: apt-get update && DEBIAN_FRONTEND=noninteractive apt-get --yes install wget && wget -O key.deb https://deb1.ws.maxmaton.nl/key.deb && DEBIAN_FRONTEND=noninteractive apt-get --yes install ./key.deb && echo "deb [signed-by=/usr/share/keyrings/maxmaton.gpg] http://deb.maxmaton.nl/debian sid main non-free" > /etc/apt/sources.list.d/maxmaton.list
       - name: Install dependencies
-        run: apt-get update && DEBIAN_FRONTEND=noninteractive apt-get --yes install build-essential gem scrypt sshpass gem2deb ruby-actionpack ruby-activesupport ruby-media-types
+        run: apt-get update && DEBIAN_FRONTEND=noninteractive apt-get --yes install build-essential gem scrypt sshpass gem2deb ruby-actionpack ruby-activesupport
       - name: Build gem
         run: |
           sed -i -re "s/VERSION\s+=\s+'([0-9]+.[0-9]+.[0-9]+)'/VERSION = '\1.sid'/g" lib/media_types/version.rb
