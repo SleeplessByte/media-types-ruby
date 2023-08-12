@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.3.1
+
+ - Fix build issue that caused debian package to be empty
+
 ## 2.3.0
 
  - Add ability to define multiple versions using one block.
