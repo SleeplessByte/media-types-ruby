@@ -1,19 +1,23 @@
 # Changelog
 
+## 2.3.2
+
+- Fix that causes bailout in nested rule to stop validation altogether
+
 ## 2.3.1
 
- - Fix build issue that caused debian package to be empty
+- Fix build issue that caused debian package to be empty
 
 ## 2.3.0
 
- - Add ability to define multiple versions using one block.
- - Add `index` attribute type that automatically generates a link list compatible with media_types-serialization.
- - Add support for `collection` to automatically look up a previously defined schema when passing a view.
- - Add ability to mark certain attributes as optional when validating with `loose: true` and required otherwise.
+- Add ability to define multiple versions using one block.
+- Add `index` attribute type that automatically generates a link list compatible with media_types-serialization.
+- Add support for `collection` to automatically look up a previously defined schema when passing a view.
+- Add ability to mark certain attributes as optional when validating with `loose: true` and required otherwise.
 
 ## 2.2.0
 
- - Change dependencies and build output to be debian compatible
+- Change dependencies and build output to be debian compatible
 
 ## 2.1.1
 
