@@ -16,11 +16,24 @@ class LooseValidationTest < Minitest::Test
 
     # default attribute (=hash object)
     validations do
+
       attribute :foo do
         attribute :bar, Numeric, optional: :loose
       end
-      assert_pass '{"foo":{}}', loose: true
-      assert_fail '{"foo":{}}', loose: false
+
+      attribute :baz, String
+
+      # Loose keys don't need to be present in loose mode
+      assert_pass '{"foo":{}, "baz": "hello world"}', loose: true
+
+      # Loose keys must be present in normal mode
+      assert_fail '{"foo":{}, "baz": "hello world"}', loose: false
+
+      # All required keys must be present
+      assert_fail '{"foo":{}}', loose: true
+
+      # Extra keys not allowed (unless not-strict)
+      assert_fail '{"foo":{}, "nope": "unknown"}', loose: true
     end
   end
 
