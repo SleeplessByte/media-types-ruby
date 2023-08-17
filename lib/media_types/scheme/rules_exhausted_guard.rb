@@ -48,11 +48,13 @@ module MediaTypes
 
           mark.call(key)
 
-          rules.get(key).validate!(
-            value,
-            options.trace(key),
-            context: context
-          )
+          catch(:end) do
+            rules.get(key).validate!(
+              value,
+              options.trace(key),
+              context: context
+            )
+          end
         end
       end
 

@@ -383,7 +383,7 @@ module MediaTypes
     #
     def index(optional: false)
       collection(:_links, optional: optional) do
-        link :_self  
+        link :_self
       end
     end
 
