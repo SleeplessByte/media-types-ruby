@@ -27,7 +27,7 @@ module MediaTypes
         assert AttributeType.version(1).valid?({ foo: 1 }), 'Version 1 should validate'
         
         assert AttributeType.version(2).valid?({ foo: 1, bar: 42 }), 'Version 2 should validate'
-        refute AttributeType.version(1).valid({ foo: 1, bar: 42 }), 'bar should only exist in version 2'
+        refute AttributeType.version(1).valid?({ foo: 1, bar: 42 }), 'bar should only exist in version 2'
       end
     end
   end
