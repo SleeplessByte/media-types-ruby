@@ -97,7 +97,7 @@ module MediaTypes
     def versions(versions, &block)
       versions.each do |v|
         Validations.new(media_type.version(v), registry) do
-          block(v)
+          block.call(v)
         end
       end
     end

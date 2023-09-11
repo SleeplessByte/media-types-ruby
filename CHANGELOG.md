@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.3.3
+
+ - Fix crash when defining multiple versions of a validator
+
 ## 2.3.2
 
 - Fix that causes bailout in nested rule to stop validation altogether
