@@ -10,7 +10,7 @@ GEM
     awesome_print (1.9.2)
     builder (3.2.4)
     docile (1.4.0)
-    minitest (5.18.0)
+    minitest (5.23.1)
     minitest-reporters (1.6.0)
       ansi
       builder
