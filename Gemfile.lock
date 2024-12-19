@@ -11,7 +11,7 @@ GEM
     bigdecimal (3.1.8)
     builder (3.3.0)
     docile (1.4.0)
-    minitest (5.25.1)
+    minitest (5.25.4)
     minitest-reporters (1.7.1)
       ansi
       builder
