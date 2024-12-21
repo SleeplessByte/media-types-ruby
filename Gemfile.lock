@@ -17,10 +17,10 @@ GEM
       builder
       minitest (>= 5.0)
       ruby-progressbar
-    oj (3.16.6)
+    oj (3.16.8)
       bigdecimal (>= 3.0)
       ostruct (>= 0.2)
-    ostruct (0.6.0)
+    ostruct (0.6.1)
     rake (13.2.1)
     ruby-progressbar (1.13.0)
     simplecov (0.22.0)
