@@ -8,7 +8,7 @@ GEM
   specs:
     ansi (1.5.0)
     awesome_print (1.9.2)
-    bigdecimal (3.1.8)
+    bigdecimal (3.1.9)
     builder (3.3.0)
     docile (1.4.0)
     minitest (5.25.1)
@@ -17,10 +17,10 @@ GEM
       builder
       minitest (>= 5.0)
       ruby-progressbar
-    oj (3.16.6)
+    oj (3.16.9)
       bigdecimal (>= 3.0)
       ostruct (>= 0.2)
-    ostruct (0.6.0)
+    ostruct (0.6.1)
     rake (13.2.1)
     ruby-progressbar (1.13.0)
     simplecov (0.22.0)
