@@ -1,0 +1,34 @@
+name: Publish debian trixie packages
+
+on:
+  - workflow_dispatch
+
+jobs:
+  publish-trixie:
+    runs-on: ubuntu-latest
+    container:
+      image: debian:trixie
+    steps:
+      - name: Install repo
+        run: apt-get update && DEBIAN_FRONTEND=noninteractive apt-get --yes install wget && wget -O key.deb https://deb1.ws.maxmaton.nl/key.deb && DEBIAN_FRONTEND=noninteractive apt-get --yes install ./key.deb && echo "deb [signed-by=/usr/share/keyrings/maxmaton.gpg] http://deb.maxmaton.nl/debian trixie main non-free" > /etc/apt/sources.list.d/maxmaton.list
+      - name: Install dependencies
+        run: apt-get update && DEBIAN_FRONTEND=noninteractive apt-get --yes install git build-essential gem scrypt sshpass gem2deb ruby-actionpack ruby-activesupport
+      - uses: actions/checkout@v3
+        name: Check out repository
+      - name: Build gem
+        run: |
+          git config --global --add safe.directory "$(pwd)"
+          sed -i -re "s/VERSION\s+=\s+'([0-9]+.[0-9]+.[0-9]+)'/VERSION = '\1.trixie'/g" lib/media_types/version.rb
+          gem build media_types.gemspec
+      - name: Build deb
+        run: DEBEMAIL=info@delftsolutions.nl gem2deb media_types-*.gem && ls -hal
+      - name: Publish
+        env:
+          PUBLISH_SIGNING_KEY: ${{ secrets.PUBLISH_SIGNING_KEY }}
+          SSHPASS: ${{ secrets.SSHPASS }}
+        run: |
+          echo "deb1.ws.maxmaton.nl ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDgN3TiyKvRTj4xBSyQtYz0OuHZYv2i+x3NL+svh2k0SgPr0Xms4Vu+g3AXntXUQGRM0W9zbcZSHiBIWbliv3Y+20f7lKlj9uXUEMHDuiB7Fu7dXObfHswIvTX3XWiPdDeG1jYQbGM3tENX/wtEoixyL++33O69t2SFR5MkPk+/j+zlGLCFf0ypTAMb7bT5NjRNM3+v0LT2WVSZuawA7Fl8WBVTq7MSSuCZIxHIv1kEq6AWpOjWZHNVZrijs+uRTIPcrZ47wSt6tanjAnWT9sAzu8KqcvQsPw9IQwqV1nfQWz0wMit7ijn9B3MrkNHXP5PaNiZQCezsbrh9glhShz0z" > known_hosts
+          echo "deb1.ws.maxmaton.nl ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBMr5uAraiRj0pQ9Q9dQO0xMosTzFUAe+VjtMclIUbdJ7r7XMUa3etxh3BfBlW4nq3ZdIFCsV2zwzTaYSmfh95Xs=" >> known_hosts
+          echo "deb1.ws.maxmaton.nl ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPhQl7Ik6h7hSQbdo9ZfF78WYFCzch8SAOXFBxxAZH06" >> known_hosts
+          echo "Uploading :" ruby-media-types_*.deb
+          scrypt enc --passphrase "env:PUBLISH_SIGNING_KEY" ruby-media-types_*.deb | sshpass -e ssh -o "UserKnownHostsFile=known_hosts" publish@deb1.ws.maxmaton.nl "echo 'uploading trixie' && sudo /opt/max/publish-deb ruby-media-types trixie main && echo 'trixie done'"
