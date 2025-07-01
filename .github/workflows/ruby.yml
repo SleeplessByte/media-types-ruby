@@ -11,7 +11,7 @@ jobs:
       - name: Set up Ruby 3.3
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 3.3.x
+          ruby-version: 3.3
       - name: Build and test with Rake
         run: |
           sudo apt-get update
